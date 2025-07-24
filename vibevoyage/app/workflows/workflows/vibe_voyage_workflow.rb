@@ -10,33 +10,56 @@ module Workflows
     # The ProcessVibeJob or another orchestrator will use this to build Rdawn::Task instances.
     def self.tasks
       [
-        {
+       {
           # Task 1: Use an LLM to parse the user's free-form text into structured data.
           id: :parse_vibe,
           type: :llm_task,
           prompt: <<-PROMPT.strip,
             Analyze the following text and extract key cultural entities. Your goal is to generate clean, useful JSON for a recommendation API.
 
-            Rules:
-            1. CITY IDENTIFICATION - Look for ANY mention of cities, including:
-               - Direct mentions: "Mexico City", "Paris", "Tokyo", "New York", "Madrid", "Toronto"
-               - Local references: "CDMX", "NYC", "SF", "LA"
-               - Contextual clues: "in the capital of France", "Japanese capital"
-               - Country mentions when city isn't specified: "Canada" → "Toronto", "Mexico" → "Mexico City", "France" → "Paris"
-               - If NO location is mentioned at all, use "New York" as default
-               - ALWAYS use the full, standardized city name in English (e.g., "Mexico City" not "CDMX")
+            CRITICAL RULES FOR CITY IDENTIFICATION:
+            1. Look for specific city names mentioned explicitly
+            2. If a state/region is mentioned, identify the main cultural city:
+               - "Yucatan" or "Yucatán" → "Mérida" 
+               - "California" → "Los Angeles" or "San Francisco" (choose based on context)
+               - "Tuscany" → "Florence"
+               - "Andalusia" → "Seville" 
+               - "Catalonia" → "Barcelona"
+               - "Bavaria" → "Munich"
+            3. If country only is mentioned, use the cultural capital:
+               - "Mexico" → "Mexico City" (unless state/region specified)
+               - "France" → "Paris"
+               - "Italy" → "Rome"
+               - "Spain" → "Madrid" 
+               - "Germany" → "Berlin"
+               - "Japan" → "Tokyo"
+            4. Regional food/cultural references help identify locations:
+               - "sopa de lima", "cochinita pibil", "mezcal" + Mexico → likely "Mérida" (Yucatan)
+               - "paella" → "Valencia" 
+               - "tapas" → "Madrid" or "Barcelona"
+               - "ramen" → "Tokyo"
+               - "pasta" → "Rome"
+            5. If NO location is mentioned at all, use "New York" as default
+            6. ALWAYS use the full, standardized city name in English (e.g., "Mérida" not "Yucatan")
 
-            2. Extract ONLY specific place types or venue categories (e.g., 'steakhouse', 'wine bar', 'tapas bar', 'brewery', 'coffee shop', 'cinema', 'tapas bar', 'bookstore', 'park'). 
+            7. Extract ONLY specific place types or venue categories (e.g., 'restaurant', 'bar', 'museum', 'cinema', 'bookstore', 'park'). 
                DO NOT include vague adjectives like 'quiet', 'bohemian', 'trendy'.
 
-            3. Identify general experience themes (e.g., 'culture', 'gastronomy', 'nightlife', 'history', 'nature', 'art').
+            8. Identify general experience themes (e.g., 'culture', 'gastronomy', 'nightlife', 'history', 'nature', 'art').
 
-            4. Respond ONLY with valid JSON, no markdown or extra text.
+            9. Respond ONLY with valid JSON, no markdown or extra text.
 
             User Text: '{{input}}'
 
             Example outputs:
             
+            For "Una tarde agradable en Yucatan Mexico probando sopa de lima con tequila":
+            {
+              "city": "Mérida",
+              "interests": ["restaurant", "tequila bar", "soup"],
+              "preferences": ["gastronomy", "culture"]
+            }
+
             For "A great day in Toronto Canada with wine and the best meat cuts":
             {
               "city": "Toronto",
@@ -51,10 +74,10 @@ module Workflows
               "preferences": ["gastronomy", "culture"]
             }
 
-            For "Exploring Mexico City's vibrant street art and authentic taquerias":
+            For "Exploring California's wine country and art galleries":
             {
-              "city": "Mexico City",
-              "interests": ["street art", "taqueria", "mural"],
+              "city": "San Francisco",
+              "interests": ["winery", "art gallery"],
               "preferences": ["art", "gastronomy", "culture"]
             }
 

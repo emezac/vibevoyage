@@ -176,27 +176,684 @@ class ProcessVibeJobIntelligent < ApplicationJob
     raise e
   end
 
+  # *** FUNCIÓN HÍBRIDA: Usar coordenadas de Qloo + Google Places para enriquecer ***
+  def fetch_google_places_data(parsed_vibe, qloo_data)
+    city = parsed_vibe[:city]
+    interests = parsed_vibe[:interests]
+    
+    puts "=== PROCESANDO DATOS DE QLOO CON ENRIQUECIMIENTO OPCIONAL ==="
+    puts "Ciudad: #{city}"
+    puts "Intereses: #{interests.inspect}"
+    puts "Qloo data present: #{qloo_data&.dig('results', 'entities')&.any? || false}"
+    
+    places_results = []
+    
+    # Si tenemos datos de Qloo, usar esos datos como base
+    if qloo_data && qloo_data.dig('results', 'entities')&.any?
+      puts "=== USANDO COORDENADAS DE QLOO + DATOS DE GOOGLE PLACES ==="
+      qloo_entities = qloo_data.dig('results', 'entities').first(3)
+      
+      qloo_entities.each_with_index do |entity, index|
+        place_name = entity['name']
+        qloo_location = entity['location']
+        qloo_address = entity.dig('properties', 'address')
+        
+        puts "--- Procesando entidad #{index + 1}: #{place_name}"
+        puts "--- Coordenadas de Qloo: #{qloo_location.inspect}"
+        
+        # Usar coordenadas de Qloo como fuente principal
+        if qloo_location && qloo_location['lat'] && qloo_location['lon']
+          coordinates = {
+            'lat' => qloo_location['lat'].to_f,
+            'lng' => qloo_location['lon'].to_f
+          }
+          
+          # Intentar enriquecer con datos de Google Places (opcional)
+          google_data = try_enrich_with_google_places(place_name, city, coordinates)
+          
+          # Si Google Places no funciona, usar datos de Qloo
+          final_google_data = google_data || create_google_data_from_qloo(entity, coordinates)
+          
+          puts "--- ✅ USANDO COORDS DE QLOO: #{place_name} - Coords: #{coordinates.inspect}"
+          
+          places_results << {
+            name: place_name,
+            google_data: final_google_data,
+            qloo_entity: entity
+          }
+        else
+          puts "--- ❌ No hay coordenadas en Qloo para: #{place_name}, buscando en Google..."
+          
+          # Solo buscar en Google Places si Qloo no tiene coordenadas
+          google_result = search_in_google_places_fallback(place_name, city)
+          
+          places_results << {
+            name: place_name,
+            google_data: google_result,
+            qloo_entity: entity
+          }
+        end
+      end
+    else
+      # Fallback: buscar lugares genéricos cuando no hay datos de Qloo
+      puts "=== NO HAY DATOS DE QLOO - USANDO BÚSQUEDA GENÉRICA ==="
+      generic_queries = build_fallback_queries(interests, city)
+      
+      generic_queries.each_with_index do |query, index|
+        puts "--- Generic Query #{index + 1}: #{query}"
+        
+        begin
+          google_result = RdawnApiService.google_places(query: query)
+          
+          if google_result[:success] && google_result[:data]&.dig('results')&.any?
+            best_place = find_best_matching_place(google_result[:data]['results'], city)
+            
+            if best_place
+              coordinates = best_place.dig('geometry', 'location')
+              puts "--- ✅ LUGAR GENÉRICO ENCONTRADO: #{best_place['name']} - Coords: #{coordinates.inspect}"
+              
+              places_results << {
+                name: best_place['name'],
+                google_data: best_place,
+                qloo_entity: nil
+              }
+            end
+          end
+        rescue => e
+          puts "--- ❌ ERROR en búsqueda genérica: #{e.message}"
+        end
+      end
+    end
+    
+    # Si no encontramos nada, crear fallback con LLM
+    if places_results.empty? || places_results.all? { |r| r[:google_data].nil? }
+      puts "=== CREANDO FALLBACK CON LLM ==="
+      fallback_place = create_fallback_place_with_coordinates(city, interests.first)
+      places_results << fallback_place if fallback_place
+    end
+    
+    puts "=== RESULTADO FINAL ==="
+    puts "Total lugares encontrados: #{places_results.size}"
+    places_results.each_with_index do |result, index|
+      coords = result[:google_data]&.dig('geometry', 'location')
+      puts "#{index + 1}. #{result[:name]} - Coords: #{coords&.inspect || 'SIN COORDENADAS'}"
+    end
+    
+    Rails.logger.info "--- Total places found: #{places_results.size}"
+    places_results
+  end
+
+  # Función para crear datos de Google Places desde Qloo
+  def create_google_data_from_qloo(entity, coordinates)
+    {
+      'name' => entity['name'],
+      'formatted_address' => entity.dig('properties', 'address') || "#{entity['name']}",
+      'geometry' => {
+        'location' => coordinates
+      },
+      'place_id' => entity['entity_id'] || "qloo_#{SecureRandom.hex(4)}",
+      'rating' => entity.dig('properties', 'business_rating')&.to_f || 4.0,
+      'types' => extract_types_from_qloo_entity(entity)
+    }
+  end
+
+  # Función opcional para enriquecer con Google Places (puede fallar)
+  def try_enrich_with_google_places(place_name, city, qloo_coordinates)
+    puts "--- Intentando enriquecer #{place_name} con Google Places..."
+    
+    begin
+      query = "#{place_name} #{city}"
+      google_result = RdawnApiService.google_places(query: query)
+      
+      if google_result[:success] && google_result[:data]&.dig('results')&.any?
+        results = google_result[:data]['results']
+        
+        # Buscar resultado que esté cerca de las coordenadas de Qloo
+        best_match = results.find do |place|
+          google_coords = place.dig('geometry', 'location')
+          next false unless google_coords
+          
+          # Verificar si están cerca (dentro de ~1km)
+          distance = calculate_distance(
+            qloo_coordinates['lat'], qloo_coordinates['lng'],
+            google_coords['lat'], google_coords['lng']
+          )
+          
+          distance < 1.0 # Menos de 1km de diferencia
+        end
+        
+        if best_match
+          # Usar coordenadas de Qloo pero otros datos de Google
+          best_match['geometry']['location'] = qloo_coordinates
+          puts "--- ✅ Enriquecido con Google Places: #{best_match['name']}"
+          return best_match
+        end
+      end
+      
+      puts "--- No se pudo enriquecer con Google Places"
+      return nil
+      
+    rescue => e
+      puts "--- Error enriqueciendo con Google Places: #{e.message}"
+      return nil
+    end
+  end
+
+  # Función para calcular distancia entre coordenadas
+  def calculate_distance(lat1, lon1, lat2, lon2)
+    rad_per_deg = Math::PI / 180
+    rlat1 = lat1 * rad_per_deg
+    rlat2 = lat2 * rad_per_deg
+    dlat = rlat2 - rlat1
+    dlon = (lon2 - lon1) * rad_per_deg
+    
+    a = Math.sin(dlat/2)**2 + Math.cos(rlat1) * Math.cos(rlat2) * Math.sin(dlon/2)**2
+    c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+    
+    6371 * c # Distancia en kilómetros
+  end
+
+  # Función para extraer tipos de lugar basándose en los tags de Qloo
+  def extract_types_from_qloo_entity(entity)
+    tags = entity['tags'] || []
+    types = []
+    
+    tags.each do |tag|
+      tag_name = tag['name']&.downcase
+      case tag_name
+      when /hotel|hostel/
+        types << 'lodging'
+      when /restaurant/
+        types << 'restaurant'
+      when /bar/
+        types << 'bar'
+      when /museum/
+        types << 'museum'
+      when /park/
+        types << 'park'
+      end
+    end
+    
+    types << 'point_of_interest' if types.empty?
+    types << 'establishment'
+    
+    types.uniq
+  end
+
+  # Fallback solo cuando Qloo no tiene coordenadas
+  def search_in_google_places_fallback(place_name, city)
+    query = "#{place_name} #{city}"
+    puts "--- Fallback Google search: #{query}"
+    
+    begin
+      google_result = RdawnApiService.google_places(query: query)
+      
+      if google_result[:success] && google_result[:data]&.dig('results')&.any?
+        best_place = find_best_matching_place(google_result[:data]['results'], city, place_name)
+        puts "--- ✅ Fallback encontrado: #{best_place['name']}" if best_place
+        return best_place
+      else
+        puts "--- ❌ No se encontró en Google Places: #{query}"
+        return nil
+      end
+    rescue => e
+      puts "--- ❌ Error en fallback de Google: #{e.message}"
+      return nil
+    end
+  end
+
+  # Nueva función para crear un lugar de fallback usando LLM para coordenadas
+  def create_fallback_place_with_coordinates(city, interest)
+    prompt = <<-PROMPT.strip
+      Necesito las coordenadas aproximadas del centro de la ciudad para crear un marcador de fallback.
+      
+      Ciudad: #{city}
+      Interés del usuario: #{interest}
+      
+      Proporciona:
+      1. Latitud y longitud del centro histórico/turístico principal de #{city}
+      2. Un nombre apropiado para el lugar (ej: "Centro Cultural de [Ciudad]", "Plaza Principal de [Ciudad]")
+      
+      Responde en formato JSON:
+      {
+        "latitude": 00.0000,
+        "longitude": 00.0000,
+        "place_name": "Nombre del lugar"
+      }
+    PROMPT
+
+    begin
+      llm_interface = Rdawn::LLMInterface.new(api_key: ENV['OPENAI_API_KEY'])
+      task = Rdawn::Task.new(
+        task_id: "fallback_coords_#{SecureRandom.hex(4)}",
+        name: "Generate Fallback Coordinates",
+        is_llm_task: true,
+        input_data: { prompt: prompt }
+      )
+      
+      workflow = Rdawn::Workflow.new(workflow_id: "coords_generator", name: "Coordinates Generator")
+      workflow.add_task(task)
+      
+      agent = Rdawn::Agent.new(workflow: workflow, llm_interface: llm_interface)
+      result = agent.run
+      
+      llm_response = result.tasks.values.first.output_data[:llm_response]
+      coords_data = extract_json_from_llm_response(llm_response)
+      
+      latitude = coords_data['latitude'].to_f
+      longitude = coords_data['longitude'].to_f
+      place_name = coords_data['place_name'] || "Centro Cultural de #{city}"
+      
+      puts "--- ✅ CREANDO FALLBACK con LLM: #{place_name} - Coords: {lat: #{latitude}, lng: #{longitude}}"
+      
+      {
+        name: place_name,
+        google_data: {
+          'name' => place_name,
+          'formatted_address' => "Centro, #{city}",
+          'geometry' => {
+            'location' => { 'lat' => latitude, 'lng' => longitude }
+          },
+          'place_id' => "fallback_#{city.downcase.gsub(' ', '_')}",
+          'rating' => 4.2
+        },
+        qloo_entity: nil
+      }
+      
+    rescue => e
+      puts "--- Error generando fallback con LLM: #{e.message}"
+      Rails.logger.error "--- Error generating fallback coordinates: #{e.message}"
+      
+      # Fallback del fallback - coordenadas muy básicas
+      {
+        name: "Centro de #{city}",
+        google_data: {
+          'name' => "Centro de #{city}",
+          'formatted_address' => "Centro, #{city}",
+          'geometry' => {
+            'location' => { 'lat' => 0.0, 'lng' => 0.0 }
+          },
+          'place_id' => "emergency_fallback",
+          'rating' => 4.0
+        },
+        qloo_entity: nil
+      }
+    end
+  end
+
+  def build_fallback_queries(interests, city)
+    queries = []
+    
+    # Construir búsquedas más específicas basadas en los intereses
+    interests.each do |interest|
+      case interest
+      when /soup|restaurant|food/
+        queries << "restaurantes #{city}"
+        queries << "comida tradicional #{city}"
+        queries << "restaurante auténtico #{city}"
+      when /tequila|mezcal|bar|craft beer/
+        queries << "bar #{city}"
+        queries << "cantina #{city}"
+        queries << "cerveza artesanal #{city}"
+      when /art|museum/
+        queries << "museo #{city}"
+        queries << "galería de arte #{city}"
+        queries << "museo de arte #{city}"
+      when /cinema|movie/
+        queries << "cine #{city}"
+        queries << "cinema #{city}"
+        queries << "teatro #{city}"
+      when /culture/
+        queries << "centro cultural #{city}"
+        queries << "sitio histórico #{city}"
+        queries << "atracción cultural #{city}"
+      else
+        queries << "#{interest} #{city}"
+      end
+    end
+    
+    # Si no hay queries específicas, usar términos genéricos garantizados
+    if queries.empty?
+      queries = [
+        "restaurantes #{city}",
+        "atracciones turísticas #{city}",
+        "lugares de interés #{city}"
+      ]
+    end
+    
+    # Asegurar que siempre tengamos al menos 3 queries diferentes
+    while queries.size < 3
+      queries += [
+        "centro histórico #{city}",
+        "plaza principal #{city}",
+        "catedral #{city}",
+        "parque #{city}",
+        "mercado #{city}"
+      ]
+    end
+    
+    puts "--- Queries generadas: #{queries.uniq.first(3).inspect}"
+    queries.uniq.first(3)
+  end
+
+  def build_fallback_queries(interests, city)
+    queries = []
+    
+    # Construir búsquedas más específicas basadas en los intereses
+    interests.each do |interest|
+      case interest
+      when /soup|restaurant|food/
+        queries << "restaurantes #{city}"
+        queries << "comida tradicional #{city}"
+        queries << "restaurante auténtico #{city}"
+      when /tequila|mezcal|bar|craft beer/
+        queries << "bar #{city}"
+        queries << "cantina #{city}"
+        queries << "cerveza artesanal #{city}"
+      when /art|museum/
+        queries << "museo #{city}"
+        queries << "galería de arte #{city}"
+        queries << "museo de arte #{city}"
+      when /cinema|movie/
+        queries << "cine #{city}"
+        queries << "cinema #{city}"
+        queries << "teatro #{city}"
+      when /culture/
+        queries << "centro cultural #{city}"
+        queries << "sitio histórico #{city}"
+        queries << "atracción cultural #{city}"
+      else
+        queries << "#{interest} #{city}"
+      end
+    end
+    
+    # Si no hay queries específicas, usar términos genéricos garantizados
+    if queries.empty?
+      queries = [
+        "restaurantes #{city}",
+        "atracciones turísticas #{city}",
+        "lugares de interés #{city}"
+      ]
+    end
+    
+    # Asegurar que siempre tengamos al menos 3 queries diferentes
+    while queries.size < 3
+      queries += [
+        "centro histórico #{city}",
+        "plaza principal #{city}",
+        "catedral #{city}",
+        "parque #{city}",
+        "mercado #{city}"
+      ]
+    end
+    
+    puts "--- Queries generadas: #{queries.uniq.first(3).inspect}"
+    queries.uniq.first(3)
+  end
+
+  # Nueva función para encontrar el mejor resultado usando LLM
+  def find_best_matching_place(results, target_city, place_name = nil)
+    return nil if results.empty?
+    
+    puts "--- Evaluating #{results.size} results for city: #{target_city} and place: #{place_name}"
+    
+    # Si solo hay un resultado, usarlo directamente
+    if results.size == 1
+      puts "--- Only one result, using it: #{results.first['name']}"
+      return results.first
+    end
+    
+    # Usar LLM para encontrar el mejor match
+    places_data = results.map.with_index do |place, index|
+      {
+        index: index,
+        name: place['name'],
+        address: place['formatted_address'],
+        rating: place['rating'],
+        types: place['types']&.join(', ')
+      }
+    end
+    
+    prompt = <<-PROMPT.strip
+      Necesito que selecciones el mejor lugar de esta lista basándote en los criterios dados.
+
+      CRITERIOS DE BÚSQUEDA:
+      - Ciudad objetivo: #{target_city}
+      - Lugar específico buscado: #{place_name || 'cualquier lugar relevante'}
+
+      OPCIONES DISPONIBLES:
+      #{places_data.map { |p| "#{p[:index]}. #{p[:name]} - #{p[:address]} (Rating: #{p[:rating]} | Tipos: #{p[:types]})" }.join("\n")}
+
+      INSTRUCCIONES:
+      1. Selecciona el lugar que mejor coincida con la ciudad objetivo "#{target_city}"
+      2. Si hay un nombre específico "#{place_name}", prioriza lugares con nombres similares
+      3. Considera la ubicación geográfica (la dirección debe estar en o cerca de #{target_city})
+      4. En caso de empate, prefiere el lugar con mejor rating
+      5. Responde SOLO con el número del índice (0, 1, 2, etc.)
+
+      RESPUESTA (solo el número):
+    PROMPT
+
+    begin
+      llm_interface = Rdawn::LLMInterface.new(api_key: ENV['OPENAI_API_KEY'])
+      task = Rdawn::Task.new(
+        task_id: "match_place_#{SecureRandom.hex(4)}",
+        name: "Find Best Matching Place",
+        is_llm_task: true,
+        input_data: { prompt: prompt }
+      )
+      
+      workflow = Rdawn::Workflow.new(workflow_id: "place_matcher", name: "Place Matcher")
+      workflow.add_task(task)
+      
+      agent = Rdawn::Agent.new(workflow: workflow, llm_interface: llm_interface)
+      result = agent.run
+      
+      llm_response = result.tasks.values.first.output_data[:llm_response].strip
+      selected_index = llm_response.to_i
+      
+      if selected_index >= 0 && selected_index < results.size
+        selected_place = results[selected_index]
+        puts "--- LLM selected index #{selected_index}: #{selected_place['name']}"
+        return selected_place
+      else
+        puts "--- LLM returned invalid index #{selected_index}, using first result"
+        return results.first
+      end
+      
+    rescue => e
+      puts "--- Error using LLM for place matching: #{e.message}"
+      Rails.logger.error "--- Error using LLM for place matching: #{e.message}"
+      
+      # Fallback: usar el primer resultado
+      puts "--- Using first result as fallback: #{results.first['name']}"
+      return results.first
+    end
+  end
+
+  def extract_area_from_google_data(google_data, city)
+    return "Centro" unless google_data&.dig('formatted_address')
+    
+    address = google_data['formatted_address']
+    
+    prompt = <<-PROMPT.strip
+      Extrae el nombre del área, barrio o distrito de esta dirección:
+      
+      Dirección: "#{address}"
+      Ciudad: #{city}
+      
+      Instrucciones:
+      - Extrae SOLO el nombre del área/barrio/distrito (ej: "Roma Norte", "Centro Histórico", "Polanco")
+      - NO incluyas códigos postales, números, o la ciudad principal
+      - Si no hay área específica, responde "Centro"
+      - Responde en máximo 3 palabras
+      
+      Área:
+    PROMPT
+
+    begin
+      llm_interface = Rdawn::LLMInterface.new(api_key: ENV['OPENAI_API_KEY'])
+      task = Rdawn::Task.new(
+        task_id: "extract_area_#{SecureRandom.hex(4)}",
+        name: "Extract Area from Address",
+        is_llm_task: true,
+        input_data: { prompt: prompt }
+      )
+      
+      workflow = Rdawn::Workflow.new(workflow_id: "area_extractor", name: "Area Extractor")
+      workflow.add_task(task)
+      
+      agent = Rdawn::Agent.new(workflow: workflow, llm_interface: llm_interface)
+      result = agent.run
+      
+      area = result.tasks.values.first.output_data[:llm_response].strip
+      
+      # Limpiar la respuesta
+      area = area.gsub(/['""]/, '').strip
+      area = area.split(',').first&.strip || "Centro"
+      
+      puts "--- LLM extracted area: '#{area}' from address: #{address}"
+      area
+      
+    rescue => e
+      puts "--- Error extracting area with LLM: #{e.message}"
+      "Centro"
+    end
+  end
+
+  def calculate_vibe_match_with_google(qloo_entity, google_data, parsed_vibe)
+    # Calcular match basado en datos disponibles
+    base_score = qloo_entity ? calculate_vibe_match(qloo_entity, parsed_vibe) : 75
+    
+    # Bonus por tener datos de Google Places
+    google_bonus = google_data ? 10 : 0
+    
+    # Bonus por rating alto
+    rating_bonus = if google_data&.dig('rating')
+      rating = google_data['rating'].to_f
+      case rating
+      when 4.5..5.0 then 15
+      when 4.0..4.4 then 10
+      when 3.5..3.9 then 5
+      else 0
+      end
+    else
+      0
+    end
+    
+    # Bonus por relevancia de tipos
+    type_bonus = if google_data&.dig('types')
+      types = google_data['types']
+      relevant_types = ['restaurant', 'food', 'bar', 'cafe', 'museum', 'tourist_attraction']
+      (types & relevant_types).any? ? 5 : 0
+    else
+      0
+    end
+    
+    final_score = [base_score + google_bonus + rating_bonus + type_bonus, 100].min
+    puts "--- Calculated vibe match: #{final_score}% (base: #{base_score}, google: #{google_bonus}, rating: #{rating_bonus}, type: #{type_bonus})"
+    
+    final_score
+  end
+
+  # Eliminar las funciones de hardcoding
+  def get_city_variations(city)
+    # Ya no necesitamos hardcodear variaciones
+    [city]
+  end
+
+  def similar_names?(name1, name2)
+    return false unless name1 && name2
+    
+    # Usar LLM para comparación más inteligente si es necesario
+    # Por ahora, comparación simple
+    name1.downcase.include?(name2.downcase) || name2.downcase.include?(name1.downcase)
+  end
+
+  def extract_area_from_google_data(google_data, city)
+    # Extraer área/distrito de la dirección de Google Places
+    if google_data && google_data['formatted_address']
+      address_parts = google_data['formatted_address'].split(',').map(&:strip)
+      
+      # Buscar el área que no sea la ciudad principal
+      area_candidates = address_parts.reject do |part|
+        part.downcase.include?(city.downcase) ||
+        part.match?(/^\d/) || # No códigos postales
+        part.length < 3 ||    # No partes muy cortas
+        part.downcase.include?('mexico') ||
+        part.downcase.include?('yuc') ||
+        part.downcase.include?('n.l.')
+      end
+      
+      # Devolver la primera parte válida o un default
+      area_candidates.first || "Centro"
+    else
+      # Fallback basado en la ciudad
+      case city
+      when "Mérida"
+        "Centro Histórico"
+      when "Monterrey"
+        "Centro"
+      when "Mexico City"
+        "Roma Norte"
+      else
+        "Distrito 1"
+      end
+    end
+  end
+
+  def calculate_vibe_match_with_google(qloo_entity, google_data, parsed_vibe)
+    # Calcular match basado en datos de Qloo y Google
+    base_score = qloo_entity ? calculate_vibe_match(qloo_entity, parsed_vibe) : 85
+    
+    # Bonus por tener datos de Google Places
+    google_bonus = google_data ? 10 : 0
+    
+    # Bonus por rating alto
+    rating_bonus = if google_data&.dig('rating')
+      rating = google_data['rating'].to_f
+      rating >= 4.5 ? 5 : rating >= 4.0 ? 3 : 0
+    else
+      0
+    end
+    
+    [base_score + google_bonus + rating_bonus, 100].min
+  end
+
+  # *** FUNCIÓN ACTUALIZADA: Curate con ubicaciones de Google ***
   def curate_experiences_with_explanations(parsed_vibe, qloo_data)
     puts "=== Curando experiencias con explicaciones culturales ==="
     
     city = parsed_vibe[:city]
     qloo_entities = qloo_data&.dig('results', 'entities') || []
     
-    if qloo_entities.empty?
-      puts "=== No hay datos de Qloo, usando experiencias de fallback ==="
+    puts "=== EJECUTANDO BÚSQUEDA GOOGLE PLACES DESDE CURATE ==="
+    
+    # *** LLAMAR A GOOGLE PLACES AQUÍ ***
+    google_places_results = fetch_google_places_data(parsed_vibe, qloo_data)
+    
+    if google_places_results.empty?
+      puts "=== No hay datos de Google Places, usando experiencias de fallback ==="
       return create_fallback_experiences_with_explanations(parsed_vibe)
     end
 
-    # Seleccionar las mejores 3 entidades
-    selected_entities = qloo_entities.first(3)
-    
-    experiences = selected_entities.map.with_index do |entity, index|
+    experiences = google_places_results.first(3).map.with_index do |place_result, index|
+      qloo_entity = place_result[:qloo_entity]
+      google_data = place_result[:google_data]
+      
+      # Extraer coordenadas de Google Places
+      location = google_data&.dig('geometry', 'location') || {}
+      latitude = location['lat']
+      longitude = location['lng']
+      
+      puts "--- Procesando experiencia #{index + 1}: #{place_result[:name]} - Coords: #{latitude}, #{longitude}"
+      
       # Extraer keywords de Qloo para contexto cultural
-      qloo_keywords = entity.dig('properties', 'keywords') || []
+      qloo_keywords = qloo_entity&.dig('properties', 'keywords')&.map { |k| k['name'] } || []
       
       # Generar explicación cultural usando LLM
       cultural_explanation = generate_cultural_explanation(
-        entity, 
+        qloo_entity || { 'name' => place_result[:name] }, 
         parsed_vibe, 
         qloo_keywords, 
         index
@@ -204,22 +861,32 @@ class ProcessVibeJobIntelligent < ApplicationJob
       
       {
         time: ["10:00 AM", "02:00 PM", "07:30 PM"][index],
-        title: generate_experience_title(entity, index),
-        location: entity['name'] || "Lugar Especial",
-        description: entity.dig('properties', 'summary') || "Una experiencia cultural única.",
+        title: generate_experience_title(qloo_entity || { 'name' => place_result[:name] }, index),
+        location: place_result[:name],
+        description: qloo_entity&.dig('properties', 'description') || google_data&.dig('editorial_summary', 'overview') || "Una experiencia cultural única.",
         cultural_explanation: cultural_explanation,
         duration: ["2 hours", "2.5 hours", "3 hours"][index],
-        area: extract_area_from_entity(entity, city),
-        vibe_match: calculate_vibe_match(entity, parsed_vibe),
-        rating: entity.dig('properties', 'business_rating') || rand(4.0..5.0).round(1),
+        area: extract_area_from_google_data(google_data, city),
+        vibe_match: calculate_vibe_match_with_google(qloo_entity, google_data, parsed_vibe),
+        rating: google_data&.dig('rating') || qloo_entity&.dig('properties', 'business_rating') || rand(4.0..5.0).round(1),
         image: get_experience_image(index),
+        # *** CAMPOS DE GOOGLE PLACES CON DEBUG ***
+        latitude: latitude&.to_f,
+        longitude: longitude&.to_f,
+        place_id: google_data&.dig('place_id'),
+        formatted_address: google_data&.dig('formatted_address'),
         qloo_keywords: qloo_keywords,
-        why_chosen: generate_why_chosen(entity, parsed_vibe, qloo_keywords),
-        qloo_entity: entity
+        why_chosen: generate_why_chosen(qloo_entity || { 'name' => place_result[:name] }, parsed_vibe, qloo_keywords),
+        qloo_entity: qloo_entity,
+        google_data: google_data
       }
     end
     
-    puts "✅ Curadas #{experiences.size} experiencias con explicaciones"
+    puts "✅ Curadas #{experiences.size} experiencias con ubicaciones de Google Maps"
+    experiences.each_with_index do |exp, index|
+      puts "   #{index + 1}. #{exp[:location]} - Coords: #{exp[:latitude]}, #{exp[:longitude]}"
+    end
+    
     experiences
   end
 
@@ -229,7 +896,7 @@ class ProcessVibeJobIntelligent < ApplicationJob
 
       Usuario busca: #{parsed_vibe[:interests].join(', ')} en #{parsed_vibe[:city]}
       Lugar: #{entity['name']}
-      Descripción: #{entity.dig('properties', 'summary')}
+      Descripción: #{entity.dig('properties', 'description') || entity.dig('properties', 'summary')}
       Keywords culturales: #{qloo_keywords.join(', ')}
       
       Explica en un párrafo evocador (máximo 100 palabras) por qué este lugar es perfecto para #{index == 0 ? 'comenzar' : index == 1 ? 'continuar' : 'culminar'} su aventura cultural. 
@@ -243,7 +910,7 @@ class ProcessVibeJobIntelligent < ApplicationJob
     begin
       llm_interface = Rdawn::LLMInterface.new(api_key: ENV['OPENAI_API_KEY'])
       task = Rdawn::Task.new(
-        task_id: "explain_#{entity['id'] || SecureRandom.hex(4)}",
+        task_id: "explain_#{entity['entity_id'] || entity['id'] || SecureRandom.hex(4)}",
         name: "Generate Cultural Explanation",
         is_llm_task: true,
         input_data: { prompt: prompt }
