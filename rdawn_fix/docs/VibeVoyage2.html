@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VibeVoyage - Tu Curador de Itinerarios Agéntico</title>
+    
+    <!-- Tailwind CSS desde CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Hotwire (Turbo) desde CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@hotwired/turbo@8.0.3/dist/turbo.es207-umd.js"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Glassmorphism utilities */
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.4);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.3); }
+            50% { transform: scale(1.02); box-shadow: 0 0 20px 10px rgba(255, 255, 255, 0); }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        .slide-in-left {
+            animation: slideInLeft 0.6s ease-out forwards;
+        }
+
+        .pulse-glow-subtle {
+            animation: pulse 3s ease-in-out infinite;
+        }
+        
+        /* Hover effects */
+        .hover-lift {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 20px 60px 0 rgba(31, 38, 135, 0.5);
+        }
+
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #ffffff 0%, #e0c3fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.1); }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.3); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.5); }
+
+        /* Floating elements */
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* Progress bar glow */
+        .progress-glow {
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body class="text-white overflow-x-hidden">
+
+    <!-- Animated background particles -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div class="absolute top-20 left-10 w-4 h-4 bg-white/20 rounded-full floating" style="animation-delay: 0s;"></div>
+        <div class="absolute top-40 right-20 w-6 h-6 bg-white/15 rounded-full floating" style="animation-delay: 2s;"></div>
+        <div class="absolute bottom-40 left-20 w-3 h-3 bg-white/25 rounded-full floating" style="animation-delay: 4s;"></div>
+        <div class="absolute bottom-20 right-10 w-5 h-5 bg-white/20 rounded-full floating" style="animation-delay: 1s;"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="glass fixed top-0 w-full z-50 transition-all duration-300">
+        <nav class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <h1 class="text-3xl font-bold gradient-text">VibeVoyage</h1>
+                <div class="hidden md:flex space-x-8 text-white/80 items-center">
+                    <a href="#" class="hover:text-white transition-colors text-lg">Inicio</a>
+                    <a href="#" class="hover:text-white transition-colors text-lg">Experiencias</a>
+                    <a href="#" class="hover:text-white transition-colors text-lg">Acerca</a>
+                    <button class="glass-card px-5 py-2 rounded-xl font-semibold hover:bg-white/20 transition-all duration-300">Iniciar Sesión</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 pt-32 pb-20 relative z-10">
+
+        <!-- Hero Section -->
+        <section id="magic-canvas" class="text-center max-w-4xl mx-auto fade-in-up">
+            <div class="mb-8">
+                <h2 class="text-6xl md:text-7xl font-black tracking-tight mb-6 leading-tight">
+                    ¿Cuál es tu <span class="gradient-text pulse-glow-subtle">vibe</span> para hoy?
+                </h2>
+                <p class="text-xl md:text-2xl text-white/80 font-light leading-relaxed">
+                    Describe tu día perfecto, tus gustos, tus pasiones.<br>
+                    Nuestro agente de IA creará una <span class="text-white font-semibold">sinfonía de experiencias</span> solo para ti.
+                </p>
+            </div>
+
+            <form class="mt-12" action="#progress-container" method="post">
+                <div class="glass-card p-8 rounded-3xl hover-lift">
+                    <textarea 
+                        name="user_vibe"
+                        rows="5" 
+                        class="w-full p-6 text-lg bg-white/10 border-none focus:ring-2 focus:ring-white/30 resize-none rounded-2xl text-white placeholder-white/60 backdrop-blur-sm"
+                        placeholder="Ej: 'Quiero un sábado en CDMX. Me encanta el cine de Guillermo del Toro, los tacos al pastor, el rock en español de los 90 y el arte surrealista...'"
+                    ></textarea>
+                    
+                    <button type="submit" class="mt-6 w-full bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-white font-bold py-6 px-8 rounded-2xl hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-white/30 transition-all duration-300 ease-in-out flex items-center justify-center text-xl group relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 mr-4 relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                        </svg>
+                        <span class="relative z-10">Curar Mi Experiencia</span>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Progress Section -->
+        <section id="progress-container" class="max-w-4xl mx-auto mt-20 slide-in-left">
+            <turbo-frame id="progress-frame">
+                <div class="glass-card p-10 rounded-3xl hover-lift">
+                    <div class="text-center mb-8">
+                        <h3 class="text-3xl font-bold text-white mb-4">Tu conserje personal está trabajando</h3>
+                        <div class="w-full bg-white/20 rounded-full h-3 mb-6 overflow-hidden">
+                            <div class="bg-gradient-to-r from-purple-400 to-pink-400 h-3 rounded-full progress-glow" style="width: 60%; transition: width 1s ease-in-out;"></div>
+                        </div>
+                    </div>
+                    
+                    <ul id="progress-steps" class="space-y-6">
+                        <li class="flex items-center p-4 glass rounded-2xl"><div class="bg-gradient-to-r from-green-400 to-emerald-500 rounded-full p-2 mr-4"><svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg></div><span class="font-semibold text-lg">[Task 1] Vibe analizado y deconstruido ✨</span></li>
+                        <li class="flex items-center p-4 glass rounded-2xl"><div class="bg-gradient-to-r from-green-400 to-emerald-500 rounded-full p-2 mr-4"><svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg></div><span class="font-semibold text-lg">[Task 2] Consultando el oráculo cultural (Qloo) 🔮</span></li>
+                        <li class="flex items-center p-4 glass rounded-2xl pulse-glow-subtle"><div class="bg-gradient-to-r from-purple-400 to-pink-500 rounded-full p-2 mr-4"><svg class="animate-spin w-6 h-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg></div><span class="font-semibold text-lg">[Task 3] Sintetizando temas ocultos 🧠</span></li>
+                        <li class="flex items-center p-4 glass rounded-2xl opacity-60"><div class="bg-white/20 rounded-full p-2 mr-4"><svg class="w-6 h-6 text-white/60" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0110 2zM5.22 6.22a.75.75 0 011.06 0l1.06 1.06a.75.75 0 01-1.06 1.06L5.22 7.28a.75.75 0 010-1.06zM2 10a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5h-1.5A.75.75 0 012 10zM5.22 13.78a.75.75 0 010 1.06l-1.06 1.06a.75.75 0 01-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zM10 18a.75.75 0 01-.75-.75v-1.5a.75.75 0 011.5 0v1.5A.75.75 0 0110 18zM14.78 13.78a.75.75 0 01-1.06 0l-1.06-1.06a.75.75 0 011.06-1.06l1.06 1.06a.75.75 0 010 1.06zM18 10a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0118 10zM14.78 6.22a.75.75 0 010-1.06l1.06-1.06a.75.75 0 011.06 1.06l-1.06 1.06a.75.75 0 01-1.06 0z"/></svg></div><span class="font-medium text-lg text-white/60">[Task 4] Escribiendo tu historia ✍️</span></li>
+                        <li class="flex items-center p-4 glass rounded-2xl opacity-60"><div class="bg-white/20 rounded-full p-2 mr-4"><svg class="w-6 h-6 text-white/60" fill="currentColor" viewBox="0 0 20 20"><path d="M5.433 13.917l1.262-3.155A4 4 0 017.58 9.42l6.92-6.918a2.121 2.121 0 013 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 01-.65-.65z"/><path d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0110 6H4.75A.25.25 0 004.5 6.25v10.5c0 .138.112.25.25.25h10.5A.25.25 0 0015.5 16.5V10a.75.75 0 011.5 0v6.5A1.75 1.75 0 0115.25 18H4.75A1.75 1.75 0 013 16.25V5.75z"/></svg></div><span class="font-medium text-lg text-white/60">[Task 5] Añadiendo detalles prácticos 📍</span></li>
+                    </ul>
+                </div>
+            </turbo-frame>
+        </section>
+
+        <!-- Results Section -->
+        <section id="itinerary-results" class="max-w-6xl mx-auto mt-20 fade-in-up">
+            <turbo-frame id="itinerary-frame">
+                <div class="text-center mb-16">
+                    <h2 class="text-5xl md:text-6xl font-black tracking-tight mb-6">
+                        Tu Sinfonía de Sábado en <span class="gradient-text">CDMX</span>
+                    </h2>
+                    <p class="text-2xl text-white/80 font-light">Un itinerario curado por IA, inspirado en tu vibe único.</p>
+                </div>
+
+                <!-- Theme 1 -->
+                <div class="mb-16">
+                    <div class="flex items-center mb-10 justify-center">
+                        <div class="bg-gradient-to-r from-indigo-400 to-purple-500 rounded-full p-4 mr-6 shadow-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></div>
+                        <h3 class="text-4xl font-bold">El Recorrido del Cinéfilo Oscuro</h3>
+                    </div>
+                    <div class="space-y-8">
+                        <!-- Stop 1.1 -->
+                        <div class="glass-card p-8 rounded-3xl hover-lift"><div class="flex items-start space-x-6"><div class="bg-gradient-to-br from-slate-400 to-slate-600 rounded-2xl p-4 flex-shrink-0 mt-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg></div><div class="flex-1"><h4 class="text-2xl font-bold mb-3">Museo de Arte Moderno</h4><p class="text-lg text-white/80 leading-relaxed mb-6">Comienza tu viaje en el corazón del surrealismo mexicano. Las obras de Remedios Varo y Leonora Carrington te transportarán a mundos oníricos que resuenan con la estética fantástica de Del Toro.</p><div class="glass p-4 rounded-2xl mb-6 text-sm space-y-2"><p><span class="font-semibold">📍 Dirección:</span> Av. P.º de la Reforma s/n, Bosque de Chapultepec</p><p><span class="font-semibold">🕒 Horario:</span> 10:15 - 17:30 <span class="ml-3 inline-flex items-center bg-green-500/30 text-green-100 font-medium px-3 py-1 rounded-full text-xs">● Abierto Ahora</span></p></div><div class="flex flex-wrap gap-3"><button class="glass px-6 py-3 rounded-xl font-semibold hover:bg-white/20 transition-all duration-300 flex items-center"><svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>Ver en Mapa</button><button class="bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300">🎫 Comprar Boletos</button></div></div></div></div>
+                        <!-- Stop 1.2 -->
+                        <div class="glass-card p-8 rounded-3xl hover-lift"><div class="flex items-start space-x-6"><div class="bg-gradient-to-br from-emerald-400 to-teal-600 rounded-2xl p-4 flex-shrink-0 mt-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg></div><div class="flex-1"><h4 class="text-2xl font-bold mb-3">Librería El Péndulo (Roma)</h4><p class="text-lg text-white/80 leading-relaxed mb-6">Sumérgete en un laberinto de libros y vegetación. Su sección de fantasía y terror gótico te permitirá encontrar joyas literarias que inspiraron al maestro del cine.</p><div class="glass p-4 rounded-2xl mb-6 text-sm space-y-2"><p><span class="font-semibold">📍 Dirección:</span> Av. Álvaro Obregón 86, Roma Nte</p><p><span class="font-semibold">🕒 Horario:</span> 08:00 - 23:00 <span class="ml-3 inline-flex items-center bg-green-500/30 text-green-100 font-medium px-3 py-1 rounded-full text-xs">● Abierto Ahora</span></p></div><div class="flex flex-wrap gap-3"><button class="glass px-6 py-3 rounded-xl font-semibold hover:bg-white/20 transition-all duration-300 flex items-center"><svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>Ver en Mapa</button></div></div></div></div>
+                    </div>
+                </div>
+
+                <!-- Theme 2 -->
+                <div class="mb-16">
+                    <div class="flex items-center mb-10 justify-center">
+                        <div class="bg-gradient-to-r from-pink-400 to-red-500 rounded-full p-4 mr-6 shadow-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 6l12-3"/></svg></div>
+                        <h3 class="text-4xl font-bold">La Ruta del Sabor y Sonido</h3>
+                    </div>
+                    <div class="space-y-8">
+                        <!-- Stop 2.1 -->
+                        <div class="glass-card p-8 rounded-3xl hover-lift"><div class="flex items-start space-x-6"><div class="bg-gradient-to-br from-orange-400 to-red-500 rounded-2xl p-4 flex-shrink-0 mt-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div><div class="flex-1"><h4 class="text-2xl font-bold mb-3">El Vilsito</h4><p class="text-lg text-white/80 leading-relaxed mb-6">Al caer la noche, este taller mecánico se transforma en una de las taquerías más legendarias de la ciudad. Experimenta el auténtico sabor de los tacos al pastor.</p><div class="glass p-4 rounded-2xl mb-6 text-sm space-y-2"><p><span class="font-semibold">📍 Dirección:</span> Av. Universidad, Narvarte Poniente</p><p><span class="font-semibold">🕒 Horario:</span> 20:00 - 03:00 <span class="ml-3 inline-flex items-center bg-red-500/30 text-red-100 font-medium px-3 py-1 rounded-full text-xs">● Cerrado Ahora</span></p></div><div class="flex flex-wrap gap-3"><button class="glass px-6 py-3 rounded-xl font-semibold hover:bg-white/20 transition-all duration-300 flex items-center"><svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>Ver en Mapa</button></div></div></div></div>
+                        <!-- Stop 2.2 -->
+                        <div class="glass-card p-8 rounded-3xl hover-lift"><div class="flex items-start space-x-6"><div class="bg-gradient-to-br from-cyan-400 to-blue-600 rounded-2xl p-4 flex-shrink-0 mt-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2h10a2 2 0 002-2v-1a2 2 0 012-2h1.945C21.055 11 21 11.523 21 12c0 4.418-4.03 8-9 8s-9-3.582-9-8c0-.477.055-1 .15-1.442zM12 6a3 3 0 110-6 3 3 0 010 6z"/></svg></div><div class="flex-1"><h4 class="text-2xl font-bold mb-3">Foro El Tejedor</h4><p class="text-lg text-white/80 leading-relaxed mb-6">Cierra la noche en este íntimo foro musical. Su cartelera a menudo presenta a leyendas y nuevos talentos del rock en español, reviviendo la energía de los 90 que define parte de tu banda sonora personal.</p><div class="glass p-4 rounded-2xl mb-6 text-sm space-y-2"><p><span class="font-semibold">📍 Dirección:</span> Av. Álvaro Obregón 86, Roma Nte.</p><p><span class="font-semibold">🕒 Horario:</span> Eventos usualmente a las 21:00 <span class="ml-3 inline-flex items-center bg-gray-500/30 text-gray-100 font-medium px-3 py-1 rounded-full text-xs">● Ver Cartelera</span></p></div><div class="flex flex-wrap gap-3"><button class="glass px-6 py-3 rounded-xl font-semibold hover:bg-white/20 transition-all duration-300 flex items-center"><svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>Ver en Mapa</button><button class="bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300">📅 Ver Eventos</button></div></div></div></div>
+                    </div>
+                </div>
+
+                <!-- Next Steps Section -->
+                <div class="glass-card p-10 rounded-3xl text-center hover-lift">
+                    <h3 class="text-3xl font-bold mb-4">¿Listo para vivir tu historia?</h3>
+                    <p class="text-lg text-white/80 mb-8">Guarda este itinerario, compártelo con tus amigos o crea una nueva aventura.</p>
+                    <div class="flex flex-wrap justify-center gap-4">
+                        <button class="bg-gradient-to-r from-green-400 to-emerald-500 text-white font-bold py-4 px-8 rounded-xl hover:shadow-lg transition-all duration-300 flex items-center">
+                            <svg class="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 20 20"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v12l-5-3-5 3V4z"/></svg>
+                            Guardar Itinerario
+                        </button>
+                        <button class="glass px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all duration-300 flex items-center">
+                            <svg class="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 20 20"><path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z"/></svg>
+                            Compartir
+                        </button>
+                        <a href="#magic-canvas" class="bg-white/20 px-8 py-4 rounded-xl font-semibold hover:bg-white/30 transition-all duration-300 flex items-center">
+                            <svg class="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.885-.666A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566z" clip-rule="evenodd"/></svg>
+                            Crear Otro Vibe
+                        </a>
+                    </div>
+                </div>
+
+            </turbo-frame>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="glass mt-20">
+        <div class="container mx-auto px-6 py-10 text-center text-white/80">
+            <p class="font-semibold text-lg">© 2024 VibeVoyage</p>
+            <p class="mt-2">Creado con ❤️, 🚂 Ruby on Rails y 🤖 rdawn.</p>
+            <div class="mt-6 flex justify-center space-x-6">
+                <a href="#" class="hover:text-white transition-colors"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd"/></svg></a>
+                <a href="#" class="hover:text-white transition-colors"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.71v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"/></svg></a>
+                <a href="#" class="hover:text-white transition-colors"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.024.06 1.378.06 3.808s-.012 2.784-.06 3.808c-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.024.048-1.378.06-3.808.06s-2.784-.012-3.808-.06c-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.048-1.024-.06-1.378-.06-3.808s.012-2.784.06-3.808c.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 016.345 2.525c.636-.247 1.363-.416 2.427-.465C9.792 2.013 10.146 2 12.315 2zM12 7a5 5 0 100 10 5 5 0 000-10zm0-2a7 7 0 110 14 7 7 0 010-14zm6.406-1.146a1.2 1.2 0 100 2.4 1.2 1.2 0 000-2.4z" clip-rule="evenodd"/></svg></a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

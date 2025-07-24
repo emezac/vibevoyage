@@ -1,0 +1,6 @@
+<!-- app/views/itineraries/processing_html.html.erb -->
+<%= turbo_stream_from "itinerary_channel:#{session.id}" %>
+
+<div id="magic_canvas">
+  <%= render 'processing_state_with_polling', user_vibe: user_vibe, process_id: process_id %>
+</div>

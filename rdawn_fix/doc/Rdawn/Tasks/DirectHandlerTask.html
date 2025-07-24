@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Rdawn::Tasks::DirectHandlerTask
+  
+    &mdash; Documentation by YARD 0.9.37
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "Rdawn::Tasks::DirectHandlerTask";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (D)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Rdawn.html" title="Rdawn (module)">Rdawn</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Tasks.html" title="Rdawn::Tasks (module)">Tasks</a></span></span>
+     &raquo; 
+    <span class="title">DirectHandlerTask</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Rdawn::Tasks::DirectHandlerTask
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName"><span class='object_link'><a href="../Task.html" title="Rdawn::Task (class)">Rdawn::Task</a></span></span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next"><span class='object_link'><a href="../Task.html" title="Rdawn::Task (class)">Rdawn::Task</a></span></li>
+          
+            <li class="next">Rdawn::Tasks::DirectHandlerTask</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/rdawn/tasks/direct_handler_task.rb</dd>
+  </dl>
+  
+</div>
+
+
+
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#handler-instance_method" title="#handler (instance method)">#<strong>handler</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the value of attribute handler.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+  
+  
+  <h3 class="inherited">Attributes inherited from <span class='object_link'><a href="../Task.html" title="Rdawn::Task (class)">Rdawn::Task</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Task.html#condition-instance_method" title="Rdawn::Task#condition (method)">#condition</a></span>, <span class='object_link'><a href="../Task.html#input_data-instance_method" title="Rdawn::Task#input_data (method)">#input_data</a></span>, <span class='object_link'><a href="../Task.html#is_llm_task-instance_method" title="Rdawn::Task#is_llm_task (method)">#is_llm_task</a></span>, <span class='object_link'><a href="../Task.html#max_retries-instance_method" title="Rdawn::Task#max_retries (method)">#max_retries</a></span>, <span class='object_link'><a href="../Task.html#name-instance_method" title="Rdawn::Task#name (method)">#name</a></span>, <span class='object_link'><a href="../Task.html#next_task_id_on_failure-instance_method" title="Rdawn::Task#next_task_id_on_failure (method)">#next_task_id_on_failure</a></span>, <span class='object_link'><a href="../Task.html#next_task_id_on_success-instance_method" title="Rdawn::Task#next_task_id_on_success (method)">#next_task_id_on_success</a></span>, <span class='object_link'><a href="../Task.html#output_data-instance_method" title="Rdawn::Task#output_data (method)">#output_data</a></span>, <span class='object_link'><a href="../Task.html#retry_count-instance_method" title="Rdawn::Task#retry_count (method)">#retry_count</a></span>, <span class='object_link'><a href="../Task.html#status-instance_method" title="Rdawn::Task#status (method)">#status</a></span>, <span class='object_link'><a href="../Task.html#task_id-instance_method" title="Rdawn::Task#task_id (method)">#task_id</a></span>, <span class='object_link'><a href="../Task.html#tool_name-instance_method" title="Rdawn::Task#tool_name (method)">#tool_name</a></span></p>
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#handler_description-instance_method" title="#handler_description (instance method)">#<strong>handler_description</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(task_id:, name:, handler:, input_data: {}, **options)  &#x21d2; DirectHandlerTask </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>A new instance of DirectHandlerTask.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#to_h-instance_method" title="#to_h (instance method)">#<strong>to_h</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods inherited from <span class='object_link'><a href="../Task.html" title="Rdawn::Task (class)">Rdawn::Task</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Task.html#mark_completed-instance_method" title="Rdawn::Task#mark_completed (method)">#mark_completed</a></span>, <span class='object_link'><a href="../Task.html#mark_failed-instance_method" title="Rdawn::Task#mark_failed (method)">#mark_failed</a></span>, <span class='object_link'><a href="../Task.html#mark_running-instance_method" title="Rdawn::Task#mark_running (method)">#mark_running</a></span></p>
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(task_id:, name:, handler:, input_data: {}, **options)  &#x21d2; <tt><span class='object_link'><a href="" title="Rdawn::Tasks::DirectHandlerTask (class)">DirectHandlerTask</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns a new instance of DirectHandlerTask.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+8
+9
+10
+11
+12
+13</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/rdawn/tasks/direct_handler_task.rb', line 8</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>task_id:</span><span class='comma'>,</span> <span class='label'>name:</span><span class='comma'>,</span> <span class='label'>handler:</span><span class='comma'>,</span> <span class='label'>input_data:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='kw'>super</span><span class='lparen'>(</span><span class='label'>task_id:</span> <span class='id identifier rubyid_task_id'>task_id</span><span class='comma'>,</span> <span class='label'>name:</span> <span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='label'>input_data:</span> <span class='id identifier rubyid_input_data'>input_data</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  
+  <span class='ivar'>@handler</span> <span class='op'>=</span> <span class='id identifier rubyid_handler'>handler</span>
+  <span class='id identifier rubyid_validate_handler!'>validate_handler!</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id="handler=-instance_method"></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="handler-instance_method">
+  
+    #<strong>handler</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns the value of attribute handler.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+6
+7
+8</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/rdawn/tasks/direct_handler_task.rb', line 6</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_handler'>handler</span>
+  <span class='ivar'>@handler</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="handler_description-instance_method">
+  
+    #<strong>handler_description</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/rdawn/tasks/direct_handler_task.rb', line 22</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_handler_description'>handler_description</span>
+  <span class='kw'>case</span> <span class='ivar'>@handler</span>
+  <span class='kw'>when</span> <span class='const'>Proc</span>
+    <span class='kw'>if</span> <span class='ivar'>@handler</span><span class='period'>.</span><span class='id identifier rubyid_lambda?'>lambda?</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Lambda with </span><span class='embexpr_beg'>#{</span><span class='ivar'>@handler</span><span class='period'>.</span><span class='id identifier rubyid_arity'>arity</span><span class='embexpr_end'>}</span><span class='tstring_content'> parameters</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>else</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Proc with </span><span class='embexpr_beg'>#{</span><span class='ivar'>@handler</span><span class='period'>.</span><span class='id identifier rubyid_arity'>arity</span><span class='embexpr_end'>}</span><span class='tstring_content'> parameters</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+  <span class='kw'>else</span>
+    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Callable object (</span><span class='embexpr_beg'>#{</span><span class='ivar'>@handler</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>)</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="to_h-instance_method">
+  
+    #<strong>to_h</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+15
+16
+17
+18
+19
+20</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/rdawn/tasks/direct_handler_task.rb', line 15</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_to_h'>to_h</span>
+  <span class='kw'>super</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span>
+    <span class='label'>handler:</span> <span class='id identifier rubyid_handler_description'>handler_description</span><span class='comma'>,</span>
+    <span class='label'>task_type:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>direct_handler</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Wed Jul 16 00:49:22 2025 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.37 (ruby-3.3.0).
+</div>
+
+    </div>
+  </body>
+</html>

@@ -1,0 +1,63 @@
+<!-- app/views/itineraries/_live_processing_state.html.erb -->
+<section class="py-20 px-4" id="processing-section">
+  <div class="max-w-4xl mx-auto">
+    <div class="glass-card glass-strong p-8 text-center relative overflow-hidden">
+      <div class="absolute inset-0 opacity-10">
+        <div class="w-full h-full" style="background: linear-gradient(45deg, var(--accent-terracotta), transparent, var(--accent-sage), transparent); animation: gradient-shift 3s ease-in-out infinite;"></div>
+      </div>
+      
+      <div class="relative z-10">
+        <div class="flex justify-center items-center mb-8">
+          <div class="relative">
+            <div class="w-20 h-20 rounded-full flex items-center justify-center thinking-animation status-indicator" style="background: radial-gradient(circle, var(--accent-terracotta), rgba(224, 122, 95, 0.3));">
+              <svg class="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+        
+        <h3 class="text-3xl md:text-4xl font-display font-bold text-white mb-4"><%= message %></h3>
+        <p class="text-slate-300 text-lg md:text-xl mb-8">
+          <strong>Tu vibe:</strong> "<%= user_vibe %>"
+          <% if city_data %>
+            <br><strong>Ciudad detectada:</strong> <%= city_data[:city] %>
+          <% end %>
+        </p>
+        
+        <div class="glass-card bg-black/40 p-6 rounded-2xl font-mono text-sm text-left space-y-3 border-0">
+          <div class="flex items-center gap-3 text-green-400">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+            </svg>
+            Procesando: "<%= user_vibe %>"
+          </div>
+          <div class="flex items-center gap-3 text-yellow-400">
+            <div class="w-4 h-4 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin"></div>
+            <%= message %>
+          </div>
+        </div>
+        
+        <div class="mt-8">
+          <div class="flex justify-between text-sm text-slate-400 mb-2">
+            <span>Progreso Cultural</span>
+            <span><%= progress %>%</span>
+          </div>
+          <div class="w-full bg-white/10 rounded-full h-2">
+            <div class="vibe-match-bar transition-all duration-500" style="width: <%= progress %>%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Auto-scroll to new content
+  setTimeout(() => {
+    document.getElementById('processing-section').scrollIntoView({ 
+      behavior: 'smooth', 
+      block: 'start' 
+    });
+  }, 300);
+</script>

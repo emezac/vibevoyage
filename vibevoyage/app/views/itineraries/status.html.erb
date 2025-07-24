@@ -1,0 +1,116 @@
+<!-- app/views/itineraries/status.html.erb -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VibeVoyage - Processing...</title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --accent-terracotta: #e07a5f;
+      --accent-gold: #f4d03f;
+    }
+    body {
+      background: linear-gradient(135deg, #1a1d2e 0%, #0f1117 100%);
+    }
+    .vibe-match-bar {
+      background: linear-gradient(90deg, var(--accent-terracotta), var(--accent-gold));
+      border-radius: 9999px;
+      height: 4px;
+      transition: width 0.5s ease-out;
+    }
+    .glass-card {
+      background: rgba(41, 46, 66, 0.8);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(243, 229, 216, 0.2);
+      border-radius: 24px;
+    }
+  </style>
+</head>
+<body class="text-white min-h-screen flex items-center justify-center">
+  <div class="max-w-md mx-auto text-center p-8 glass-card">
+    <div class="w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, var(--accent-terracotta), #8fbc8f);">
+      <svg class="w-8 h-8 text-white animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+      </svg>
+    </div>
+    
+    <h1 class="text-2xl font-bold mb-4">🎭 Procesando tu vibe...</h1>
+    <p class="text-gray-400 mb-2"><strong>Tu vibe:</strong></p>
+    <p class="text-white mb-6">"<%= params[:user_vibe] %>"</p>
+    <p class="text-gray-400 mb-8" id="status-message">Iniciando...</p>
+    
+    <div class="mb-4">
+      <div class="flex justify-between text-sm text-gray-400 mb-2">
+        <span>Progreso</span>
+        <span id="progress-percent">0%</span>
+      </div>
+      <div class="w-full bg-gray-700 rounded-full h-2">
+        <div class="vibe-match-bar" id="progress-bar" style="width: 0%;"></div>
+      </div>
+    </div>
+    
+    <div id="result-container" class="hidden">
+      <h2 class="text-xl font-bold text-green-400 mb-4">¡Tu aventura está lista!</h2>
+      <div class="space-y-3">
+        <a href="#" id="view-itinerary" class="block bg-gradient-to-r from-orange-500 to-green-500 hover:from-orange-600 hover:to-green-600 px-6 py-3 rounded-lg font-semibold transition-all">
+          💾 Ver Itinerario Completo
+        </a>
+        <a href="/itineraries/new" class="block bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded transition-all">
+          🎭 Crear Otra Aventura
+        </a>
+      </div>
+    </div>
+    
+    <div id="error-container" class="hidden">
+      <h2 class="text-xl font-bold text-red-400 mb-4">😕 Algo salió mal</h2>
+      <p class="text-gray-400 mb-4" id="error-message"></p>
+      <a href="/itineraries/new" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded transition-all">
+        Intentar de nuevo
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const processId = '<%= params[:process_id] %>';
+    const userVibe = '<%= params[:user_vibe] %>';
+    
+    function pollStatus() {
+      fetch(`/itineraries/status/${processId}`, {
+        headers: {
+          'Accept': 'application/json'
+        }
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Status update:', data);
+          
+          document.getElementById('status-message').textContent = data.message || 'Procesando...';
+          document.getElementById('progress-bar').style.width = `${data.progress || 0}%`;
+          document.getElementById('progress-percent').textContent = `${data.progress || 0}%`;
+          
+          if (data.status === 'complete' && data.itinerary) {
+            document.getElementById('result-container').classList.remove('hidden');
+            document.getElementById('view-itinerary').href = `/itineraries/${data.itinerary.id}`;
+            clearInterval(pollInterval);
+          } else if (data.status === 'failed') {
+            document.getElementById('error-container').classList.remove('hidden');
+            document.getElementById('error-message').textContent = data.message;
+            clearInterval(pollInterval);
+          }
+        })
+        .catch(error => {
+          console.error('Polling error:', error);
+          // Continuar polling en caso de error temporal
+        });
+    }
+    
+    const pollInterval = setInterval(pollStatus, 2000);
+    pollStatus(); // Primera consulta inmediata
+  </script>
+</body>
+</html>

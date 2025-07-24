@@ -1,0 +1,62 @@
+===============================================================================
+
+  Rdawn has been successfully installed in your Rails application!
+
+===============================================================================
+
+Files created:
+  - config/initializers/rdawn.rb  (Configuration file)
+  - app/workflows/                (Directory for workflow definitions)
+  - app/workflows/handlers/       (Directory for workflow handlers)
+
+Next steps:
+
+1. Configure your LLM API key:
+   Add your OpenAI API key to your environment variables:
+   
+   # In your .env file or environment
+   export RDAWN_LLM_API_KEY=your_api_key_here
+   
+   # Or use the standard OpenAI environment variable
+   export OPENAI_API_KEY=your_api_key_here
+
+2. Create your first workflow handler:
+   # app/workflows/handlers/user_onboarding.rb
+   
+   class UserOnboarding
+     def self.call(input_data, workflow_variables)
+       user = User.find(input_data['user_id'])
+       user.update!(onboarded: true)
+       { success: true, user: user.attributes }
+     end
+   end
+
+3. Execute workflows in background jobs:
+   # In your controllers or models
+   
+   workflow_data = {
+     workflow_id: 'user_onboarding',
+     name: 'User Onboarding Workflow',
+     tasks: {
+       'welcome_task' => {
+         type: 'direct_handler',
+         name: 'Welcome User',
+         handler: 'UserOnboarding',
+         input_data: { user_id: user.id }
+       }
+     }
+   }
+   
+   # Execute in background
+   Rdawn::Rails::WorkflowJob.run_workflow_later(
+     workflow_data: workflow_data,
+     llm_config: { api_key: ENV['RDAWN_LLM_API_KEY'] },
+     initial_input: { user_id: user.id }
+   )
+
+4. Check the initializer file:
+   Edit config/initializers/rdawn.rb to customize your configuration.
+
+For more information, visit: https://github.com/your-org/rdawn
+
+=============================================================================== 

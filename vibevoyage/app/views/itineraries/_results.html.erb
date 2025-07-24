@@ -1,0 +1,28 @@
+<%# app/views/itineraries/_results.html.erb %>
+<section class="py-20 px-4" id="timeline-section">
+    <div class="max-w-6xl mx-auto">
+        <!-- Section Header -->
+        <div class="text-center mb-20">
+            <h2 class="text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-6">
+              <%= itinerary.name %>
+            </h2>
+            <p class="text-xl text-slate-400 max-w-3xl mx-auto">
+              <%= itinerary.description %>
+            </p>
+        </div>
+
+        <div class="relative">
+            <!-- Enhanced Timeline Path -->
+            <div class="absolute top-0 left-1/2 ...">
+              <%# ... SVG de la línea del tiempo de ui_design2.html ... %>
+            </div>
+            
+            <div class="relative z-10 space-y-32">
+                <% itinerary.itinerary_stops.each_with_index do |stop, index| %>
+                    <%# Aquí renderizamos cada parada, pasándole las variables necesarias %>
+                    <%= render 'itineraries/stop', stop: stop, itinerary: itinerary, user_vibe: user_vibe, index: index %>
+                <% end %>
+            </div>
+        </div>
+    </div>
+</section>

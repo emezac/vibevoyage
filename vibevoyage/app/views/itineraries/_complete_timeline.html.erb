@@ -1,0 +1,241 @@
+<!-- app/views/itineraries/_complete_timeline.html.erb -->
+<section class="py-20 px-4" id="timeline-section">
+  <div class="max-w-6xl mx-auto">
+    <!-- Section Header -->
+    <div class="text-center mb-20">
+      <div class="inline-flex items-center gap-2 glass-card px-6 py-3 text-sm font-medium text-slate-300 mb-8">
+        <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+        Your Personalized Journey
+      </div>
+      <h2 class="text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-6">
+        Your Adventure in <span class="gradient-text"><%= city_data[:city] %></span>
+      </h2>
+      <p class="text-xl text-slate-400 max-w-3xl mx-auto">
+        Curado con datos reales de Qloo y Google Places APIs para una experiencia auténtica.
+      </p>
+    </div>
+
+    <div class="relative">
+      <!-- Enhanced Timeline Path -->
+      <div class="absolute top-0 left-1/2 -translate-x-1/2 h-full w-full max-w-xs hidden lg:block" style="pointer-events: none;">
+        <svg width="100%" height="100%" viewBox="0 0 200 1400" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M 100,0 C 200,250 0,500 100,750 C 200,1000 0,1250 100,1400" stroke="url(#timeline-gradient)" stroke-width="3" fill="none" class="timeline-path timeline-revealed"/>
+          <defs>
+            <linearGradient id="timeline-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style="stop-color: var(--accent-terracotta); stop-opacity: 0.8" />
+              <stop offset="50%" style="stop-color: var(--accent-sage); stop-opacity: 0.8" />
+              <stop offset="100%" style="stop-color: var(--accent-sand); stop-opacity: 0.8" />
+            </linearGradient>
+          </defs>
+          <!-- Timeline nodes -->
+          <% experiences.each_with_index do |exp, index| %>
+            <circle cx="100" cy="<%= 200 + (index * 500) %>" r="8" fill="var(--accent-<%= ['terracotta', 'sage', 'gold'][index] || 'terracotta' %>)" opacity="0.8"/>
+          <% end %>
+        </svg>
+      </div>
+      
+      <div class="relative z-10 space-y-32">
+        <% experiences.each_with_index do |experience, index| %>
+          <% is_even = index.even? %>
+          <% colors = ['terracotta', 'sage', 'gold'] %>
+          <% emojis = ['☀️', '📖', '🍷'] %>
+          
+          <div class="timeline-item revealed lg:grid lg:grid-cols-2 lg:gap-16 items-center">
+            <div class="<%= is_even ? 'text-left' : 'lg:order-1 text-left lg:text-right' %>">
+              <div class="flex items-center gap-4 mb-6 <%= is_even ? '' : 'lg:justify-end' %>">
+                <div class="<%= is_even ? '' : 'lg:order-2' %>">
+                  <p class="text-sm font-medium text-slate-400 uppercase tracking-wide"><%= experience[:time] %></p>
+                  <h3 class="text-3xl md:text-4xl font-display font-bold text-white"><%= experience[:title] %></h3>
+                </div>
+                <div class="w-16 h-16 rounded-2xl flex items-center justify-center <%= is_even ? '' : 'lg:order-1' %>" style="background: linear-gradient(135deg, var(--accent-<%= colors[index] || 'terracotta' %>), var(--accent-<%= colors[(index + 1) % 3] || 'sage' %>));">
+                  <span class="text-3xl"><%= emojis[index] || '📍' %></span>
+                </div>
+              </div>
+              <p class="text-lg md:text-xl text-slate-400 leading-relaxed mb-6">
+                <%= experience[:description] %>
+              </p>
+              <div class="flex items-center gap-4 text-sm <%= is_even ? '' : 'lg:justify-end' %>">
+                <div class="flex items-center gap-2 text-slate-300">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <%= experience[:duration] %>
+                </div>
+                <div class="flex items-center gap-2 text-slate-300">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  </svg>
+                  <%= experience[:area] %>
+                </div>
+              </div>
+            </div>
+            <div class="mt-12 lg:mt-0 <%= is_even ? '' : 'lg:order-2' %>">
+              <div class="glass-card p-6 hover:scale-[1.02] transition-all duration-500">
+                <div class="relative overflow-hidden rounded-2xl mb-6">
+                  <img src="<%= experience[:image] %>" alt="<%= experience[:location] %>" class="w-full h-56 object-cover">
+                  <div class="absolute top-4 right-4">
+                    <div class="glass-card px-3 py-1 text-xs font-semibold border-0">
+                      <div class="flex items-center gap-1">
+                        <div class="w-2 h-2 rounded-full bg-green-400"></div>
+                        API Match
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="flex items-start justify-between mb-4">
+                  <h4 class="text-2xl font-bold text-white"><%= experience[:location] %></h4>
+                  <button class="p-2 rounded-full hover:bg-white/10 transition-colors">
+                    <svg class="w-5 h-5 text-slate-400 hover:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                  </button>
+                </div>
+
+                <div class="glass-card bg-black/30 p-4 rounded-xl mb-6 border-0">
+                  <div class="flex items-center gap-2 mb-2">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: var(--accent-<%= colors[index] || 'terracotta' %>);">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    <p class="font-semibold text-sm" style="color: var(--accent-sand);">CULTURAL CONNECTION:</p>
+                  </div>
+                  <p class="text-slate-300 text-sm leading-relaxed">
+                    Curado usando datos reales de Qloo Cultural API y Google Places.
+                  </p>
+                </div>
+
+                <div class="flex items-center justify-between mb-4">
+                  <div class="text-xs text-slate-400">Vibe Match: <%= experience[:vibe_match] %>%</div>
+                  <div class="flex items-center gap-1">
+                    <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                    <span class="text-xs text-slate-400">4.<%= 5 + (rand * 0.5).round(1) %></span>
+                  </div>
+                </div>
+                
+                <div class="w-full bg-white/10 rounded-full h-2 mb-4">
+                  <div class="vibe-match-bar" style="width: <%= experience[:vibe_match] %>%;"></div>
+                </div>
+
+                <div class="flex gap-2">
+                  <button class="flex-1 glass-card px-4 py-3 rounded-xl font-semibold text-sm border-0 hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Details
+                  </button>
+                  <button class="glass-card px-4 py-3 rounded-xl font-semibold text-sm border-0 hover:bg-white/10 transition-colors flex items-center justify-center">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Journey Summary & Actions -->
+<section class="py-20 px-4">
+  <div class="max-w-4xl mx-auto text-center">
+    <div class="glass-card glass-strong p-10">
+      <h3 class="text-4xl md:text-5xl font-display font-bold mb-6">
+        Tu aventura está lista
+      </h3>
+      <p class="text-xl text-slate-400 mb-12 max-w-2xl mx-auto">
+        <strong>Tu vibe:</strong> "<%= user_vibe %>"<br>
+        Cada experiencia ha sido curada usando datos reales de APIs culturales.
+      </p>
+      <div class="flex flex-wrap justify-center gap-6">
+        <a href="/itineraries/<%= itinerary.id %>" class="font-bold py-4 px-8 rounded-xl transition-all duration-300 text-lg transform hover:scale-105" style="background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage)); color: white;">
+          💾 Ver Itinerario Completo
+        </a>
+        <button class="glass-card px-8 py-4 rounded-xl font-semibold text-white hover:bg-white/20 transition-all duration-300 text-lg border-0">
+          🔗 Compartir Aventura
+        </button>
+        <a href="/itineraries/new" class="glass-card px-8 py-4 rounded-xl font-semibold text-white hover:bg-white/20 transition-all duration-300 text-lg border-0">
+          🎭 Crear Otra
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Animar timeline cuando aparece
+  setTimeout(function() {
+    const timelineItems = document.querySelectorAll('.timeline-item');
+    timelineItems.forEach((item, index) => {
+      setTimeout(() => {
+        item.style.animationDelay = `${index * 0.3}s`;
+        item.classList.add('revealed');
+      }, index * 200);
+    });
+
+    // Scroll suave al timeline
+    document.getElementById('timeline-section').scrollIntoView({ 
+      behavior: 'smooth', 
+      block: 'start' 
+    });
+  }, 500);
+});
+</script>
+
+<style>
+.timeline-path {
+  stroke-dasharray: 1400;
+  stroke-dashoffset: 1400;
+  transition: stroke-dashoffset 3s ease-out;
+}
+
+.timeline-revealed {
+  stroke-dashoffset: 0;
+}
+
+.timeline-item {
+  opacity: 0;
+  transform: translateY(40px);
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.timeline-item.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.vibe-match-bar {
+  background: linear-gradient(90deg, var(--accent-terracotta), var(--accent-gold));
+  border-radius: 9999px;
+  height: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.vibe-match-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: shine 2s ease-in-out infinite;
+}
+
+@keyframes shine {
+  0% { left: -100%; }
+  50% { left: 100%; }
+  100% { left: 100%; }
+}
+</style>

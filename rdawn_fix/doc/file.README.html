@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  File: README
+  
+    &mdash; Documentation by YARD 0.9.37
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "README";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="file_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index</a> &raquo; 
+    <span class="title">File: README</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><div id='filecontents'>
+<h1 id="label-rdawn">rdawn</h1>
+
+<p><code>rdawn</code> is an open-source framework for Ruby, built on Ruby on Rails 8.0, designed for creating robust, <strong>web-native AI agents</strong>. Unlike agentic frameworks that operate as external services, <code>rdawn</code> is envisioned as the <strong>central nervous system of a SaaS application</strong>, allowing developers to build AI capabilities that are deeply integrated with the application’s data models, business logic, and user context.</p>
+
+<h2 id="label-Key+Features">Key Features</h2>
+<ul><li>
+<p><strong>🔗 Rails-Native Integration</strong>: Deep integration with Active Record, Active Job, and the Rails ecosystem</p>
+</li><li>
+<p><strong>🧠 LLM Integration</strong>: Built-in support for OpenAI via OpenRouter with <code>raix</code> gem</p>
+</li><li>
+<p><strong>🛠️ Extensible Tool System</strong>: Register and execute custom tools with flexible parameter handling</p>
+</li><li>
+<p><strong>⚡ DirectHandlerTask</strong>: Execute Ruby code directly within workflows for maximum flexibility</p>
+</li><li>
+<p><strong>🔄 Sequential Workflows</strong>: Robust workflow engine with conditional execution and failure handling</p>
+</li><li>
+<p><strong>📊 Variable Resolution</strong>: Pass data between tasks with <code>${...}</code> syntax support</p>
+</li><li>
+<p><strong>🎯 Type Safety</strong>: Comprehensive validation and error handling throughout</p>
+</li></ul>
+
+<h2 id="label-Installation">Installation</h2>
+
+<p>Add this line to your application’s Gemfile:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_gem'>gem</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rdawn</span><span class='tstring_end'>&#39;</span></span>
+</code></pre>
+
+<p>And then execute:</p>
+
+<pre class="code ruby"><code class="ruby">$ bundle install
+</code></pre>
+
+<p>Or install it yourself as:</p>
+
+<pre class="code ruby"><code class="ruby">$ gem install rdawn
+</code></pre>
+
+<h2 id="label-API+Key+Setup">API Key Setup</h2>
+
+<p><strong>Important</strong>: You need an OpenAI API key to run any examples or use LLM features in rdawn.</p>
+
+<h3 id="label-Option+1-3A+Environment+Variable+-28Recommended-29">Option 1: Environment Variable (Recommended)</h3>
+
+<p>Set your OpenAI API key as an environment variable:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='comment'># Add to your shell profile (.bashrc, .zshrc, etc.)
+</span><span class='id identifier rubyid_export'>export</span> <span class='const'>OPENAI_API_KEY</span><span class='op'>=</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>sk-your-actual-openai-api-key-here</span><span class='tstring_end'>&quot;</span></span>
+
+<span class='comment'># Or add to your Rails application&#39;s .env file
+</span><span class='const'>OPENAI_API_KEY</span><span class='op'>=</span><span class='id identifier rubyid_sk'>sk</span><span class='op'>-</span><span class='id identifier rubyid_your'>your</span><span class='op'>-</span><span class='id identifier rubyid_actual'>actual</span><span class='op'>-</span><span class='id identifier rubyid_openai'>openai</span><span class='op'>-</span><span class='id identifier rubyid_api'>api</span><span class='op'>-</span><span class='id identifier rubyid_key'>key</span><span class='op'>-</span><span class='id identifier rubyid_here'>here</span>
+
+<span class='comment'># Alternative environment variable name (also supported)
+</span><span class='const'>RDAWN_LLM_API_KEY</span><span class='op'>=</span><span class='id identifier rubyid_sk'>sk</span><span class='op'>-</span><span class='id identifier rubyid_your'>your</span><span class='op'>-</span><span class='id identifier rubyid_actual'>actual</span><span class='op'>-</span><span class='id identifier rubyid_openai'>openai</span><span class='op'>-</span><span class='id identifier rubyid_api'>api</span><span class='op'>-</span><span class='id identifier rubyid_key'>key</span><span class='op'>-</span><span class='id identifier rubyid_here'>here</span>
+</code></pre>
+
+<h3 id="label-Option+2-3A+Rails+Credentials+-28Rails+Apps-29">Option 2: Rails Credentials (Rails Apps)</h3>
+
+<p>For Rails applications, you can store the API key in encrypted credentials:</p>
+
+<pre class="code ruby"><code class="ruby"># Edit credentials
+rails credentials:edit
+
+# Add to the opened file:
+openai_api_key: sk-your-actual-openai-api-key-here
+</code></pre>
+
+<p>Then configure in your initializer:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='comment'># config/initializers/rdawn.rb
+</span><span class='const'><span class='object_link'><a href="Rdawn.html" title="Rdawn (module)">Rdawn</a></span></span><span class='period'>.</span><span class='id identifier rubyid_configure'><span class='object_link'><a href="Rdawn.html#configure-class_method" title="Rdawn.configure (method)">configure</a></span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_config'>config</span><span class='op'>|</span>
+  <span class='id identifier rubyid_config'>config</span><span class='period'>.</span><span class='id identifier rubyid_llm_api_key'>llm_api_key</span> <span class='op'>=</span> <span class='const'>Rails</span><span class='period'>.</span><span class='id identifier rubyid_application'>application</span><span class='period'>.</span><span class='id identifier rubyid_credentials'>credentials</span><span class='period'>.</span><span class='id identifier rubyid_openai_api_key'>openai_api_key</span>
+<span class='kw'>end</span>
+</code></pre>
+
+<h3 id="label-Option+3-3A+Direct+Configuration">Option 3: Direct Configuration</h3>
+
+<p>You can also pass the API key directly when initializing:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_llm_interface'>llm_interface</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Rdawn.html" title="Rdawn (module)">Rdawn</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/LLMInterface.html" title="Rdawn::LLMInterface (class)">LLMInterface</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Rdawn/LLMInterface.html#initialize-instance_method" title="Rdawn::LLMInterface#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='label'>api_key:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>sk-your-actual-openai-api-key-here</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+</code></pre>
+
+<h3 id="label-Getting+Your+OpenAI+API+Key">Getting Your OpenAI API Key</h3>
+<ol><li>
+<p>Visit <a href="https://platform.openai.com/api-keys">OpenAI API Keys</a></p>
+</li><li>
+<p>Sign in or create an account</p>
+</li><li>
+<p>Click “Create new secret key”</p>
+</li><li>
+<p>Copy the key (starts with <code>sk-</code>)</p>
+</li><li>
+<p>Add billing information to your OpenAI account</p>
+</li><li>
+<p>Set usage limits if desired</p>
+</li></ol>
+
+<p><strong>Note</strong>: Keep your API key secure and never commit it to version control!</p>
+
+<h2 id="label-Quick+Start">Quick Start</h2>
+
+<h3 id="label-Basic+Workflow+Example">Basic Workflow Example</h3>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rdawn</span><span class='tstring_end'>&#39;</span></span>
+
+<span class='comment'># Create a workflow
+</span><span class='id identifier rubyid_workflow'>workflow</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Rdawn.html" title="Rdawn (module)">Rdawn</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/Workflow.html" title="Rdawn::Workflow (class)">Workflow</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Rdawn/Workflow.html#initialize-instance_method" title="Rdawn::Workflow#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='label'>workflow_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>example</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Example Workflow</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+
+<span class='comment'># Add tasks
+</span><span class='id identifier rubyid_task1'>task1</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Rdawn.html" title="Rdawn (module)">Rdawn</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/Task.html" title="Rdawn::Task (class)">Task</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Rdawn/Task.html#initialize-instance_method" title="Rdawn::Task#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='label'>task_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Initialize</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_task1'>task1</span><span class='period'>.</span><span class='id identifier rubyid_next_task_id_on_success'>next_task_id_on_success</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>2</span><span class='tstring_end'>&#39;</span></span>
+
+<span class='id identifier rubyid_task2'>task2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Rdawn.html" title="Rdawn (module)">Rdawn</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/Task.html" title="Rdawn::Task (class)">Task</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Rdawn/Task.html#initialize-instance_method" title="Rdawn::Task#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='label'>task_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>2</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Process</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_workflow'>workflow</span><span class='period'>.</span><span class='id identifier rubyid_add_task'>add_task</span><span class='lparen'>(</span><span class='id identifier rubyid_task1'>task1</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_workflow'>workflow</span><span class='period'>.</span><span class='id identifier rubyid_add_task'>add_task</span><span class='lparen'>(</span><span class='id identifier rubyid_task2'>task2</span><span class='rparen'>)</span>
+
+<span class='comment'># Create and run agent
+</span><span class='id identifier rubyid_llm_interface'>llm_interface</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Rdawn.html" title="Rdawn (module)">Rdawn</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/LLMInterface.html" title="Rdawn::LLMInterface (class)">LLMInterface</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Rdawn/LLMInterface.html#initialize-instance_method" title="Rdawn::LLMInterface#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='label'>api_key:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>your_openrouter_key</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_agent'>agent</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Rdawn.html" title="Rdawn (module)">Rdawn</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/Agent.html" title="Rdawn::Agent (class)">Agent</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Rdawn/Agent.html#initialize-instance_method" title="Rdawn::Agent#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='label'>workflow:</span> <span class='id identifier rubyid_workflow'>workflow</span><span class='comma'>,</span> <span class='label'>llm_interface:</span> <span class='id identifier rubyid_llm_interface'>llm_interface</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_agent'>agent</span><span class='period'>.</span><span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='label'>initial_input:</span> <span class='lbrace'>{</span> <span class='label'>user_id:</span> <span class='int'>123</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
+</code></pre>
+
+<h2 id="label-Task+Types">Task Types</h2>
+
+<h3 id="label-1.+DirectHandlerTask+-+Execute+Ruby+Code">1. DirectHandlerTask - Execute Ruby Code</h3>
+
+<p>Perfect for Rails integration and custom business logic:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='comment'># Simple handler
+</span><span class='id identifier rubyid_task'>task</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Rdawn.html" title="Rdawn (module)">Rdawn</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/Tasks.html" title="Rdawn::Tasks (module)">Tasks</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/Tasks/DirectHandlerTask.html" title="Rdawn::Tasks::DirectHandlerTask (class)">DirectHandlerTask</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Rdawn/Tasks/DirectHandlerTask.html#initialize-instance_method" title="Rdawn::Tasks::DirectHandlerTask#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='label'>task_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+  <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Create User</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+  <span class='label'>handler:</span> <span class='id identifier rubyid_proc'>proc</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_input_data'>input_data</span><span class='op'>|</span>
+    <span class='comment'># Direct Rails model interaction
+</span>    <span class='id identifier rubyid_user'>user</span> <span class='op'>=</span> <span class='const'>User</span><span class='period'>.</span><span class='id identifier rubyid_create!'>create!</span><span class='lparen'>(</span>
+      <span class='label'>name:</span> <span class='id identifier rubyid_input_data'>input_data</span><span class='lbracket'>[</span><span class='symbol'>:name</span><span class='rbracket'>]</span><span class='comma'>,</span>
+      <span class='label'>email:</span> <span class='id identifier rubyid_input_data'>input_data</span><span class='lbracket'>[</span><span class='symbol'>:email</span><span class='rbracket'>]</span>
+    <span class='rparen'>)</span>
+    <span class='lbrace'>{</span> <span class='label'>user_id:</span> <span class='id identifier rubyid_user'>user</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>created:</span> <span class='kw'>true</span> <span class='rbrace'>}</span>
+  <span class='kw'>end</span><span class='comma'>,</span>
+  <span class='label'>input_data:</span> <span class='lbrace'>{</span> <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>John</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>email:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>john@example.com</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
+<span class='rparen'>)</span>
+
+<span class='comment'># Handler with workflow variables
+</span><span class='id identifier rubyid_task'>task</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Rdawn.html" title="Rdawn (module)">Rdawn</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/Tasks.html" title="Rdawn::Tasks (module)">Tasks</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/Tasks/DirectHandlerTask.html" title="Rdawn::Tasks::DirectHandlerTask (class)">DirectHandlerTask</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Rdawn/Tasks/DirectHandlerTask.html#initialize-instance_method" title="Rdawn::Tasks::DirectHandlerTask#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='label'>task_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>2</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+  <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Process Data</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+  <span class='label'>handler:</span> <span class='id identifier rubyid_proc'>proc</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_input_data'>input_data</span><span class='comma'>,</span> <span class='id identifier rubyid_workflow_vars'>workflow_vars</span><span class='op'>|</span>
+    <span class='id identifier rubyid_user_id'>user_id</span> <span class='op'>=</span> <span class='id identifier rubyid_workflow_vars'>workflow_vars</span><span class='lbracket'>[</span><span class='symbol'>:user_id</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_user'>user</span> <span class='op'>=</span> <span class='const'>User</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_user_id'>user_id</span><span class='rparen'>)</span>
+    
+    <span class='comment'># Complex business logic
+</span>    <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='const'>SomeService</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_user'>user</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_process'>process</span><span class='lparen'>(</span><span class='id identifier rubyid_input_data'>input_data</span><span class='rparen'>)</span>
+    <span class='lbrace'>{</span> <span class='label'>processed:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>result:</span> <span class='id identifier rubyid_result'>result</span> <span class='rbrace'>}</span>
+  <span class='kw'>end</span>
+<span class='rparen'>)</span>
+
+<span class='comment'># Handler with keyword arguments
+</span><span class='id identifier rubyid_task'>task</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Rdawn.html" title="Rdawn (module)">Rdawn</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/Tasks.html" title="Rdawn::Tasks (module)">Tasks</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/Tasks/DirectHandlerTask.html" title="Rdawn::Tasks::DirectHandlerTask (class)">DirectHandlerTask</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Rdawn/Tasks/DirectHandlerTask.html#initialize-instance_method" title="Rdawn::Tasks::DirectHandlerTask#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='label'>task_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>3</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+  <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Send Notification</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+  <span class='label'>handler:</span> <span class='id identifier rubyid_proc'>proc</span> <span class='kw'>do</span> <span class='op'>|</span><span class='label'>user_id:</span><span class='comma'>,</span> <span class='label'>message:</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_other_vars'>other_vars</span><span class='op'>|</span>
+    <span class='const'>UserMailer</span><span class='period'>.</span><span class='id identifier rubyid_notification'>notification</span><span class='lparen'>(</span><span class='id identifier rubyid_user_id'>user_id</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_deliver_now'>deliver_now</span>
+    <span class='lbrace'>{</span> <span class='label'>sent:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>timestamp:</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_current'>current</span> <span class='rbrace'>}</span>
+  <span class='kw'>end</span>
+<span class='rparen'>)</span>
+</code></pre>
+
+<h3 id="label-2.+LLM+Tasks+-+AI+Integration">2. LLM Tasks - AI Integration</h3>
+
+<pre class="code ruby"><code class="ruby"><span class='comment'># Simple LLM task
+</span><span class='id identifier rubyid_task'>task</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Rdawn.html" title="Rdawn (module)">Rdawn</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/Task.html" title="Rdawn::Task (class)">Task</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Rdawn/Task.html#initialize-instance_method" title="Rdawn::Task#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='label'>task_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+  <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Generate Content</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+  <span class='label'>is_llm_task:</span> <span class='kw'>true</span><span class='comma'>,</span>
+  <span class='label'>input_data:</span> <span class='lbrace'>{</span>
+    <span class='label'>prompt:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Write a product description for a Ruby gem</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>model_params:</span> <span class='lbrace'>{</span> <span class='label'>temperature:</span> <span class='float'>0.7</span><span class='comma'>,</span> <span class='label'>max_tokens:</span> <span class='int'>500</span> <span class='rbrace'>}</span>
+  <span class='rbrace'>}</span>
+<span class='rparen'>)</span>
+
+<span class='comment'># LLM task with dynamic prompt
+</span><span class='id identifier rubyid_task'>task</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Rdawn.html" title="Rdawn (module)">Rdawn</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/Task.html" title="Rdawn::Task (class)">Task</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Rdawn/Task.html#initialize-instance_method" title="Rdawn::Task#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='label'>task_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>2</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+  <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Analyze Data</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+  <span class='label'>is_llm_task:</span> <span class='kw'>true</span><span class='comma'>,</span>
+  <span class='label'>input_data:</span> <span class='lbrace'>{</span>
+    <span class='label'>prompt:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Analyze this data: ${previous_task_result}</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>model_params:</span> <span class='lbrace'>{</span> <span class='label'>temperature:</span> <span class='float'>0.3</span> <span class='rbrace'>}</span>
+  <span class='rbrace'>}</span>
+<span class='rparen'>)</span>
+</code></pre>
+
+<h3 id="label-3.+Tool+Tasks+-+Reusable+Components">3. Tool Tasks - Reusable Components</h3>
+
+<pre class="code ruby"><code class="ruby"><span class='comment'># Register a tool
+</span><span class='id identifier rubyid_calculator'>calculator</span> <span class='op'>=</span> <span class='id identifier rubyid_proc'>proc</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_input'>input</span><span class='op'>|</span>
+  <span class='id identifier rubyid_a'>a</span> <span class='op'>=</span> <span class='id identifier rubyid_input'>input</span><span class='lbracket'>[</span><span class='symbol'>:a</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_b'>b</span> <span class='op'>=</span> <span class='id identifier rubyid_input'>input</span><span class='lbracket'>[</span><span class='symbol'>:b</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_operation'>operation</span> <span class='op'>=</span> <span class='id identifier rubyid_input'>input</span><span class='lbracket'>[</span><span class='symbol'>:operation</span><span class='rbracket'>]</span>
+  
+  <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='kw'>case</span> <span class='id identifier rubyid_operation'>operation</span>
+  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>add</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>then</span> <span class='id identifier rubyid_a'>a</span> <span class='op'>+</span> <span class='id identifier rubyid_b'>b</span>
+  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>multiply</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>then</span> <span class='id identifier rubyid_a'>a</span> <span class='op'>*</span> <span class='id identifier rubyid_b'>b</span>
+  <span class='kw'>else</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Unknown operation</span><span class='tstring_end'>&#39;</span></span>
+  <span class='kw'>end</span>
+  
+  <span class='lbrace'>{</span> <span class='label'>result:</span> <span class='id identifier rubyid_result'>result</span><span class='comma'>,</span> <span class='label'>operation:</span> <span class='id identifier rubyid_operation'>operation</span> <span class='rbrace'>}</span>
+<span class='kw'>end</span>
+
+<span class='const'><span class='object_link'><a href="Rdawn.html" title="Rdawn (module)">Rdawn</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/ToolRegistry.html" title="Rdawn::ToolRegistry (class)">ToolRegistry</a></span></span><span class='period'>.</span><span class='id identifier rubyid_register'><span class='object_link'><a href="Rdawn/ToolRegistry.html#register-class_method" title="Rdawn::ToolRegistry.register (method)">register</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>calculator</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_calculator'>calculator</span><span class='rparen'>)</span>
+
+<span class='comment'># Use tool in workflow
+</span><span class='id identifier rubyid_task'>task</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Rdawn.html" title="Rdawn (module)">Rdawn</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/Task.html" title="Rdawn::Task (class)">Task</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Rdawn/Task.html#initialize-instance_method" title="Rdawn::Task#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='label'>task_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+  <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Calculate</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+  <span class='label'>tool_name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>calculator</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+  <span class='label'>input_data:</span> <span class='lbrace'>{</span> <span class='label'>a:</span> <span class='int'>10</span><span class='comma'>,</span> <span class='label'>b:</span> <span class='int'>5</span><span class='comma'>,</span> <span class='label'>operation:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>add</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
+<span class='rparen'>)</span>
+</code></pre>
+
+<h2 id="label-Configuration">Configuration</h2>
+
+<h3 id="label-LLM+Configuration">LLM Configuration</h3>
+
+<p>Once your API key is set up (see <a href="#api-key-setup">API Key Setup</a> above), you can configure the LLM interface:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='comment'># Using environment variables (API key auto-detected)
+</span><span class='id identifier rubyid_llm_interface'>llm_interface</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Rdawn.html" title="Rdawn (module)">Rdawn</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/LLMInterface.html" title="Rdawn::LLMInterface (class)">LLMInterface</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Rdawn/LLMInterface.html#initialize-instance_method" title="Rdawn::LLMInterface#initialize (method)">new</a></span></span>
+
+<span class='comment'># Or explicit configuration
+</span><span class='id identifier rubyid_llm_interface'>llm_interface</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Rdawn.html" title="Rdawn (module)">Rdawn</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/LLMInterface.html" title="Rdawn::LLMInterface (class)">LLMInterface</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Rdawn/LLMInterface.html#initialize-instance_method" title="Rdawn::LLMInterface#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='label'>provider:</span> <span class='symbol'>:open_router</span><span class='comma'>,</span>
+  <span class='label'>api_key:</span> <span class='const'>ENV</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>OPENAI_API_KEY</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='label'>model:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>anthropic/claude-3.5-sonnet</span><span class='tstring_end'>&#39;</span></span>
+<span class='rparen'>)</span>
+</code></pre>
+
+<h3 id="label-Rails+Integration">Rails Integration</h3>
+
+<p>Create <code>config/initializers/rdawn.rb</code>:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='comment'># config/initializers/rdawn.rb
+</span><span class='const'><span class='object_link'><a href="Rdawn.html" title="Rdawn (module)">Rdawn</a></span></span><span class='period'>.</span><span class='id identifier rubyid_configure'><span class='object_link'><a href="Rdawn.html#configure-class_method" title="Rdawn.configure (method)">configure</a></span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_config'>config</span><span class='op'>|</span>
+  <span class='id identifier rubyid_config'>config</span><span class='period'>.</span><span class='id identifier rubyid_llm_api_key'>llm_api_key</span> <span class='op'>=</span> <span class='const'>ENV</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>OPENAI_API_KEY</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_config'>config</span><span class='period'>.</span><span class='id identifier rubyid_llm_provider'>llm_provider</span> <span class='op'>=</span> <span class='symbol'>:open_router</span>
+  <span class='id identifier rubyid_config'>config</span><span class='period'>.</span><span class='id identifier rubyid_default_model'>default_model</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>anthropic/claude-3.5-sonnet</span><span class='tstring_end'>&#39;</span></span>
+  <span class='id identifier rubyid_config'>config</span><span class='period'>.</span><span class='id identifier rubyid_default_model_params'>default_model_params</span> <span class='op'>=</span> <span class='lbrace'>{</span>
+    <span class='label'>temperature:</span> <span class='float'>0.7</span><span class='comma'>,</span>
+    <span class='label'>max_tokens:</span> <span class='int'>1000</span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span>
+</code></pre>
+
+<h2 id="label-Advanced+Features">Advanced Features</h2>
+
+<h3 id="label-Variable+Resolution">Variable Resolution</h3>
+
+<p>Pass data between tasks using <code>${...}</code> syntax:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_task1'>task1</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Rdawn.html" title="Rdawn (module)">Rdawn</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/Tasks.html" title="Rdawn::Tasks (module)">Tasks</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/Tasks/DirectHandlerTask.html" title="Rdawn::Tasks::DirectHandlerTask (class)">DirectHandlerTask</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Rdawn/Tasks/DirectHandlerTask.html#initialize-instance_method" title="Rdawn::Tasks::DirectHandlerTask#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='label'>task_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+  <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Get User</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+  <span class='label'>handler:</span> <span class='id identifier rubyid_proc'>proc</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_input'>input</span><span class='op'>|</span> <span class='lbrace'>{</span> <span class='label'>user_id:</span> <span class='int'>123</span><span class='comma'>,</span> <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>John</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span> <span class='rbrace'>}</span>
+<span class='rparen'>)</span>
+
+<span class='id identifier rubyid_task2'>task2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Rdawn.html" title="Rdawn (module)">Rdawn</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/Task.html" title="Rdawn::Task (class)">Task</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Rdawn/Task.html#initialize-instance_method" title="Rdawn::Task#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='label'>task_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>2</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+  <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Generate Email</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+  <span class='label'>is_llm_task:</span> <span class='kw'>true</span><span class='comma'>,</span>
+  <span class='label'>input_data:</span> <span class='lbrace'>{</span>
+    <span class='label'>prompt:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Write a welcome email for user ${user_id} named ${name}</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span>
+<span class='rparen'>)</span>
+</code></pre>
+
+<h3 id="label-Conditional+Execution">Conditional Execution</h3>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_task'>task</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Rdawn.html" title="Rdawn (module)">Rdawn</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/Task.html" title="Rdawn::Task (class)">Task</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Rdawn/Task.html#initialize-instance_method" title="Rdawn::Task#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='label'>task_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Process</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_task'>task</span><span class='period'>.</span><span class='id identifier rubyid_next_task_id_on_success'>next_task_id_on_success</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>2</span><span class='tstring_end'>&#39;</span></span>  <span class='comment'># Normal flow
+</span><span class='id identifier rubyid_task'>task</span><span class='period'>.</span><span class='id identifier rubyid_next_task_id_on_failure'>next_task_id_on_failure</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>3</span><span class='tstring_end'>&#39;</span></span>  <span class='comment'># Error handling
+</span><span class='id identifier rubyid_task'>task</span><span class='period'>.</span><span class='id identifier rubyid_condition'>condition</span> <span class='op'>=</span> <span class='id identifier rubyid_proc'>proc</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_workflow_vars'>workflow_vars</span><span class='op'>|</span> <span class='id identifier rubyid_workflow_vars'>workflow_vars</span><span class='lbracket'>[</span><span class='symbol'>:user_type</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>premium</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
+</code></pre>
+
+<h3 id="label-Error+Handling">Error Handling</h3>
+
+<pre class="code ruby"><code class="ruby"><span class='kw'>begin</span>
+  <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_agent'>agent</span><span class='period'>.</span><span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='label'>initial_input:</span> <span class='lbrace'>{</span> <span class='label'>user_id:</span> <span class='int'>123</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
+<span class='kw'>rescue</span> <span class='const'><span class='object_link'><a href="Rdawn.html" title="Rdawn (module)">Rdawn</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/Errors.html" title="Rdawn::Errors (module)">Errors</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/Errors/TaskExecutionError.html" title="Rdawn::Errors::TaskExecutionError (class)">TaskExecutionError</a></span></span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
+  <span class='const'>Rails</span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_error'>error</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Task failed: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>rescue</span> <span class='const'><span class='object_link'><a href="Rdawn.html" title="Rdawn (module)">Rdawn</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/Errors.html" title="Rdawn::Errors (module)">Errors</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/Errors/ConfigurationError.html" title="Rdawn::Errors::ConfigurationError (class)">ConfigurationError</a></span></span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
+  <span class='const'>Rails</span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_error'>error</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Configuration error: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span>
+</code></pre>
+
+<h2 id="label-Rails+Integration+Examples">Rails Integration Examples</h2>
+
+<h3 id="label-User+Onboarding+Workflow">User Onboarding Workflow</h3>
+
+<pre class="code ruby"><code class="ruby"><span class='kw'>class</span> <span class='const'>UserOnboardingWorkflow</span>
+  <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_create_workflow'>create_workflow</span><span class='lparen'>(</span><span class='id identifier rubyid_user'>user</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_workflow'>workflow</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Rdawn.html" title="Rdawn (module)">Rdawn</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/Workflow.html" title="Rdawn::Workflow (class)">Workflow</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Rdawn/Workflow.html#initialize-instance_method" title="Rdawn::Workflow#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+      <span class='label'>workflow_id:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>onboarding_</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_user'>user</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>User Onboarding</span><span class='tstring_end'>&#39;</span></span>
+    <span class='rparen'>)</span>
+    
+    <span class='comment'># Step 1: Send welcome email
+</span>    <span class='id identifier rubyid_welcome_task'>welcome_task</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Rdawn.html" title="Rdawn (module)">Rdawn</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/Tasks.html" title="Rdawn::Tasks (module)">Tasks</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/Tasks/DirectHandlerTask.html" title="Rdawn::Tasks::DirectHandlerTask (class)">DirectHandlerTask</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Rdawn/Tasks/DirectHandlerTask.html#initialize-instance_method" title="Rdawn::Tasks::DirectHandlerTask#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+      <span class='label'>task_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+      <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Send Welcome Email</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+      <span class='label'>handler:</span> <span class='id identifier rubyid_proc'>proc</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_input_data'>input_data</span><span class='op'>|</span>
+        <span class='id identifier rubyid_user'>user</span> <span class='op'>=</span> <span class='const'>User</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_input_data'>input_data</span><span class='lbracket'>[</span><span class='symbol'>:user_id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+        <span class='const'>UserMailer</span><span class='period'>.</span><span class='id identifier rubyid_welcome'>welcome</span><span class='lparen'>(</span><span class='id identifier rubyid_user'>user</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_deliver_now'>deliver_now</span>
+        <span class='lbrace'>{</span> <span class='label'>email_sent:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>user_name:</span> <span class='id identifier rubyid_user'>user</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='rbrace'>}</span>
+      <span class='kw'>end</span><span class='comma'>,</span>
+      <span class='label'>input_data:</span> <span class='lbrace'>{</span> <span class='label'>user_id:</span> <span class='id identifier rubyid_user'>user</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span> <span class='rbrace'>}</span>
+    <span class='rparen'>)</span>
+    <span class='id identifier rubyid_welcome_task'>welcome_task</span><span class='period'>.</span><span class='id identifier rubyid_next_task_id_on_success'>next_task_id_on_success</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>2</span><span class='tstring_end'>&#39;</span></span>
+    
+    <span class='comment'># Step 2: Generate personalized content
+</span>    <span class='id identifier rubyid_content_task'>content_task</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Rdawn.html" title="Rdawn (module)">Rdawn</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/Task.html" title="Rdawn::Task (class)">Task</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Rdawn/Task.html#initialize-instance_method" title="Rdawn::Task#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+      <span class='label'>task_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>2</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+      <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Generate Personalized Content</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+      <span class='label'>is_llm_task:</span> <span class='kw'>true</span><span class='comma'>,</span>
+      <span class='label'>input_data:</span> <span class='lbrace'>{</span>
+        <span class='label'>prompt:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Create personalized onboarding content for ${user_name}</span><span class='tstring_end'>&#39;</span></span>
+      <span class='rbrace'>}</span>
+    <span class='rparen'>)</span>
+    <span class='id identifier rubyid_content_task'>content_task</span><span class='period'>.</span><span class='id identifier rubyid_next_task_id_on_success'>next_task_id_on_success</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>3</span><span class='tstring_end'>&#39;</span></span>
+    
+    <span class='comment'># Step 3: Create user profile
+</span>    <span class='id identifier rubyid_profile_task'>profile_task</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Rdawn.html" title="Rdawn (module)">Rdawn</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/Tasks.html" title="Rdawn::Tasks (module)">Tasks</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/Tasks/DirectHandlerTask.html" title="Rdawn::Tasks::DirectHandlerTask (class)">DirectHandlerTask</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Rdawn/Tasks/DirectHandlerTask.html#initialize-instance_method" title="Rdawn::Tasks::DirectHandlerTask#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+      <span class='label'>task_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>3</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+      <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Create Profile</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+      <span class='label'>handler:</span> <span class='id identifier rubyid_proc'>proc</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_input_data'>input_data</span><span class='comma'>,</span> <span class='id identifier rubyid_workflow_vars'>workflow_vars</span><span class='op'>|</span>
+        <span class='id identifier rubyid_user'>user</span> <span class='op'>=</span> <span class='const'>User</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_input_data'>input_data</span><span class='lbracket'>[</span><span class='symbol'>:user_id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_content'>content</span> <span class='op'>=</span> <span class='id identifier rubyid_workflow_vars'>workflow_vars</span><span class='lbracket'>[</span><span class='symbol'>:llm_response</span><span class='rbracket'>]</span>
+        
+        <span class='id identifier rubyid_user'>user</span><span class='period'>.</span><span class='id identifier rubyid_profile'>profile</span><span class='period'>.</span><span class='id identifier rubyid_update!'>update!</span><span class='lparen'>(</span>
+          <span class='label'>onboarding_content:</span> <span class='id identifier rubyid_content'>content</span><span class='comma'>,</span>
+          <span class='label'>onboarding_completed:</span> <span class='kw'>true</span>
+        <span class='rparen'>)</span>
+        
+        <span class='lbrace'>{</span> <span class='label'>profile_created:</span> <span class='kw'>true</span> <span class='rbrace'>}</span>
+      <span class='kw'>end</span><span class='comma'>,</span>
+      <span class='label'>input_data:</span> <span class='lbrace'>{</span> <span class='label'>user_id:</span> <span class='id identifier rubyid_user'>user</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span> <span class='rbrace'>}</span>
+    <span class='rparen'>)</span>
+    
+    <span class='id identifier rubyid_workflow'>workflow</span><span class='period'>.</span><span class='id identifier rubyid_add_task'>add_task</span><span class='lparen'>(</span><span class='id identifier rubyid_welcome_task'>welcome_task</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_workflow'>workflow</span><span class='period'>.</span><span class='id identifier rubyid_add_task'>add_task</span><span class='lparen'>(</span><span class='id identifier rubyid_content_task'>content_task</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_workflow'>workflow</span><span class='period'>.</span><span class='id identifier rubyid_add_task'>add_task</span><span class='lparen'>(</span><span class='id identifier rubyid_profile_task'>profile_task</span><span class='rparen'>)</span>
+    
+    <span class='id identifier rubyid_workflow'>workflow</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span>
+
+<span class='comment'># Usage
+</span><span class='id identifier rubyid_user'>user</span> <span class='op'>=</span> <span class='const'>User</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='int'>123</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_workflow'>workflow</span> <span class='op'>=</span> <span class='const'>UserOnboardingWorkflow</span><span class='period'>.</span><span class='id identifier rubyid_create_workflow'>create_workflow</span><span class='lparen'>(</span><span class='id identifier rubyid_user'>user</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_llm_interface'>llm_interface</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Rdawn.html" title="Rdawn (module)">Rdawn</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/LLMInterface.html" title="Rdawn::LLMInterface (class)">LLMInterface</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Rdawn/LLMInterface.html#initialize-instance_method" title="Rdawn::LLMInterface#initialize (method)">new</a></span></span>
+<span class='id identifier rubyid_agent'>agent</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Rdawn.html" title="Rdawn (module)">Rdawn</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/Agent.html" title="Rdawn::Agent (class)">Agent</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Rdawn/Agent.html#initialize-instance_method" title="Rdawn::Agent#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='label'>workflow:</span> <span class='id identifier rubyid_workflow'>workflow</span><span class='comma'>,</span> <span class='label'>llm_interface:</span> <span class='id identifier rubyid_llm_interface'>llm_interface</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_agent'>agent</span><span class='period'>.</span><span class='id identifier rubyid_run'>run</span>
+</code></pre>
+
+<h3 id="label-Background+Job+Integration">Background Job Integration</h3>
+
+<pre class="code ruby"><code class="ruby"><span class='kw'>class</span> <span class='const'>WorkflowJob</span> <span class='op'>&lt;</span> <span class='const'>ApplicationJob</span>
+  <span class='id identifier rubyid_queue_as'>queue_as</span> <span class='symbol'>:default</span>
+  
+  <span class='kw'>def</span> <span class='id identifier rubyid_perform'>perform</span><span class='lparen'>(</span><span class='id identifier rubyid_workflow_class'>workflow_class</span><span class='comma'>,</span> <span class='id identifier rubyid_workflow_params'>workflow_params</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_workflow'>workflow</span> <span class='op'>=</span> <span class='id identifier rubyid_workflow_class'>workflow_class</span><span class='period'>.</span><span class='id identifier rubyid_constantize'>constantize</span><span class='period'>.</span><span class='id identifier rubyid_create_workflow'>create_workflow</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_workflow_params'>workflow_params</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_llm_interface'>llm_interface</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Rdawn.html" title="Rdawn (module)">Rdawn</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/LLMInterface.html" title="Rdawn::LLMInterface (class)">LLMInterface</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Rdawn/LLMInterface.html#initialize-instance_method" title="Rdawn::LLMInterface#initialize (method)">new</a></span></span>
+    <span class='id identifier rubyid_agent'>agent</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Rdawn.html" title="Rdawn (module)">Rdawn</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Rdawn/Agent.html" title="Rdawn::Agent (class)">Agent</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Rdawn/Agent.html#initialize-instance_method" title="Rdawn::Agent#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='label'>workflow:</span> <span class='id identifier rubyid_workflow'>workflow</span><span class='comma'>,</span> <span class='label'>llm_interface:</span> <span class='id identifier rubyid_llm_interface'>llm_interface</span><span class='rparen'>)</span>
+    
+    <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_agent'>agent</span><span class='period'>.</span><span class='id identifier rubyid_run'>run</span>
+    
+    <span class='comment'># Broadcast completion via Action Cable
+</span>    <span class='const'>ActionCable</span><span class='period'>.</span><span class='id identifier rubyid_server'>server</span><span class='period'>.</span><span class='id identifier rubyid_broadcast'>broadcast</span><span class='lparen'>(</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>workflow_</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_workflow'>workflow</span><span class='period'>.</span><span class='id identifier rubyid_workflow_id'>workflow_id</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='lbrace'>{</span> <span class='label'>status:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>completed</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>result:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_to_h'>to_h</span> <span class='rbrace'>}</span>
+    <span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span>
+
+<span class='comment'># Enqueue workflow
+</span><span class='const'>WorkflowJob</span><span class='period'>.</span><span class='id identifier rubyid_perform_later'>perform_later</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>UserOnboardingWorkflow</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='lbrace'>{</span> <span class='label'>user_id:</span> <span class='int'>123</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
+</code></pre>
+
+<h2 id="label-API+Reference">API Reference</h2>
+
+<h3 id="label-Core+Classes">Core Classes</h3>
+
+<h4 id="label-Rdawn-3A-3AWorkflow"><code>Rdawn::Workflow</code></h4>
+<ul><li>
+<p><code>workflow_id</code>: Unique identifier</p>
+</li><li>
+<p><code>name</code>: Human-readable name</p>
+</li><li>
+<p><code>status</code>: Current status (<code>:pending</code>, <code>:running</code>, <code>:completed</code>)</p>
+</li><li>
+<p><code>tasks</code>: Hash of tasks by task_id</p>
+</li><li>
+<p><code>variables</code>: Workflow-level variables</p>
+</li><li>
+<p><code>add_task(task)</code>: Add a task to the workflow</p>
+</li><li>
+<p><code>get_task(task_id)</code>: Retrieve a task by ID</p>
+</li></ul>
+
+<h4 id="label-Rdawn-3A-3ATask"><code>Rdawn::Task</code></h4>
+<ul><li>
+<p><code>task_id</code>: Unique identifier</p>
+</li><li>
+<p><code>name</code>: Human-readable name</p>
+</li><li>
+<p><code>status</code>: Current status</p>
+</li><li>
+<p><code>input_data</code>: Input data for the task</p>
+</li><li>
+<p><code>output_data</code>: Output data from the task</p>
+</li><li>
+<p><code>is_llm_task</code>: Boolean flag for LLM tasks</p>
+</li><li>
+<p><code>tool_name</code>: Name of tool to execute</p>
+</li><li>
+<p><code>next_task_id_on_success</code>: Next task if successful</p>
+</li><li>
+<p><code>next_task_id_on_failure</code>: Next task if failed</p>
+</li></ul>
+
+<h4 id="label-Rdawn-3A-3ATasks-3A-3ADirectHandlerTask"><code>Rdawn::Tasks::DirectHandlerTask</code></h4>
+<ul><li>
+<p><code>handler</code>: Proc, lambda, or callable object</p>
+</li><li>
+<p>Supports 0, 1, 2, or keyword parameters</p>
+</li><li>
+<p>Access to input data and workflow variables</p>
+</li></ul>
+
+<h4 id="label-Rdawn-3A-3AAgent"><code>Rdawn::Agent</code></h4>
+<ul><li>
+<p><code>initialize(workflow:, llm_interface:)</code>: Create agent</p>
+</li><li>
+<p><code>run(initial_input: {})</code>: Execute workflow</p>
+</li></ul>
+
+<h4 id="label-Rdawn-3A-3ALLMInterface"><code>Rdawn::LLMInterface</code></h4>
+<ul><li>
+<p><code>initialize(provider:, api_key:, model:)</code>: Create interface</p>
+</li><li>
+<p><code>execute_llm_call(prompt:, model_params:)</code>: Execute LLM call</p>
+</li></ul>
+
+<h4 id="label-Rdawn-3A-3AToolRegistry"><code>Rdawn::ToolRegistry</code></h4>
+<ul><li>
+<p><code>register(name, tool_object)</code>: Register a tool</p>
+</li><li>
+<p><code>execute(name, input_data)</code>: Execute a tool</p>
+</li><li>
+<p><code>registered_tools</code>: List all registered tools</p>
+</li></ul>
+
+<h2 id="label-Development">Development</h2>
+
+<p>After checking out the repo, run <code>bin/setup</code> to install dependencies. Then, run <code>rake spec</code> to run the tests. You can also run <code>bin/console</code> for an interactive prompt that will allow you to experiment.</p>
+
+<h3 id="label-Running+Tests">Running Tests</h3>
+
+<pre class="code ruby"><code class="ruby"># Run all tests
+bundle exec rspec
+
+# Run specific test file
+bundle exec rspec spec/rdawn/task_spec.rb
+
+# Run with documentation format
+bundle exec rspec --format documentation
+</code></pre>
+
+<h3 id="label-Development+Setup">Development Setup</h3>
+
+<pre class="code ruby"><code class="ruby"><span class='comment'># Install dependencies
+</span><span class='id identifier rubyid_bundle'>bundle</span> <span class='id identifier rubyid_install'>install</span>
+
+<span class='comment'># Run tests
+</span><span class='id identifier rubyid_bundle'>bundle</span> <span class='id identifier rubyid_exec'>exec</span> <span class='id identifier rubyid_rspec'>rspec</span>
+
+<span class='comment'># Run with auto-reload during development
+</span><span class='id identifier rubyid_bundle'>bundle</span> <span class='id identifier rubyid_exec'>exec</span> <span class='id identifier rubyid_guard'>guard</span>
+
+<span class='comment'># Generate documentation
+</span><span class='id identifier rubyid_bundle'>bundle</span> <span class='id identifier rubyid_exec'>exec</span> <span class='id identifier rubyid_yard'>yard</span>
+</code></pre>
+
+<h2 id="label-Contributing">Contributing</h2>
+
+<p>Bug reports and pull requests are welcome on GitHub at <a href="https://github.com/emezac/rdawn">github.com/emezac/rdawn</a>.</p>
+
+<h3 id="label-Development+Process">Development Process</h3>
+<ol><li>
+<p>Fork the repository</p>
+</li><li>
+<p>Create your feature branch (<code>git checkout -b feature/amazing-feature</code>)</p>
+</li><li>
+<p>Write tests for your changes</p>
+</li><li>
+<p>Ensure all tests pass (<code>bundle exec rspec</code>)</p>
+</li><li>
+<p>Commit your changes (<code>git commit -am &#39;Add amazing feature&#39;</code>)</p>
+</li><li>
+<p>Push to the branch (<code>git push origin feature/amazing-feature</code>)</p>
+</li><li>
+<p>Create a Pull Request</p>
+</li></ol>
+
+<h3 id="label-Code+Style">Code Style</h3>
+
+<p>This project uses RuboCop for code style enforcement. Run <code>bundle exec rubocop</code> to check your code.</p>
+
+<h2 id="label-License">License</h2>
+
+<p>The gem is available as open source under the terms of the <a href="https://opensource.org/licenses/MIT">MIT License</a>.</p>
+
+<h2 id="label-Roadmap">Roadmap</h2>
+<ul><li>
+<p><strong>v0.2.0</strong>: Variable resolution with <code>${...}</code> syntax</p>
+</li><li>
+<p><strong>v0.3.0</strong>: Rails generators and improved ActiveJob integration</p>
+</li><li>
+<p><strong>v0.4.0</strong>: Action Cable real-time updates</p>
+</li><li>
+<p><strong>v0.5.0</strong>: Multiple LLM provider support</p>
+</li><li>
+<p><strong>v1.0.0</strong>: Production-ready Rails integration with full documentation</p>
+</li></ul>
+
+<h2 id="label-Support">Support</h2>
+<ul><li>
+<p><a href="https://github.com/emezac/rdawn/issues">GitHub Issues</a></p>
+</li><li>
+<p><a href="https://github.com/emezac/rdawn/wiki">Documentation</a></p>
+</li><li>
+<p><a href="https://github.com/emezac/rdawn/tree/main/examples">Examples</a></p>
+</li></ul>
+</div></div>
+
+      <div id="footer">
+  Generated on Wed Jul 16 00:49:22 2025 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.37 (ruby-3.3.0).
+</div>
+
+    </div>
+  </body>
+</html>

@@ -1,0 +1,141 @@
+<!-- Header -->
+<header class="sticky top-0 z-50 nav-blur">
+  <div class="glass-card mx-4 md:mx-auto md:max-w-7xl mt-4">
+    <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+      <%= link_to "/", class: "flex items-center gap-3" do %>
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage));">
+          <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" />
+          </svg>
+        </div>
+        <h1 class="text-3xl font-display font-bold gradient-text">VibeVoyage</h1>
+      <% end %>
+      <div class="flex items-center gap-4">
+        <%= link_to "#how-it-works", class: "text-slate-300 hover:text-white transition-colors hidden md:flex items-center gap-2" do %>
+          How It Works
+        <% end %>
+        <%= link_to "/app", class: "glass-card px-6 py-2 rounded-full font-semibold hover:bg-white/10 transition-colors border-0 flex items-center gap-2" do %>
+          Get Started
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          </svg>
+        <% end %>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main class="relative">
+  <!-- Hero Section -->
+  <section class="min-h-[90vh] flex items-center justify-center hero-pattern relative overflow-hidden px-4">
+    <div class="container mx-auto text-center">
+      <div class="inline-flex items-center gap-2 glass-card px-6 py-3 text-sm font-medium text-slate-300 mb-8 fade-in-up">
+        <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+        AI-Powered Cultural Curation
+      </div>
+      
+      <h1 class="text-5xl md:text-7xl lg:text-8xl font-display font-bold tracking-tight mb-8 leading-tight fade-in-up" style="animation-delay: 0.2s;">
+        Stop searching.
+        <span class="gradient-text block">Start living a story.</span>
+      </h1>
+      
+      <p class="text-xl md:text-2xl text-slate-400 font-light leading-relaxed max-w-4xl mx-auto mb-16 fade-in-up" style="animation-delay: 0.4s;">
+        We transform your unique tastes into narrative itineraries. Describe your "vibe," and let our AI design a bespoke cultural adventure, turning any day into a memory to cherish.
+      </p>
+      
+      <div class="fade-in-up" style="animation-delay: 0.6s;">
+        <%= link_to "/app", class: "w-full md:w-auto inline-flex items-center justify-center gap-3 group font-bold py-5 px-10 rounded-2xl transition-all duration-300 text-lg transform hover:scale-[1.02] hover:shadow-2xl", style: "background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage)); color: white;" do %>
+          <svg class="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.781 0-2.674-2.153-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+          </svg>
+          Curate my Adventure
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="py-20 px-4" id="how-it-works">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-20">
+        <h2 class="text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-6">
+          From Your <span class="gradient-text">Vibe</span> to Your <span class="gradient-text">Voyage</span>
+        </h2>
+        <p class="text-xl text-slate-400 max-w-3xl mx-auto">
+          Our process is designed to be as magical as the result. In three simple steps, we turn your inspiration into a concrete plan.
+        </p>
+      </div>
+      
+      <div class="grid md:grid-cols-3 gap-8 text-center">
+        <!-- Step 1 -->
+        <div class="glass-card p-8">
+          <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6" style="background: linear-gradient(135deg, var(--accent-terracotta), #e49a85);">
+            <span class="text-3xl">💬</span>
+          </div>
+          <h3 class="text-2xl font-display font-bold mb-4">1. Describe Your Vibe</h3>
+          <p class="text-slate-400">
+            Tell us in natural language what inspires you. A film noir day in Paris? A bohemian afternoon with books and jazz in New York? You provide the vision, we interpret it.
+          </p>
+        </div>
+        
+        <!-- Step 2 -->
+        <div class="glass-card p-8">
+          <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6" style="background: linear-gradient(135deg, var(--accent-sage), #b5c7ae);">
+            <svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"/>
+            </svg>
+          </div>
+          <h3 class="text-2xl font-display font-bold mb-4">2. Magic in Progress</h3>
+          <p class="text-slate-400">
+            Our AI agent analyzes your essence, consults its vast cultural knowledge (thanks to Qloo) to find hidden connections, and synthesizes themes to bring your day to life.
+          </p>
+        </div>
+        
+        <!-- Step 3 -->
+        <div class="glass-card p-8">
+          <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6" style="background: linear-gradient(135deg, var(--accent-gold), #f7d96d);">
+            <span class="text-3xl">🗺️</span>
+          </div>
+          <h3 class="text-2xl font-display font-bold mb-4">3. Receive Your Story</h3>
+          <p class="text-slate-400">
+            In moments, you get a complete narrative itinerary. It's not a list, it's a story. Each stop is connected, with evocative descriptions and all the logistics handled.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA Section -->
+  <section class="py-20 px-4">
+    <div class="max-w-4xl mx-auto text-center">
+      <div class="glass-card glass-strong p-10">
+        <h3 class="text-4xl md:text-5xl font-display font-bold mb-6">Your next story awaits</h3>
+        <p class="text-xl text-slate-400 mb-12 max-w-2xl mx-auto">Ready to stop planning and start living experiences designed for you? The magic canvas is just a click away.</p>
+        <div class="flex flex-wrap justify-center gap-6">
+          <%= link_to "/app", class: "font-bold py-4 px-8 rounded-2xl transition-all duration-300 text-lg transform hover:scale-105", style: "background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage)); color: white;" do %>
+            ✨ Create My Itinerary Now
+          <% end %>
+          <%= link_to "#how-it-works", class: "glass-card px-8 py-4 rounded-xl font-semibold text-white hover:bg-white/20 transition-all duration-300 text-lg border-0" do %>
+            Learn More
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Footer -->
+<footer class="border-t border-white/10 py-16 px-4 mt-10">
+  <div class="max-w-6xl mx-auto text-center">
+    <h2 class="text-3xl font-display font-bold mb-4 gradient-text">VibeVoyage</h2>
+    <p class="text-slate-400 mb-8 max-w-md mx-auto">We transform your tastes into memorable experiences.</p>
+    <div class="flex flex-wrap justify-center gap-8 text-sm text-slate-400 mb-8">
+      <%= link_to "#", class: "hover:text-white transition-colors" do %>About Us<% end %>
+      <%= link_to "#how-it-works", class: "hover:text-white transition-colors" do %>How It Works<% end %>
+      <%= link_to "#", class: "hover:text-white transition-colors" do %>Cities<% end %>
+      <%= link_to "#", class: "hover:text-white transition-colors" do %>Privacy<% end %>
+      <%= link_to "#", class: "hover:text-white transition-colors" do %>Contact<% end %>
+    </div>
+    <p class="text-xs text-slate-600">© 2025 VibeVoyage. All rights reserved.</p>
+  </div>
+</footer>

@@ -1,0 +1,172 @@
+<!-- app/views/itineraries/new.html.erb -->
+<%= turbo_stream_from "itinerary_channel:#{session.id}" %>
+
+<div id="magic_canvas">
+  <!-- Hero Section with Form -->
+  <section class="min-h-screen flex items-center justify-center hero-pattern relative overflow-hidden">
+    <!-- Floating Elements -->
+    <div class="absolute top-20 left-10 w-20 h-20 rounded-full opacity-20 floating" style="background: radial-gradient(circle, var(--accent-sage), transparent);"></div>
+    <div class="absolute bottom-32 right-16 w-32 h-32 rounded-full opacity-15 floating" style="background: radial-gradient(circle, var(--accent-terracotta), transparent); animation-delay: 2s;"></div>
+    
+    <div class="container mx-auto px-4 pt-20 pb-20">
+      <div class="text-center max-w-6xl mx-auto">
+        <div class="mb-8">
+          <div class="inline-flex items-center gap-2 glass-card px-6 py-3 text-sm font-medium text-slate-300 mb-8 fade-in-up">
+            <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+            AI-Powered Cultural Curation
+          </div>
+        </div>
+        
+        <h1 class="text-5xl md:text-7xl lg:text-8xl font-display font-bold tracking-tight mb-8 leading-none fade-in-up" style="animation-delay: 0.2s;">
+          Turn your tastes into a 
+          <span class="gradient-text block">story worth living</span>
+        </h1>
+        
+        <p class="text-xl md:text-2xl text-slate-400 font-light leading-relaxed max-w-4xl mx-auto mb-16 fade-in-up" style="animation-delay: 0.4s;">
+          Describe your perfect day. Our AI agent will design a unique narrative journey, connecting your passions with authentic cultural experiences.
+        </p>
+        
+        <!-- Enhanced Input Form -->
+        <%= form_with url: itineraries_path, local: false, data: { turbo: true }, class: "glass-card glass-strong p-8 max-w-3xl mx-auto relative fade-in-up", style: "animation-delay: 0.6s;" do |form| %>
+          <div class="absolute -top-6 left-1/2 transform -translate-x-1/2">
+            <div class="w-12 h-12 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage));">
+              <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-1l-4 4z" />
+              </svg>
+            </div>
+          </div>
+
+          <%= form.label :user_vibe, class: "text-left block text-lg font-semibold text-slate-200 mb-4 flex items-center gap-2" do %>
+            <span class="text-2xl">🎭</span>
+            Describe your perfect vibe:
+          <% end %>
+          
+          <div class="relative">
+            <%= form.text_area :user_vibe, rows: 4, required: true,
+                class: "w-full p-6 text-lg bg-black/30 border-2 border-white/10 focus:border-terracotta/50 focus:ring-0 resize-none rounded-2xl text-white placeholder-slate-400 transition-all duration-300",
+                placeholder: "Ex: A peaceful day in Madrid, with a touch of classic cinema, good reading, and authentic tapas...",
+                style: "--tw-ring-color: var(--accent-terracotta);" %>
+            <div class="absolute bottom-4 right-4 text-xs text-slate-500">
+              <span class="flex items-center gap-1">
+                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                AI Enhanced
+              </span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-6 text-sm">
+            <div class="glass-card p-4 text-center border-0">
+              <div class="w-8 h-8 mx-auto mb-2 rounded-lg flex items-center justify-center" style="background-color: var(--accent-terracotta);">
+                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <p class="text-slate-300">Local Experiences</p>
+            </div>
+            <div class="glass-card p-4 text-center border-0">
+              <div class="w-8 h-8 mx-auto mb-2 rounded-lg flex items-center justify-center" style="background-color: var(--accent-sage);">
+                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.636-6.364l.707.707M12 21v-1m-6.364-1.636l.707-.707" />
+                </svg>
+              </div>
+              <p class="text-slate-300">AI Curation</p>
+            </div>
+            <div class="glass-card p-4 text-center border-0">
+              <div class="w-8 h-8 mx-auto mb-2 rounded-lg flex items-center justify-center" style="background-color: var(--accent-gold);">
+                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+              </div>
+              <p class="text-slate-300">Personal Match</p>
+            </div>
+          </div>
+          
+          <%= form.submit "Curate my Adventure", 
+              class: "mt-6 w-full font-bold py-5 px-8 rounded-2xl transition-all duration-300 text-lg transform hover:scale-[1.02] hover:shadow-2xl flex items-center justify-center gap-3 group",
+              style: "background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage)); color: white;" %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+</div>
+<!--script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // ... código existente ...
+  
+  // Suscribirse a ActionCable cuando sea necesario
+  let cable = null;
+  
+  form.addEventListener('turbo:submit-start', function() {
+    // Inicializar ActionCable
+    cable = ActionCable.createConsumer();
+    
+    const subscription = cable.subscriptions.create(
+      { 
+        channel: "ItineraryChannel", 
+        session_id: '<%= session.id %>' 
+      },
+      {
+        received: function(data) {
+          console.log('Received:', data.type, data);
+          
+          switch(data.type) {
+            case 'processing_update':
+              // Actualizar contenido de procesamiento
+              document.getElementById('magic_canvas').innerHTML = data.html;
+              break;
+              
+            case 'api_results':
+              // Agregar resultados de APIs
+              const magicCanvas = document.getElementById('magic_canvas');
+              magicCanvas.innerHTML += data.html;
+              break;
+              
+            case 'timeline_step':
+              // Agregar paso del timeline
+              const currentContent = document.getElementById('magic_canvas');
+              currentContent.innerHTML += data.html;
+              break;
+              
+            case 'final_timeline':
+              // Mostrar timeline completo
+              document.getElementById('magic_canvas').innerHTML = data.html;
+              
+              // Desconectar después del resultado final
+              setTimeout(() => {
+                if (cable) {
+                  cable.disconnect();
+                  cable = null;
+                }
+              }, 2000);
+              break;
+              
+            case 'error':
+              // Mostrar error
+              document.getElementById('magic_canvas').innerHTML = data.html;
+              if (cable) {
+                cable.disconnect();
+                cable = null;
+              }
+              break;
+          }
+        },
+        
+        connected: function() {
+          console.log('Connected to ItineraryChannel');
+        },
+        
+        disconnected: function() {
+          console.log('Disconnected from ItineraryChannel');
+        }
+      }
+    );
+    
+    // Guardar subscription para poder desconectar más tarde
+    form.dataset.subscriptionActive = 'true';
+  });
+});
+</script>

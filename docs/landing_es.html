@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VibeVoyage - Curaduría de Experiencias Narrativas</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-deep-space: #1a1d2e;
+            --bg-darker: #0f1117;
+            --text-primary: #f0f2f5;
+            --text-secondary: #a0a7b7;
+            --text-muted: #6b7280;
+            --accent-sand: #f3e5d8;
+            --accent-terracotta: #e07a5f;
+            --accent-sage: #a3b899;
+            --accent-gold: #f4d03f;
+            --glass-bg: rgba(41, 46, 66, 0.6);
+            --glass-strong: rgba(41, 46, 66, 0.8);
+            --border-color: rgba(243, 229, 216, 0.2);
+            --border-glow: rgba(224, 122, 95, 0.3);
+            --shadow-glow: rgba(224, 122, 95, 0.15);
+        }
+
+        body {
+            font-family: 'Manrope', sans-serif;
+            background: linear-gradient(135deg, var(--bg-deep-space) 0%, var(--bg-darker) 100%);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .font-display {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px var(--shadow-glow), 0 0 0 1px var(--border-glow);
+            border-color: var(--border-glow);
+        }
+
+        .glass-strong {
+            background: var(--glass-strong);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, var(--accent-sand), var(--accent-gold), var(--text-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+            background-size: 200% 100%;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+        
+        @keyframes shimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in-up { animation: fadeIn 1s ease-out forwards; }
+
+        .hero-pattern {
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(224, 122, 95, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 85% 80%, rgba(163, 184, 153, 0.1) 0%, transparent 40%);
+        }
+
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 nav-blur">
+        <div class="glass-card mx-4 md:mx-auto md:max-w-7xl mt-4">
+            <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+                <a href="/" class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage));">
+                        <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" />
+                        </svg>
+                    </div>
+                    <h1 class="text-3xl font-display font-bold gradient-text">VibeVoyage</h1>
+                </a>
+                <div class="flex items-center gap-4">
+                    <a href="#how-it-works" class="text-slate-300 hover:text-white transition-colors hidden md:flex items-center gap-2">
+                        Cómo Funciona
+                    </a>
+                    <a href="/app" class="glass-card px-6 py-2 rounded-full font-semibold hover:bg-white/10 transition-colors border-0 flex items-center gap-2">
+                        Comenzar
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                        </svg>
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="relative">
+        <!-- Hero Section -->
+        <section class="min-h-[90vh] flex items-center justify-center hero-pattern relative overflow-hidden px-4">
+            <div class="container mx-auto text-center">
+                <div class="inline-flex items-center gap-2 glass-card px-6 py-3 text-sm font-medium text-slate-300 mb-8 fade-in-up">
+                    <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+                    Curaduría Cultural Potenciada por IA
+                </div>
+                
+                <h1 class="text-5xl md:text-7xl lg:text-8xl font-display font-bold tracking-tight mb-8 leading-tight fade-in-up" style="animation-delay: 0.2s;">
+                    Deja de buscar.
+                    <span class="gradient-text block">Empieza a vivir una historia.</span>
+                </h1>
+                
+                <p class="text-xl md:text-2xl text-slate-400 font-light leading-relaxed max-w-4xl mx-auto mb-16 fade-in-up" style="animation-delay: 0.4s;">
+                    Transformamos tus gustos únicos en itinerarios narrativos. Describe tu "vibe" y deja que nuestra IA diseñe una aventura cultural a tu medida, convirtiendo un día cualquiera en un recuerdo memorable.
+                </p>
+                
+                <div class="fade-in-up" style="animation-delay: 0.6s;">
+                    <a href="/app" class="w-full md:w-auto inline-flex items-center justify-center gap-3 group font-bold py-5 px-10 rounded-2xl transition-all duration-300 text-lg transform hover:scale-[1.02] hover:shadow-2xl" style="background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage)); color: white;">
+                        <svg class="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.781 0-2.674-2.153-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                        </svg>
+                        Curar mi Aventura
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section class="py-20 px-4" id="how-it-works">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-20">
+                    <h2 class="text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-6">
+                        De tu <span class="gradient-text">Vibe</span> a tu <span class="gradient-text">Viaje</span>
+                    </h2>
+                    <p class="text-xl text-slate-400 max-w-3xl mx-auto">
+                        Nuestro proceso está diseñado para ser tan mágico como el resultado. En tres simples pasos, pasamos de tu inspiración a un plan concreto.
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8 text-center">
+                    <!-- Step 1 -->
+                    <div class="glass-card p-8">
+                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6" style="background: linear-gradient(135deg, var(--accent-terracotta), #e49a85);">
+                            <span class="text-3xl">💬</span>
+                        </div>
+                        <h3 class="text-2xl font-display font-bold mb-4">1. Describe tu Vibe</h3>
+                        <p class="text-slate-400">
+                            Cuéntanos en lenguaje natural qué te inspira. ¿Un día de cine negro en París? ¿Una tarde bohemia con libros y jazz en Nueva York? Tú pones la visión, nosotros la interpretamos.
+                        </p>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="glass-card p-8">
+                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6" style="background: linear-gradient(135deg, var(--accent-sage), #b5c7ae);">
+                            <svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-display font-bold mb-4">2. Magia en Progreso</h3>
+                        <p class="text-slate-400">
+                            Nuestro agente de IA analiza tu esencia, consulta su vasto conocimiento cultural (gracias a Qloo) para encontrar conexiones ocultas y sintetiza los temas que darán vida a tu día.
+                        </p>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="glass-card p-8">
+                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6" style="background: linear-gradient(135deg, var(--accent-gold), #f7d96d);">
+                             <span class="text-3xl">🗺️</span>
+                        </div>
+                        <h3 class="text-2xl font-display font-bold mb-4">3. Recibe tu Historia</h3>
+                        <p class="text-slate-400">
+                            En instantes, obtienes un itinerario narrativo completo. No es una lista, es una historia. Cada parada está conectada, con descripciones evocadoras y toda la logística resuelta.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Final CTA Section -->
+        <section class="py-20 px-4">
+            <div class="max-w-4xl mx-auto text-center">
+                <div class="glass-card glass-strong p-10">
+                    <h3 class="text-4xl md:text-5xl font-display font-bold mb-6">
+                        Tu próxima historia te espera
+                    </h3>
+                    <p class="text-xl text-slate-400 mb-12 max-w-2xl mx-auto">
+                        ¿Listo para dejar de planificar y empezar a vivir experiencias diseñadas para ti? El lienzo mágico está a un clic de distancia.
+                    </p>
+                    <div class="flex flex-wrap justify-center gap-6">
+                        <a href="/app" class="font-bold py-4 px-8 rounded-2xl transition-all duration-300 text-lg transform hover:scale-105" style="background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage)); color: white;">
+                            ✨ Crear Mi Itinerario Ahora
+                        </a>
+                        <a href="#how-it-works" class="glass-card px-8 py-4 rounded-xl font-semibold text-white hover:bg-white/20 transition-all duration-300 text-lg border-0">
+                            Saber Más
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 py-16 px-4 mt-10">
+        <div class="max-w-6xl mx-auto text-center">
+            <h2 class="text-3xl font-display font-bold mb-4 gradient-text">VibeVoyage</h2>
+            <p class="text-slate-400 mb-8 max-w-md mx-auto">
+                Transformamos tus gustos en experiencias memorables.
+            </p>
+            <div class="flex flex-wrap justify-center gap-8 text-sm text-slate-400 mb-8">
+                <a href="#" class="hover:text-white transition-colors">Sobre Nosotros</a>
+                <a href="#how-it-works" class="hover:text-white transition-colors">Cómo Funciona</a>
+                <a href="#" class="hover:text-white transition-colors">Ciudades</a>
+                <a href="#" class="hover:text-white transition-colors">Privacidad</a>
+                <a href="#" class="hover:text-white transition-colors">Contacto</a>
+            </div>
+            <p class="text-xs text-slate-600">© 2025 VibeVoyage. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+</body>
+</html>

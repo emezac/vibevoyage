@@ -1,0 +1,4 @@
+<%# app/views/itineraries/create.turbo_stream.erb %>
+<%= turbo_stream.replace "magic_canvas" do %>
+  <%= render 'itineraries/processing_state' %>
+<% end %>

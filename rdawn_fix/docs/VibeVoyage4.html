@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VibeVoyage - Curaduría de Experiencias Narrativas</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-deep-space: #1a1d2e;
+            --text-primary: #f0f2f5;
+            --text-secondary: #a0a7b7;
+            --accent-sand: #f3e5d8;
+            --accent-terracotta: #e07a5f;
+            --accent-sage: #a3b899;
+            --glass-bg: rgba(41, 46, 66, 0.6);
+            --border-color: rgba(243, 229, 216, 0.2);
+            --border-glow: rgba(224, 122, 95, 0.3);
+        }
+
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: var(--bg-deep-space);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        .font-display {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            border-color: var(--border-glow);
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, var(--accent-sand), var(--text-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in-up { animation: fadeIn 1s ease-out forwards; }
+        
+        .timeline-path {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: drawPath 5s ease-out forwards;
+        }
+        @keyframes drawPath {
+            to { stroke-dashoffset: 0; }
+        }
+
+        .thinking-animation {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="sticky top-0 z-50 glass-card mx-4 md:mx-auto md:max-w-7xl mt-4">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-3xl font-display font-bold" style="color: var(--accent-sand);">VibeVoyage</h1>
+            <div class="flex items-center gap-4">
+                <a href="#" class="text-slate-300 hover:text-white transition-colors hidden md:block">Explorar</a>
+                <button class="bg-white/10 px-6 py-2 rounded-full font-semibold hover:bg-white/20 transition-colors">Iniciar Sesión</button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="relative container mx-auto px-4 pt-20 pb-20">
+
+        <section class="min-h-screen flex items-center justify-center">
+            <div class="text-center max-w-5xl mx-auto">
+                <h1 class="text-6xl md:text-8xl font-display font-bold tracking-tight mb-8 leading-none">
+                    Convierte tus gustos en una 
+                    <span class="gradient-text block">historia por vivir</span>
+                </h1>
+                <p class="text-xl md:text-2xl text-slate-400 font-light leading-relaxed max-w-3xl mx-auto mb-12">
+                    Describe tu día perfecto. Nuestro agente de IA diseñará un viaje narrativo único, conectando tus pasiones con experiencias culturales auténticas.
+                </p>
+                
+                <div class="glass-card p-8 max-w-2xl mx-auto">
+                    <label for="user-vibe-input" class="text-left block text-lg font-semibold text-slate-200 mb-4">
+                        🎭 Describe tu vibe perfecto:
+                    </label>
+                    <textarea 
+                        id="user-vibe-input" 
+                        rows="4" 
+                        class="w-full p-4 text-lg bg-black/20 border-2 border-transparent focus:border-terracotta/50 focus:ring-0 resize-none rounded-xl text-white placeholder-slate-400 transition-all duration-300" 
+                        style="--tw-ring-color: var(--accent-terracotta);"
+                        placeholder="Ej: Un día tranquilo en Madrid, con un toque de cine clásico, buena lectura y tapas auténticas..."
+                    ></textarea>
+                    <button class="mt-6 w-full font-bold py-4 px-6 rounded-xl transition-all duration-300 text-lg bg-accent-terracotta text-white hover:bg-opacity-80"
+                            style="background-color: var(--accent-terracotta);">
+                        ✨ Curar mi Aventura
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Thinking Section -->
+        <section class="py-20 px-4">
+            <div class="max-w-3xl mx-auto">
+                <div class="glass-card p-8 text-center">
+                    <div class="flex justify-center items-center mb-6">
+                        <div class="w-16 h-16 rounded-full flex items-center justify-center thinking-animation" style="background: radial-gradient(circle, var(--accent-terracotta), transparent 60%);">
+                            <svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.636-6.364l.707.707M12 21v-1m-6.364-1.636l.707-.707"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <h3 class="text-3xl font-display font-bold text-white mb-4">Analizando tu esencia cultural...</h3>
+                    <p class="text-slate-300 text-lg mb-8">Conectando tus pasiones con experiencias únicas en Madrid.</p>
+                    
+                    <div class="bg-black/30 p-6 rounded-xl font-mono text-sm text-left space-y-2 text-slate-400">
+                        <p class="text-green-400">✓ Procesando: "cine clásico" → Filmoteca Española</p>
+                        <p class="text-yellow-400">⟳ Análisis cultural via Qloo API...</p>
+                        <p class="text-cyan-400">⟳ Mapeando afinidades: literatura + espacios tranquilos</p>
+                        <p class="text-orange-400">⟳ Generando narrativa personalizada...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Journey Timeline -->
+        <section class="py-20 px-4">
+            <div class="max-w-5xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="text-5xl md:text-6xl font-display font-bold mb-6">
+                        Tu Sábado Bohemio en <span class="gradient-text">Madrid</span>
+                    </h2>
+                </div>
+
+                <div class="relative">
+                    <!-- Winding Path SVG -->
+                    <div class="absolute top-0 left-1/2 -translate-x-1/2 h-full w-full max-w-xs hidden md:block" style="pointer-events: none;">
+                        <svg width="100%" height="100%" viewBox="0 0 200 1200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M 100,0 C 200,200 0,400 100,600 C 200,800 0,1000 100,1200" stroke="url(#line-gradient)" stroke-width="2" fill="none" class="timeline-path"/>
+                            <defs>
+                                <linearGradient id="line-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color: var(--accent-terracotta); stop-opacity: 0.8" />
+                                    <stop offset="50%" style="stop-color: var(--accent-sage); stop-opacity: 0.8" />
+                                    <stop offset="100%" style="stop-color: var(--accent-sand); stop-opacity: 0.8" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                    
+                    <div class="relative z-10 space-y-24">
+                        <!-- Morning -->
+                        <div class="md:grid md:grid-cols-2 md:gap-12 items-center">
+                            <div class="text-left">
+                                <h3 class="text-4xl font-display font-bold mb-4 flex items-center gap-4"><span class="text-5xl">☀️</span> Mañana: Un Comienzo de Película</h3>
+                                <p class="text-slate-400 text-lg leading-relaxed">Empezamos con una dosis de nostalgia y cafeína, en un lugar que respira historia cinematográfica.</p>
+                            </div>
+                            <div class="mt-8 md:mt-0">
+                                <div class="glass-card p-6 hover-lift">
+                                    <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=800&auto=format&fit=crop" alt="Café de especialidad" class="w-full h-48 object-cover rounded-xl mb-4">
+                                    <h4 class="text-2xl font-bold" style="color: var(--accent-terracotta);">Café Doré & Filmoteca Española</h4>
+                                    <div class="bg-black/20 p-4 rounded-lg my-4 text-sm">
+                                        <p class="font-semibold" style="color: var(--accent-sand);">CONEXIÓN CULTURAL:</p>
+                                        <p class="text-slate-300">Porque amas el cine clásico, tu día empieza en un café que es, en sí mismo, un cine histórico.</p>
+                                    </div>
+                                    <div class="text-xs text-slate-400 mt-3">Vibe Match: 95%</div>
+                                    <div class="w-full bg-white/10 rounded-full h-1 mt-1"><div class="h-1 rounded-full" style="width: 95%; background-color: var(--accent-terracotta);"></div></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Afternoon -->
+                        <div class="md:grid md:grid-cols-2 md:gap-12 items-center">
+                            <div class="mt-8 md:mt-0 md:order-2">
+                                <div class="glass-card p-6 hover-lift">
+                                    <img src="https://images.unsplash.com/photo-1507682543668-3ca4a3818e02?q=80&w=800&auto=format&fit=crop" alt="Parque del Retiro" class="w-full h-48 object-cover rounded-xl mb-4">
+                                    <h4 class="text-2xl font-bold" style="color: var(--accent-sage);">Librería La Central & Parque del Retiro</h4>
+                                    <div class="bg-black/20 p-4 rounded-lg my-4 text-sm">
+                                        <p class="font-semibold" style="color: var(--accent-sand);">CONEXIÓN CULTURAL:</p>
+                                        <p class="text-slate-300">Conecta tu amor por la lectura con un espacio icónico. La simbiosis perfecta de cultura y calma.</p>
+                                    </div>
+                                    <div class="text-xs text-slate-400 mt-3">Vibe Match: 92%</div>
+                                    <div class="w-full bg-white/10 rounded-full h-1 mt-1"><div class="h-1 rounded-full" style="width: 92%; background-color: var(--accent-sage);"></div></div>
+                                    <button class="text-sm mt-4 bg-white/10 px-4 py-2 rounded-full hover:bg-white/20 transition-colors">Ver alternativas literarias</button>
+                                </div>
+                            </div>
+                            <div class="md:order-1 text-left md:text-right">
+                                <h3 class="text-4xl font-display font-bold mb-4 flex items-center md:justify-end gap-4">Tarde: Páginas y Serenidad <span class="text-5xl">📖</span></h3>
+                                <p class="text-slate-400 text-lg leading-relaxed">Una pausa contemplativa donde la literatura se encuentra con la naturaleza urbana.</p>
+                            </div>
+                        </div>
+
+                        <!-- Evening -->
+                        <div class="md:grid md:grid-cols-2 md:gap-12 items-center">
+                            <div class="text-left">
+                                <h3 class="text-4xl font-display font-bold mb-4 flex items-center gap-4"><span class="text-5xl">🍷</span> Noche: Sabores de Tradición</h3>
+                                <p class="text-slate-400 text-lg leading-relaxed">El gran final: donde la gastronomía auténtica se convierte en el acto culminante de tu jornada cultural.</p>
+                            </div>
+                            <div class="mt-8 md:mt-0">
+                                <div class="glass-card p-6 hover-lift">
+                                    <img src="https://images.unsplash.com/photo-1579871494447-98114245806c?q=80&w=800&auto=format&fit=crop" alt="Tapas españolas" class="w-full h-48 object-cover rounded-xl mb-4">
+                                    <h4 class="text-2xl font-bold" style="color: var(--accent-terracotta);">Mercado de San Miguel</h4>
+                                    <div class="bg-black/20 p-4 rounded-lg my-4 text-sm">
+                                        <p class="font-semibold" style="color: var(--accent-sand);">CONEXIÓN CULTURAL:</p>
+                                        <p class="text-slate-300">Las tapas auténticas cierran tu círculo cultural. Es social, histórico y vibrante - el contrapunto perfecto a tu tarde.</p>
+                                    </div>
+                                    <div class="text-xs text-slate-400 mt-3">Vibe Match: 88%</div>
+                                    <div class="w-full bg-white/10 rounded-full h-1 mt-1"><div class="h-1 rounded-full" style="width: 88%; background-color: var(--accent-terracotta);"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-20 px-4">
+            <div class="max-w-4xl mx-auto text-center">
+                <h3 class="text-4xl md:text-5xl font-display font-bold mb-6">
+                    Tu historia cultural te espera
+                </h3>
+                <p class="text-xl text-slate-400 mb-12 max-w-2xl mx-auto">
+                    Cada experiencia ha sido cuidadosamente seleccionada para resonar con tu esencia cultural única.
+                </p>
+                <div class="flex flex-wrap justify-center gap-6">
+                    <button class="font-bold py-4 px-8 rounded-xl transition-all duration-300 text-lg transform hover:scale-105" style="background-color: var(--accent-terracotta); color: white;">💾 Guardar Itinerario</button>
+                    <button class="glass-card px-8 py-4 rounded-xl font-semibold text-white hover:bg-white/20 transition-all duration-300 text-lg">🔗 Compartir Aventura</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="border-t border-white/10 py-12 px-4">
+        <div class="max-w-6xl mx-auto text-center">
+            <h2 class="text-3xl font-display font-bold mb-4" style="color: var(--accent-sand);">VibeVoyage</h2>
+            <p class="text-slate-400 mb-8">Transformamos tus gustos en experiencias memorables.</p>
+            <div class="flex flex-wrap justify-center gap-8 text-sm text-slate-400">
+                <a href="#" class="hover:text-white transition-colors">Sobre nosotros</a>
+                <a href="#" class="hover:text-white transition-colors">Cómo funciona</a>
+                <a href="#" class="hover:text-white transition-colors">Ciudades</a>
+                <a href="#" class="hover:text-white transition-colors">Privacidad</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

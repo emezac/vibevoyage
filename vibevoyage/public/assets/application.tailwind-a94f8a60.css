@@ -1,0 +1,85 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+@layer components {
+  .glass-card {
+    @apply relative overflow-hidden transition-all duration-500;
+    background: rgba(41, 46, 66, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(243, 229, 216, 0.2);
+    border-radius: 24px;
+  }
+  
+  .glass-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 25px 50px rgba(224, 122, 95, 0.15), 0 0 0 1px rgba(224, 122, 95, 0.3);
+    border-color: rgba(224, 122, 95, 0.3);
+  }
+
+  .glass-strong {
+    background: rgba(41, 46, 66, 0.8);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+  }
+
+  .font-display {
+    font-family: 'Playfair Display', serif;
+  }
+
+  .gradient-text {
+    background: linear-gradient(90deg, #f3e5d8, #f4d03f, #f0f2f5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+  }
+
+  .fade-in-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  }
+  
+  .fade-in-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .hero-pattern {
+    background-image: 
+      radial-gradient(circle at 15% 20%, rgba(224, 122, 95, 0.1) 0%, transparent 40%),
+      radial-gradient(circle at 85% 80%, rgba(163, 184, 153, 0.1) 0%, transparent 40%);
+  }
+
+  .nav-blur {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  
+  header.scrolled .glass-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  }
+}
+
+@layer utilities {
+  @keyframes shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .fade-in-up:nth-child(1) { transition-delay: 0s; }
+  .fade-in-up:nth-child(2) { transition-delay: 0.1s; }
+  .fade-in-up:nth-child(3) { transition-delay: 0.2s; }
+  .fade-in-up:nth-child(4) { transition-delay: 0.3s; }
+}

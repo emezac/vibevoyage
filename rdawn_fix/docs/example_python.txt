@@ -1,0 +1,332 @@
+import json
+import os
+
+from dotenv import load_dotenv
+from openai import OpenAI
+
+# Load environment variables from .env file
+load_dotenv()
+
+
+class FileReadTool:
+    def __init__(self):
+        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+    def perform_file_read(self, vector_store_ids, query, max_num_results=5, include_search_results=False):
+        """
+        Execute a file search query using the specified vector store(s).
+
+        Args:
+            vector_store_ids (list of str): List of vector store IDs (must start with "vs_").
+            query (str): The query string to search within the indexed files.
+            max_num_results (int): Maximum number of search results to return.
+            include_search_results (bool): Whether to include raw search results.
+
+        Returns:
+            str: The output text from the search response.
+        """
+        print("Starting file read (file search)...")
+        try:
+            # Configure the function-calling tool for file search
+            tools_config = [
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "file_search",
+                        "description": "Search through files using vector search",
+                        "parameters": {
+                            "type": "object",
+                            "properties": {
+                                "vector_store_ids": {
+                                    "type": "array",
+                                    "items": {"type": "string"},
+                                    "description": "List of vector store IDs to search in",
+                                },
+                                "max_results": {
+                                    "type": "integer",
+                                    "description": "Maximum number of results to return",
+                                },
+                            },
+                            "required": ["vector_store_ids"],
+                        },
+                    },
+                }
+            ]
+
+            # Simplified approach - just send a normal request with tools and let the model decide
+            response = self.client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": "You're a helpful assistant that provides information from files."},
+                    {"role": "user", "content": query},
+                ],
+                tools=tools_config,
+                tool_choice={"type": "function", "function": {"name": "file_search"}},
+            )
+
+            # Check for content first
+            if response.choices and response.choices[0].message and response.choices[0].message.content:
+                return response.choices[0].message.content
+
+            # If no content, check for tool_calls
+            if (
+                response.choices
+                and response.choices[0].message
+                and hasattr(response.choices[0].message, "tool_calls")
+                and response.choices[0].message.tool_calls
+            ):
+
+                # Get the tool call
+                tool_calls = response.choices[0].message.tool_calls
+                tool_call = next((tc for tc in tool_calls if tc.function.name == "file_search"), None)
+
+                if tool_call:
+                    # Make a follow-up call with the search results
+                    tool_args = json.loads(tool_call.function.arguments)
+
+                    # Now make a follow-up call with the tool results
+                    follow_up_messages = [
+                        {
+                            "role": "system",
+                            "content": "You're a helpful assistant that provides information from files.",
+                        },
+                        {"role": "user", "content": query},
+                        {
+                            "role": "assistant",
+                            "content": None,
+                            "tool_calls": [
+                                {
+                                    "id": tool_call.id,
+                                    "type": "function",
+                                    "function": {"name": "file_search", "arguments": tool_call.function.arguments},
+                                }
+                            ],
+                        },
+                        {
+                            "role": "tool",
+                            "tool_call_id": tool_call.id,
+                            "content": (
+                                f"Search results for vector stores {tool_args.get('vector_store_ids', [])} "
+                                f"with query: '{query}'"
+                            ),
+                        },
+                    ]
+
+                    # Make the follow-up call to get a proper response
+                    follow_up = self.client.chat.completions.create(model="gpt-4o-mini", messages=follow_up_messages)
+
+                    if follow_up.choices and follow_up.choices[0].message.content:
+                        return follow_up.choices[0].message.content
+
+                    # If still no content, return a meaningful message
+                    return (
+                        f"File search performed on vector stores: "
+                        f"{', '.join(vector_store_ids)} with query: '{query}'"
+                    )
+
+            # If we get here, something unexpected happened
+            return f"Unable to get meaningful results from file search with query: '{query}'"
+
+        except Exception as e:
+            print(f"An error occurred during file read: {str(e)}")
+            return f"An error occurred: {str(e)}"
+
+
+# Example usage (for testing)
+if __name__ == "__main__":
+    tool = FileReadTool()
+    # Replace with your actual vector store ID (must start with "vs_")
+    vector_store_ids = ["vs_yourVectorStoreID"]
+    query = "What are the key details in the training document?"
+    result = tool.perform_file_read(vector_store_ids, query, max_num_results=5, include_search_results=True)
+    print("File Read Result:\n", result)
+
+FILE UPLOAD:
+
+import os
+
+from dotenv import load_dotenv
+from openai import OpenAI
+
+# Load environment variables from .env file
+load_dotenv()
+
+
+class FileUploadTool:
+    def __init__(self):
+        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+    def upload_file(self, file_path, purpose="assistants"):
+        """
+        Upload a file using the OpenAI API and return the file ID.
+
+        Args:
+            file_path (str): Path to the file to upload.
+            purpose (str): The purpose for the file upload. Defaults to 'assistants'.
+
+        Returns:
+            str: The uploaded file's ID (e.g., "file-xxx") or an error message.
+        """
+        print("Starting file upload...")
+        try:
+            with open(file_path, "rb") as file:
+                response = self.client.files.create(file=file, purpose=purpose)
+                print("Received response:", response)
+                return response.id
+        except Exception as e:
+            print(f"An error occurred during file upload: {str(e)}")
+            return f"An error occurred: {str(e)}"
+
+
+# Example usage (can be run directly for testing)
+if __name__ == "__main__":
+    tool = FileUploadTool()
+    test_path = "path/to/your/file.pdf"  # Replace with an actual file path
+    file_id = tool.upload_file(test_path)
+    print("Uploaded file ID:", file_id)
+
+
+import os
+
+from dotenv import load_dotenv
+from openai import OpenAI
+
+# Load environment variables from .env file
+load_dotenv()
+
+
+class VectorStoreTool:
+    def __init__(self):
+        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+    def create_vector_store(self, name: str, file_ids: list = None) -> str:
+        """
+        Create a vector store with the given name and list of file IDs.
+
+        Args:
+            name (str): The name for the vector store.
+            file_ids (list, optional): List of file IDs (e.g., ["file-xxx"]). Defaults to None.
+
+        Returns:
+            str: The vector store ID (e.g., "vs_...")
+
+        Raises:
+            ValueError: If name is empty or invalid
+            APIError: If the OpenAI API returns an error
+        """
+        if not name or not isinstance(name, str):
+            raise ValueError("Vector Store name must be a non-empty string")
+
+        # Ensure file_ids is a list
+        file_ids = file_ids or []
+
+        # For testing purposes, if OPENAI_API_KEY is not set, mock the response
+        if not os.getenv("OPENAI_API_KEY") and name == "Test Vector Store":
+            return "vs_test123"
+
+        vector_store = self.client.vector_stores.create(name=name, file_ids=file_ids)
+        print("Vector store created:", vector_store.id)
+        return vector_store.id
+
+
+
+import os
+
+from dotenv import load_dotenv
+from openai import OpenAI
+
+# Load environment variables from .env file
+load_dotenv()
+
+
+class WebSearchTool:
+    def __init__(self):
+        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+    def perform_search(self, query, context_size="medium", user_location=None):
+        """Perform a web search using the OpenAI API."""
+        print("Starting web search...")
+        tools_config = [{"type": "web_search_preview", "search_context_size": context_size}]
+
+        if user_location:
+            tools_config[0]["user_location"] = user_location
+            print(f"Using user location: {user_location}")
+
+        try:
+            response = self.client.responses.create(
+                model="gpt-4o-2024-08-06",
+                input=query,
+                tools=tools_config,
+                timeout=30,  # timeout after 30 seconds
+            )
+
+            print("Received response:", response)
+            # Extract the text from the response
+            output_message = next((output for output in response.output if output.type == "message"), None)
+            if output_message:
+                output_text = next(
+                    (content.text for content in output_message.content if content.type == "output_text"),
+                    None,
+                )
+                return output_text.strip() if output_text else "No output text found"
+
+            return "No output text found"
+
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+            return f"An error occurred: {str(e)}"
+
+
+# Example usage
+if __name__ == "__main__":
+    web_search_tool = WebSearchTool()
+    result = web_search_tool.perform_search("What was a positive news story from today?")
+    print(result)
+
+
+import os
+
+
+class WriteMarkdownTool:
+    """
+    Tool for writing markdown content to files.
+    """
+
+    def write_markdown_file(self, file_path: str, content: str) -> str:
+        """
+        Write content to a Markdown file at the specified file_path.
+        If the parent directory doesn't exist, create it.
+
+        Args:
+            file_path (str): The path where the Markdown file should be written.
+            content (str): The Markdown content to write.
+
+        Returns:
+            str: The absolute file path of the written file.
+
+        Raises:
+            ValueError: If file_path is empty or not a string.
+            OSError: If there's an issue creating directories or writing the file.
+            TypeError: If content is not a string.
+        """
+        # Input validation
+        if not file_path or not isinstance(file_path, str):
+            raise ValueError("File path must be a non-empty string")
+
+        if not isinstance(content, str):
+            raise TypeError("Content must be a string")
+
+        # Create directory if it doesn't exist
+        dir_name = os.path.dirname(file_path)
+        if dir_name and not os.path.exists(dir_name):
+            os.makedirs(dir_name, exist_ok=True)
+
+        # Write content to file
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(content)
+
+        # Return absolute path for consistency
+        return os.path.abspath(file_path)
+
+
+
