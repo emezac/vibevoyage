@@ -73,7 +73,14 @@ class ProcessVibeJobIntelligent < ApplicationJob
               rating: exp[:rating],
               image: exp[:image],
               qloo_keywords: exp[:qloo_keywords] || [],
-              why_chosen: exp[:why_chosen]
+              why_chosen: exp[:why_chosen],
+              latitude: exp[:latitude],
+              longitude: exp[:longitude],
+              price_level: exp[:price_level],
+              hours: exp[:hours],
+              website: exp[:website],
+              phone: exp[:phone],
+              tags: exp[:tags]
             }
           end
         }
@@ -869,7 +876,12 @@ class ProcessVibeJobIntelligent < ApplicationJob
         area: extract_area_from_google_data(google_data, city),
         vibe_match: calculate_vibe_match_with_google(qloo_entity, google_data, parsed_vibe),
         rating: google_data&.dig('rating') || qloo_entity&.dig('properties', 'business_rating') || rand(4.0..5.0).round(1),
-        image: get_experience_image(index),
+        image: qloo_entity&.dig('properties', 'images', 0, 'url') || get_experience_image(index),
+        price_level: qloo_entity&.dig('properties', 'price_level'),
+        hours: qloo_entity&.dig('properties', 'hours'),
+        website: qloo_entity&.dig('properties', 'website'),
+        phone: qloo_entity&.dig('properties', 'phone'),
+        tags: qloo_entity&.dig('tags') || [],
         # *** CAMPOS DE GOOGLE PLACES CON DEBUG ***
         latitude: latitude&.to_f,
         longitude: longitude&.to_f,

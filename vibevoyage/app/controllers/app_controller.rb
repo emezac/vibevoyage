@@ -4,30 +4,44 @@ class AppController < ApplicationController
     # Renderiza la interfaz principal (tu diseño de una sola página)
   end
 
-  def create_real_journey
-    user_vibe = params[:user_vibe]
+# En app/controllers/app_controller.rb
 
-    if user_vibe.blank?
-      render json: { error: 'Vibe description is required' }, status: :bad_request
-      return
-    end
-
-    # Generar process_id único
-    process_id = "#{session.id}_#{SecureRandom.hex(8)}"
+def create_real_journey
+  user_vibe = params[:user_vibe]
+  puts "=== EJECUTANDO PROCESAMIENTO INTELIGENTE SÍNCRONAMENTE ==="
+  puts "User vibe: #{user_vibe}"
+  
+  begin
+    # Crear un process_id temporal para la ejecución síncrona
+    temp_process_id = "sync_#{SecureRandom.hex(8)}"
     
-    # Estado inicial en cache
-    initial_status = { 
-      status: 'queued', 
-      message: 'Iniciando análisis cultural...', 
-      progress: 5 
+    # ✅ INICIALIZAR el estado en cache ANTES de ejecutar el job
+    Rails.cache.write("journey_#{temp_process_id}", {
+      status: 'processing',
+      progress: 0,
+      message: 'Iniciando análisis cultural...'
+    }, expires_in: 30.minutes)
+    
+    # ✅ DEVOLVER inmediatamente el process_id para que el frontend inicie el polling
+    render json: {
+      success: true,
+      process_id: temp_process_id
     }
-    Rails.cache.write("journey_#{process_id}", initial_status, expires_in: 15.minutes)
-
-    # *** USAR EL JOB INTELIGENTE MEJORADO CON APIs REALES ***
-    ProcessVibeJobIntelligent.perform_later(process_id, user_vibe)
-
-    render json: { process_id: process_id, status: 'queued' }
+    
+    # ✅ EJECUTAR el job en background para no bloquear la respuesta
+    ProcessVibeJobIntelligent.perform_later(temp_process_id, user_vibe)
+    
+  rescue => e
+    puts "❌ Error iniciando ProcessVibeJobIntelligent: #{e.message}"
+    Rails.logger.error "Error: #{e.message}\n#{e.backtrace.join("\n")}"
+    
+    render json: {
+      success: false,
+      error: e.message,
+      message: "Error procesando tu vibe: #{e.message}. Puedes intentar de nuevo."
+    }
   end
+end
 
   # def real_status
   #   process_id = params[:process_id]
