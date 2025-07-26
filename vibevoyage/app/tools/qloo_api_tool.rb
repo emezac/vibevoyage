@@ -46,6 +46,13 @@ class QlooApiTool
     headers = { 'X-Api-Key' => @api_key, 'Content-Type' => 'application/json' }
     response = HTTPX.with(headers: headers).post("#{API_SERVER}#{INSIGHTS_ENDPOINT}", json: body)
 
+    # FIX: Verificar si es un ErrorResponse antes de acceder a status
+    if response.is_a?(HTTPX::ErrorResponse)
+      error_msg = response.error&.message || response.error.to_s || "Unknown HTTPX error"
+      return { success: false, error: "Network error: #{error_msg}" }
+    end
+
+    # Solo acceder a status si no es un ErrorResponse
     if response.status == 200
       { success: true, data: JSON.parse(response.body.to_s) }
     else

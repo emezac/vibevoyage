@@ -43,9 +43,18 @@ end
 require_relative '../../app/tools/qloo_api_tool'
 require_relative '../../app/tools/maps_api_tool'
 
-qloo_tool_instance = QlooApiTool.new(api_key: ENV['QLOO_API_KEY']&.strip)
-Rdawn::ToolRegistry.register('qloo_api', qloo_tool_instance.method(:recommendations))
-Rdawn::ToolRegistry.register('maps_api', MapsApiTool.method(:search_places))
+# FIX: Verificar que las herramientas se registren correctamente
+begin
+  qloo_tool_instance = QlooApiTool.new(api_key: ENV['QLOO_API_KEY']&.strip)
+  Rdawn::ToolRegistry.register('qloo_api', qloo_tool_instance.method(:recommendations))
+  
+  # FIX: Usar el método 'execute' que maneja el formato { query: query }
+  Rdawn::ToolRegistry.register('maps_api', MapsApiTool.method(:execute))
+  
+  Rails.logger.info "Successfully registered tools: qloo_api, maps_api"
+rescue => e
+  Rails.logger.error "Error registering tools: #{e.message}"
+end
 
 # Ejemplo de registro de workflow handler
 # Registra tus workflow handlers aquí o en archivos separados

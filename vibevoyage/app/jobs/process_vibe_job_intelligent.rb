@@ -2,66 +2,154 @@
 class ProcessVibeJobIntelligent < ApplicationJob
   queue_as :default
 
-  def perform(process_id, user_vibe)
-    puts "=== INICIANDO ProcessVibeJobIntelligent ==="
-    puts "Process ID: #{process_id}"
-    puts "User vibe: #{user_vibe}"
+def perform(process_id, user_vibe)
+  puts "=== INICIANDO ProcessVibeJobIntelligent ==="
+  puts "Process ID: #{process_id}"
+  puts "User vibe: #{user_vibe}"
+  
+  begin
+    # Paso 1: Análisis con LLM (25%)
+    update_status(process_id, 'analyzing', 'Analizando tu esencia cultural...', 25)
     
-    begin
-      # Paso 1: Análisis con LLM (25%)
-      update_status(process_id, 'analyzing', 'Analizando tu esencia cultural...', 25)
-      
-      parsed_vibe = parse_vibe_with_rdawn(user_vibe, process_id)
-      Rails.logger.info "--- Parsed Vibe from LLM: #{parsed_vibe.inspect}"
-      
-      # Paso 2: Consulta a Qloo API (50%)
-      update_status(process_id, 'processing', 'Conectando con bases de datos culturales...', 50)
-      
-      Rails.logger.info "--- Calling Qloo with: interests=#{parsed_vibe[:interests].inspect}, city=#{parsed_vibe[:city].inspect}, preferences=#{parsed_vibe[:preferences].inspect}"
-      
-      recommendations_result = RdawnApiService.qloo_recommendations(
-        interests: parsed_vibe[:interests],
+    parsed_vibe = parse_vibe_with_rdawn(user_vibe, process_id)
+    Rails.logger.info "--- Parsed Vibe from LLM: #{parsed_vibe.inspect}"
+    
+    # Paso 2: Consulta a Qloo API (50%)
+    update_status(process_id, 'processing', 'Conectando con bases de datos culturales...', 50)
+    
+    Rails.logger.info "--- Calling Qloo with: interests=#{parsed_vibe[:interests].inspect}, city=#{parsed_vibe[:city].inspect}, preferences=#{parsed_vibe[:preferences].inspect}"
+    
+    recommendations_result = RdawnApiService.qloo_recommendations(
+      interests: parsed_vibe[:interests],
+      city: parsed_vibe[:city],
+      preferences: parsed_vibe[:preferences]
+    )
+    
+    Rails.logger.info "--- Qloo API Result: #{recommendations_result.inspect}"
+    
+    unless recommendations_result[:success]
+      error_msg = "Error fetching recommendations: #{recommendations_result[:error]}"
+      update_status(process_id, 'failed', error_msg, 100)
+      return
+    end
+    
+    # Paso 3: Curación inteligente con explicaciones (75%)
+    update_status(process_id, 'curating', 'Curando experiencias con contexto cultural...', 75)
+    
+    curated_experiences = curate_experiences_with_explanations(
+      parsed_vibe, 
+      recommendations_result[:data]
+    )
+    
+    # Paso 4: Construir narrativa final (90%)
+    update_status(process_id, 'finalizing', 'Construyendo tu narrativa personalizada...', 90)
+    
+    narrative = build_intelligent_narrative(parsed_vibe, user_vibe, curated_experiences)
+    
+    # Paso 5: Guardar en base de datos con explicaciones culturales
+    itinerary = save_intelligent_itinerary(user_vibe, parsed_vibe, narrative, curated_experiences)
+    
+    # *** RESULTADO FINAL ACTUALIZADO CON TODOS LOS CAMPOS ***
+    final_result = {
+      status: 'complete',
+      message: '¡Tu aventura cultural está lista!',
+      progress: 100,
+      itinerary: {
+        id: itinerary.id,
+        title: "Tu Aventura en #{parsed_vibe[:city]}",
         city: parsed_vibe[:city],
-        preferences: parsed_vibe[:preferences]
-      )
+        narrative_html: narrative,
+        experiences: curated_experiences.map.with_index do |exp, index|
+          {
+            # *** CAMPOS BÁSICOS ***
+            id: itinerary.itinerary_stops[index]&.id,
+            time: exp[:time],
+            title: exp[:title],
+            location: exp[:location],
+            description: exp[:description],
+            cultural_explanation: exp[:cultural_explanation],
+            duration: exp[:duration],
+            area: exp[:area],
+            vibe_match: exp[:vibe_match],
+            rating: exp[:rating],
+            image: exp[:image],
+            
+            # *** DATOS PRINCIPALES DE QLOO ***
+            qloo_keywords: exp[:qloo_keywords] || [],
+            qloo_entity_id: exp[:qloo_entity_id],
+            qloo_popularity: exp[:qloo_popularity],
+            why_chosen: exp[:why_chosen],
+            
+            # *** INFORMACIÓN DE CONTACTO Y UBICACIÓN ***
+            website: exp[:website],
+            phone: exp[:phone],
+            address: exp[:address],
+            latitude: exp[:latitude],
+            longitude: exp[:longitude],
+            google_maps_url: exp[:google_maps_url],
+            directions_url: exp[:directions_url],
+            
+            # *** INFORMACIÓN OPERATIVA ***
+            hours: exp[:hours],
+            price_level: exp[:price_level],
+            price_range: exp[:price_range],
+            
+            # *** CATEGORÍAS Y CARACTERÍSTICAS ***
+            tags: exp[:tags] || [],
+            categories: exp[:categories] || [],
+            amenities: exp[:amenities] || [],
+            accessibility: exp[:accessibility],
+            family_friendly: exp[:family_friendly],
+            
+            # *** INFORMACIÓN ADICIONAL ***
+            booking_info: exp[:booking_info]
+          }.compact  # Remove nil values
+        end
+      }
+    }
+    
+    update_status(process_id, 'complete', '¡Tu aventura está lista!', 100, itinerary: final_result[:itinerary])
+    
+    Rails.logger.info "ProcessVibeJobIntelligent completado para process_id: #{process_id}"
+    Rails.logger.info "--- Total campos por experiencia: #{final_result[:itinerary][:experiences].first&.keys&.size || 0}"
+    Rails.logger.info "--- Experiencias con coordenadas: #{final_result[:itinerary][:experiences].count { |e| e[:latitude] && e[:longitude] }}"
+    Rails.logger.info "--- Experiencias con website: #{final_result[:itinerary][:experiences].count { |e| e[:website] }}"
+    
+  rescue => e
+    puts "=== ERROR en ProcessVibeJobIntelligent: #{e.message} ==="
+    Rails.logger.error "ProcessVibeJobIntelligent falló: #{e.message}\n#{e.backtrace.join("\n")}"
+    
+    # *** MEJORAR EL FALLBACK ***
+    begin
+      puts "=== Attempting fallback response ==="
+      update_status(process_id, 'processing', 'Creando experiencia de fallback...', 75)
       
-      Rails.logger.info "--- Qloo API Result: #{recommendations_result.inspect}"
+      # Parse vibe with simpler method
+      parsed_vibe = simple_vibe_parsing(user_vibe)
       
-      unless recommendations_result[:success]
-        error_msg = "Error fetching recommendations: #{recommendations_result[:error]}"
-        update_status(process_id, 'failed', error_msg, 100)
-        return
-      end
+      # Create fallback experiences
+      fallback_experiences = create_comprehensive_fallback(parsed_vibe)
       
-      # Paso 3: Curación inteligente con explicaciones (75%)
-      update_status(process_id, 'curating', 'Curando experiencias con contexto cultural...', 75)
+      # Create simple narrative
+      fallback_narrative = create_fallback_narrative(parsed_vibe, user_vibe)
       
-      curated_experiences = curate_experiences_with_explanations(
-        parsed_vibe, 
-        recommendations_result[:data]
-      )
+      # Save fallback itinerary
+      fallback_itinerary = save_fallback_itinerary(user_vibe, parsed_vibe, fallback_narrative, fallback_experiences)
       
-      # Paso 4: Construir narrativa final (90%)
-      update_status(process_id, 'finalizing', 'Construyendo tu narrativa personalizada...', 90)
-      
-      narrative = build_intelligent_narrative(parsed_vibe, user_vibe, curated_experiences)
-      
-      # Paso 5: Guardar en base de datos con explicaciones culturales
-      itinerary = save_intelligent_itinerary(user_vibe, parsed_vibe, narrative, curated_experiences)
-      
-      # Resultado final para la interfaz de una sola página
+      # Create final result with same enhanced structure
       final_result = {
         status: 'complete',
-        message: '¡Tu aventura cultural está lista!',
+        message: '¡Tu aventura está lista! (Modo offline)',
         progress: 100,
         itinerary: {
-          id: itinerary.id,
+          id: fallback_itinerary.id,
           title: "Tu Aventura en #{parsed_vibe[:city]}",
           city: parsed_vibe[:city],
-          narrative_html: narrative,
-          experiences: curated_experiences.map.with_index do |exp, index|
+          narrative_html: fallback_narrative,
+          experiences: fallback_experiences.map.with_index do |exp, index|
             {
-              id: itinerary.itinerary_stops[index]&.id,
+              # Same enhanced structure as the main path
+              id: fallback_itinerary.itinerary_stops[index]&.id,
               time: exp[:time],
               title: exp[:title],
               location: exp[:location],
@@ -73,30 +161,41 @@ class ProcessVibeJobIntelligent < ApplicationJob
               rating: exp[:rating],
               image: exp[:image],
               qloo_keywords: exp[:qloo_keywords] || [],
+              qloo_entity_id: nil,
+              qloo_popularity: nil,
               why_chosen: exp[:why_chosen],
-              latitude: exp[:latitude],
-              longitude: exp[:longitude],
-              price_level: exp[:price_level],
-              hours: exp[:hours],
               website: exp[:website],
               phone: exp[:phone],
-              tags: exp[:tags]
-            }
+              address: exp[:address],
+              latitude: exp[:latitude],
+              longitude: exp[:longitude],
+              google_maps_url: exp[:latitude] && exp[:longitude] ? 
+                "https://www.google.com/maps/search/?api=1&query=#{exp[:latitude]},#{exp[:longitude]}" : nil,
+              directions_url: exp[:latitude] && exp[:longitude] ? 
+                "https://www.google.com/maps/dir/?api=1&destination=#{exp[:latitude]},#{exp[:longitude]}" : nil,
+              hours: exp[:hours],
+              price_level: exp[:price_level],
+              price_range: exp[:price_range],
+              tags: exp[:tags] || [],
+              categories: [],
+              amenities: [],
+              accessibility: nil,
+              family_friendly: nil,
+              booking_info: nil
+            }.compact
           end
         }
       }
       
       update_status(process_id, 'complete', '¡Tu aventura está lista!', 100, itinerary: final_result[:itinerary])
+      puts "✅ Fallback response created successfully with enhanced data structure"
       
-      Rails.logger.info "ProcessVibeJobIntelligent completado para process_id: #{process_id}"
-      
-    rescue => e
-      puts "=== ERROR en ProcessVibeJobIntelligent: #{e.message} ==="
-      Rails.logger.error "ProcessVibeJobIntelligent falló: #{e.message}\n#{e.backtrace.join("\n")}"
-      
+    rescue => fallback_error
+      puts "=== FALLBACK ALSO FAILED: #{fallback_error.message} ==="
       update_status(process_id, 'failed', "Error procesando tu vibe: #{e.message}", 100)
     end
   end
+end
 
   private
 
@@ -828,79 +927,152 @@ class ProcessVibeJobIntelligent < ApplicationJob
   end
 
   # *** FUNCIÓN ACTUALIZADA: Curate con ubicaciones de Google ***
-  def curate_experiences_with_explanations(parsed_vibe, qloo_data)
-    puts "=== Curando experiencias con explicaciones culturales ==="
-    
-    city = parsed_vibe[:city]
-    qloo_entities = qloo_data&.dig('results', 'entities') || []
-    
-    puts "=== EJECUTANDO BÚSQUEDA GOOGLE PLACES DESDE CURATE ==="
-    
-    # *** LLAMAR A GOOGLE PLACES AQUÍ ***
-    google_places_results = fetch_google_places_data(parsed_vibe, qloo_data)
-    
-    if google_places_results.empty?
-      puts "=== No hay datos de Google Places, usando experiencias de fallback ==="
-      return create_fallback_experiences_with_explanations(parsed_vibe)
-    end
-
-    experiences = google_places_results.first(3).map.with_index do |place_result, index|
-      qloo_entity = place_result[:qloo_entity]
-      google_data = place_result[:google_data]
-      
-      # Extraer coordenadas de Google Places
-      location = google_data&.dig('geometry', 'location') || {}
-      latitude = location['lat']
-      longitude = location['lng']
-      
-      puts "--- Procesando experiencia #{index + 1}: #{place_result[:name]} - Coords: #{latitude}, #{longitude}"
-      
-      # Extraer keywords de Qloo para contexto cultural
-      qloo_keywords = qloo_entity&.dig('properties', 'keywords')&.map { |k| k['name'] } || []
-      
-      # Generar explicación cultural usando LLM
-      cultural_explanation = generate_cultural_explanation(
-        qloo_entity || { 'name' => place_result[:name] }, 
-        parsed_vibe, 
-        qloo_keywords, 
-        index
-      )
-      
-      {
-        time: ["10:00 AM", "02:00 PM", "07:30 PM"][index],
-        title: generate_experience_title(qloo_entity || { 'name' => place_result[:name] }, index),
-        location: place_result[:name],
-        description: qloo_entity&.dig('properties', 'description') || google_data&.dig('editorial_summary', 'overview') || "Una experiencia cultural única.",
-        cultural_explanation: cultural_explanation,
-        duration: ["2 hours", "2.5 hours", "3 hours"][index],
-        area: extract_area_from_google_data(google_data, city),
-        vibe_match: calculate_vibe_match_with_google(qloo_entity, google_data, parsed_vibe),
-        rating: google_data&.dig('rating') || qloo_entity&.dig('properties', 'business_rating') || rand(4.0..5.0).round(1),
-        image: qloo_entity&.dig('properties', 'images', 0, 'url') || get_experience_image(index),
-        price_level: qloo_entity&.dig('properties', 'price_level'),
-        hours: qloo_entity&.dig('properties', 'hours'),
-        website: qloo_entity&.dig('properties', 'website'),
-        phone: qloo_entity&.dig('properties', 'phone'),
-        tags: qloo_entity&.dig('tags') || [],
-        # *** CAMPOS DE GOOGLE PLACES CON DEBUG ***
-        latitude: latitude&.to_f,
-        longitude: longitude&.to_f,
-        place_id: google_data&.dig('place_id'),
-        formatted_address: google_data&.dig('formatted_address'),
-        qloo_keywords: qloo_keywords,
-        why_chosen: generate_why_chosen(qloo_entity || { 'name' => place_result[:name] }, parsed_vibe, qloo_keywords),
-        qloo_entity: qloo_entity,
-        google_data: google_data
-      }
-    end
-    
-    puts "✅ Curadas #{experiences.size} experiencias con ubicaciones de Google Maps"
-    experiences.each_with_index do |exp, index|
-      puts "   #{index + 1}. #{exp[:location]} - Coords: #{exp[:latitude]}, #{exp[:longitude]}"
-    end
-    
-    experiences
+def curate_experiences_with_explanations(parsed_vibe, qloo_data)
+  puts "=== Curando experiencias con explicaciones culturales ==="
+  
+  city = parsed_vibe[:city]
+  qloo_entities = qloo_data&.dig('results', 'entities') || []
+  
+  puts "=== QLOO ENTITIES FOUND: #{qloo_entities.size} ==="
+  qloo_entities.each_with_index do |entity, i|
+    puts "Entity #{i+1}: #{entity['name']} - #{entity['entity_id']}"
   end
+  
+  if qloo_entities.empty?
+    puts "=== No hay datos de Qloo, usando experiencias de fallback ==="
+    return create_fallback_experiences_with_explanations(parsed_vibe)
+  end
+
+  experiences = qloo_entities.first(3).map.with_index do |qloo_entity, index|
+    puts "--- Procesando experiencia #{index + 1}: #{qloo_entity['name']} ---"
+    
+    # Extraer TODOS los datos de Qloo de forma más completa
+    entity_properties = qloo_entity['properties'] || {}
+    entity_location = qloo_entity['location'] || {}
+    entity_tags = qloo_entity['tags'] || []
+    
+    # Coordenadas de Qloo (prioritarias)
+    latitude = entity_location['lat']&.to_f
+    longitude = entity_location['lon']&.to_f
+    
+    # Extraer keywords de Qloo de forma más robusta
+    qloo_keywords = []
+    if entity_properties['keywords'].is_a?(Array)
+      qloo_keywords = entity_properties['keywords'].map { |k| k.is_a?(Hash) ? k['name'] : k.to_s }.compact
+    elsif entity_properties['keywords'].is_a?(String)
+      qloo_keywords = entity_properties['keywords'].split(',').map(&:strip)
+    end
+    
+    # Si no hay keywords en properties, extraer de tags
+    if qloo_keywords.empty? && entity_tags.any?
+      qloo_keywords = entity_tags.map { |tag| tag['name'] }.compact.first(10)
+    end
+    
+    puts "--- Keywords extraídas: #{qloo_keywords.inspect}"
+    
+    # Extraer información de contacto completa
+    website = entity_properties['website']
+    phone = entity_properties['phone']
+    address = entity_properties['address']
+    
+    # Extraer información de horarios
+    hours = entity_properties['hours']
+    
+    # Extraer información de precios
+    price_level = entity_properties['price_level']&.to_i
+    
+    # Extraer rating
+    rating = entity_properties['business_rating']&.to_f || 
+             entity_properties['rating']&.to_f || 
+             rand(4.0..5.0).round(1)
+    
+    # Extraer descripción más completa
+    description = entity_properties['description'] || 
+                  entity_properties['summary'] || 
+                  entity_properties['editorial_summary'] ||
+                  "Una experiencia cultural única curada especialmente para tu vibe."
+    
+    # Extraer imágenes
+    images = entity_properties['images'] || []
+    main_image = if images.any?
+      images.first.is_a?(Hash) ? images.first['url'] : images.first
+    else
+      get_experience_image(index)
+    end
+    
+    # Generar explicación cultural usando LLM
+    cultural_explanation = generate_cultural_explanation(
+      qloo_entity, 
+      parsed_vibe, 
+      qloo_keywords, 
+      index
+    )
+    
+    # Extraer área de forma más inteligente
+    area = extract_area_from_qloo_entity(qloo_entity, city)
+    
+    # Calcular vibe match más sofisticado
+    vibe_match = calculate_enhanced_vibe_match(qloo_entity, parsed_vibe, qloo_keywords)
+    
+    # Crear experiencia con TODOS los datos
+    experience = {
+      time: ["10:00 AM", "02:00 PM", "07:30 PM"][index],
+      title: generate_experience_title(qloo_entity, index),
+      location: qloo_entity['name'],
+      description: description,
+      cultural_explanation: cultural_explanation,
+      duration: ["2 hours", "2.5 hours", "3 hours"][index],
+      area: area,
+      vibe_match: vibe_match,
+      rating: rating,
+      image: main_image,
+      
+      # *** DATOS COMPLETOS DE QLOO ***
+      qloo_keywords: qloo_keywords,
+      qloo_entity_id: qloo_entity['entity_id'],
+      qloo_popularity: qloo_entity['popularity'],
+      
+      # *** INFORMACIÓN DE CONTACTO ***
+      website: website,
+      phone: phone,
+      address: address,
+      
+      # *** COORDENADAS Y MAPAS ***
+      latitude: latitude,
+      longitude: longitude,
+      google_maps_url: generate_google_maps_url(latitude, longitude, qloo_entity['name']),
+      directions_url: generate_directions_url(latitude, longitude),
+      
+      # *** INFORMACIÓN OPERATIVA ***
+      hours: hours,
+      price_level: price_level,
+      price_range: generate_price_range(price_level),
+      
+      # *** TAGS Y CATEGORÍAS ***
+      tags: entity_tags,
+      categories: extract_categories_from_tags(entity_tags),
+      amenities: extract_amenities_from_tags(entity_tags),
+      
+      # *** INFORMACIÓN ADICIONAL ***
+      why_chosen: generate_enhanced_why_chosen(qloo_entity, parsed_vibe, qloo_keywords),
+      booking_info: extract_booking_info(entity_properties),
+      accessibility: extract_accessibility_info(entity_tags),
+      family_friendly: extract_family_friendly_info(entity_tags),
+      
+      # *** DATOS RAW PARA DEBUG ***
+      qloo_raw_data: qloo_entity
+    }
+    
+    puts "--- ✅ Experiencia #{index + 1} creada con #{qloo_keywords.size} keywords y coordenadas: #{latitude}, #{longitude}"
+    puts "--- Website: #{website || 'N/A'}, Phone: #{phone || 'N/A'}"
+    puts "--- Google Maps URL: #{experience[:google_maps_url]}"
+    
+    experience
+  end
+  
+  puts "✅ Curadas #{experiences.size} experiencias con datos completos de Qloo"
+  experiences
+end
 
   def generate_cultural_explanation(entity, parsed_vibe, qloo_keywords, index)
     prompt = <<-PROMPT.strip
@@ -1053,62 +1225,163 @@ class ProcessVibeJobIntelligent < ApplicationJob
     HTML
   end
 
-  def save_intelligent_itinerary(user_vibe, parsed_vibe, narrative, experiences)
-    city = parsed_vibe[:city] || 'Unknown City'
-    preferences = parsed_vibe[:preferences]&.join(', ') || 'various preferences'
-    
-    itinerary = Itinerary.create!(
-      user_id: 1,
-      description: user_vibe,
-      city: city,
-      location: city,
-      name: "Aventura Cultural en #{city}",
-      narrative_html: narrative,
-      themes: preferences
-    )
-    
-    experiences.each_with_index do |exp, index|
-      begin
-        attributes = {
-          name: exp[:location],
-          description: exp[:description],
-          address: "#{exp[:area]}, #{city}",
+# Replace the save_intelligent_itinerary method in ProcessVibeJobIntelligent
+
+def save_intelligent_itinerary(user_vibe, parsed_vibe, narrative, experiences)
+  city = parsed_vibe[:city] || 'Unknown City'
+  preferences = parsed_vibe[:preferences]&.join(', ') || 'various preferences'
+  
+  itinerary = Itinerary.create!(
+    user_id: 1,
+    description: user_vibe,
+    city: city,
+    location: city,
+    name: "Aventura Cultural en #{city}",
+    narrative_html: narrative,
+    themes: preferences
+  )
+  
+  experiences.each_with_index do |exp, index|
+    begin
+      # Base attributes that should always exist
+      attributes = {
+        name: exp[:location],
+        description: exp[:description],
+        address: exp[:address] || "#{exp[:area]}, #{city}"
+      }
+      
+      # Get available columns to avoid errors
+      column_names = ItineraryStop.column_names
+      
+      # Add position if column exists
+      attributes[:position] = index + 1 if column_names.include?('position')
+      
+      # Add coordinates if columns exist
+      if column_names.include?('latitude') && column_names.include?('longitude')
+        attributes[:latitude] = exp[:latitude]&.to_f
+        attributes[:longitude] = exp[:longitude]&.to_f
+      end
+      
+      # Add enhanced fields if they exist in the schema
+      if column_names.include?('cultural_explanation')
+        attributes[:cultural_explanation] = exp[:cultural_explanation]
+      end
+      
+      if column_names.include?('why_chosen')
+        attributes[:why_chosen] = exp[:why_chosen]
+      end
+      
+      if column_names.include?('qloo_keywords')
+        attributes[:qloo_keywords] = exp[:qloo_keywords]&.join(', ')
+      end
+      
+      if column_names.include?('website')
+        attributes[:website] = exp[:website]
+      end
+      
+      if column_names.include?('phone')
+        attributes[:phone] = exp[:phone]
+      end
+      
+      if column_names.include?('rating')
+        attributes[:rating] = exp[:rating]&.to_f
+      end
+      
+      if column_names.include?('price_level')
+        attributes[:price_level] = exp[:price_level]&.to_i
+      end
+      
+      if column_names.include?('vibe_match')
+        attributes[:vibe_match] = exp[:vibe_match]&.to_i
+      end
+      
+      if column_names.include?('opening_hours')
+        attributes[:opening_hours] = exp[:hours]&.to_json
+      end
+      
+      if column_names.include?('image_url')
+        attributes[:image_url] = exp[:image]
+      end
+      
+      # Store all enhanced data as JSON if there's a flexible field
+      if column_names.include?('qloo_data')
+        enhanced_data = {
+          # Core Qloo data
+          qloo_entity_id: exp[:qloo_entity_id],
+          qloo_popularity: exp[:qloo_popularity],
+          qloo_keywords: exp[:qloo_keywords],
+          
+          # Enhanced contact and location
+          google_maps_url: exp[:google_maps_url],
+          directions_url: exp[:directions_url],
+          website: exp[:website],
+          phone: exp[:phone],
+          
+          # Operational info
+          hours: exp[:hours],
+          price_level: exp[:price_level],
+          price_range: exp[:price_range],
+          
+          # Categories and features
+          categories: exp[:categories],
+          amenities: exp[:amenities],
+          accessibility: exp[:accessibility],
+          family_friendly: exp[:family_friendly],
+          
+          # Additional info
+          booking_info: exp[:booking_info],
           cultural_explanation: exp[:cultural_explanation],
           why_chosen: exp[:why_chosen],
-          qloo_keywords: exp[:qloo_keywords]&.join(', ')
+          vibe_match: exp[:vibe_match],
+          
+          # Raw data for debugging
+          tags: exp[:tags]
+        }.compact
+        
+        attributes[:qloo_data] = enhanced_data.to_json
+      end
+      
+      # Create the stop with all available data
+      stop = itinerary.itinerary_stops.create!(attributes)
+      
+      puts "✅ Enhanced stop creado: #{exp[:location]} (ID: #{stop.id})"
+      puts "   - Coords: #{exp[:latitude]}, #{exp[:longitude]}"
+      puts "   - Website: #{exp[:website] || 'N/A'}"
+      puts "   - Phone: #{exp[:phone] || 'N/A'}"
+      puts "   - Keywords: #{exp[:qloo_keywords]&.size || 0}"
+      
+    rescue => e
+      puts "❌ Error creando enhanced stop: #{e.message}"
+      puts "=== Columnas disponibles: #{ItineraryStop.column_names.inspect}"
+      
+      # Fallback: try with minimal data
+      begin
+        minimal_attributes = {
+          name: exp[:location],
+          description: exp[:description],
+          address: "#{exp[:area]}, #{city}"
         }
         
-        column_names = ItineraryStop.column_names
-        attributes[:position] = index + 1 if column_names.include?('position')
-        attributes[:latitude] = nil if column_names.include?('latitude')
-        attributes[:longitude] = nil if column_names.include?('longitude')
+        minimal_attributes[:position] = index + 1 if column_names.include?('position')
         
-        # Solo agregar campos que existen en la tabla
-        if column_names.include?('cultural_explanation')
-          # El campo ya está en attributes
-        else
-          # Guardar en qloo_data como JSON si no hay campo específico
-          if column_names.include?('qloo_data')
-            attributes[:qloo_data] = {
-              cultural_explanation: exp[:cultural_explanation],
-              why_chosen: exp[:why_chosen],
-              qloo_keywords: exp[:qloo_keywords]
-            }.to_json
-          end
-        end
+        fallback_stop = itinerary.itinerary_stops.create!(minimal_attributes)
+        puts "✅ Fallback stop creado: #{exp[:location]} (ID: #{fallback_stop.id})"
         
-        stop = itinerary.itinerary_stops.create!(attributes)
-        puts "✅ Stop creado: #{exp[:location]} (ID: #{stop.id})"
-        
-      rescue => e
-        puts "❌ Error creando stop: #{e.message}"
-        puts "=== Columnas disponibles: #{ItineraryStop.column_names.inspect}"
+      rescue => fallback_error
+        puts "❌ Error en fallback stop: #{fallback_error.message}"
       end
     end
-    
-    puts "✅ Itinerario inteligente guardado con ID: #{itinerary.id}"
-    itinerary
   end
+  
+  puts "✅ Enhanced itinerary guardado con ID: #{itinerary.id}"
+  puts "   - Experiencias: #{experiences.size}"
+  puts "   - Keywords totales: #{experiences.sum { |e| e[:qloo_keywords]&.size || 0 }}"
+  puts "   - Lugares con coordenadas: #{experiences.count { |e| e[:latitude] && e[:longitude] }}"
+  puts "   - Lugares con website: #{experiences.count { |e| e[:website] }}"
+  puts "   - Lugares con teléfono: #{experiences.count { |e| e[:phone] }}"
+  
+  itinerary
+end
 
   def calculate_vibe_match(entity, parsed_vibe)
     # Calcular match basado en popularidad de Qloo y coincidencias de intereses
@@ -1130,6 +1403,170 @@ class ProcessVibeJobIntelligent < ApplicationJob
     
     area.strip if area
   end
+
+  def calculate_enhanced_vibe_match(qloo_entity, parsed_vibe, qloo_keywords)
+  # Base score from Qloo popularity
+  base_score = ((qloo_entity['popularity'] || 0.8).to_f * 100).round
+  
+  # Keyword matching bonus
+  user_interests = parsed_vibe[:interests] || []
+  keyword_matches = (user_interests & qloo_keywords).size
+  keyword_bonus = keyword_matches * 10
+  
+  # Category matching bonus
+  entity_tags = qloo_entity['tags'] || []
+  category_bonus = 0
+  
+  entity_tags.each do |tag|
+    tag_name = tag['name'].downcase
+    user_interests.each do |interest|
+      if tag_name.include?(interest.downcase) || interest.downcase.include?(tag_name)
+        category_bonus += 5
+      end
+    end
+  end
+  
+  # Quality bonus based on rating
+  rating = qloo_entity.dig('properties', 'business_rating')&.to_f || 4.0
+  quality_bonus = case rating
+  when 4.5..5.0 then 10
+  when 4.0..4.4 then 5
+  else 0
+  end
+  
+  final_score = [base_score + keyword_bonus + category_bonus + quality_bonus, 100].min
+  [final_score, 75].max # Minimum 75%
+end
+
+  def extract_area_from_qloo_entity(qloo_entity, city)
+  # Intentar extraer área de múltiples fuentes en Qloo
+  area_candidates = [
+    qloo_entity.dig('properties', 'geocode', 'name'),
+    qloo_entity.dig('properties', 'neighborhood'),
+    qloo_entity.dig('properties', 'district'),
+    qloo_entity.dig('properties', 'area'),
+    qloo_entity.dig('location', 'neighborhood'),
+    qloo_entity.dig('properties', 'address')&.split(',')&.first
+  ].compact.map(&:strip)
+  
+  # Filtrar candidatos válidos
+  valid_area = area_candidates.find do |candidate|
+    candidate.length > 2 && 
+    !candidate.downcase.include?(city.downcase) &&
+    !candidate.match?(/^\d+/) # No códigos postales
+  end
+  
+  valid_area || "Centro"
+end
+
+  def generate_google_maps_url(latitude, longitude, place_name)
+  return nil unless latitude && longitude
+  
+  # URL para abrir en Google Maps
+  encoded_name = CGI.escape(place_name || "")
+  "https://www.google.com/maps/search/?api=1&query=#{latitude},#{longitude}&query_place_id=#{encoded_name}"
+end
+
+def generate_directions_url(latitude, longitude)
+  return nil unless latitude && longitude
+  
+  # URL para obtener direcciones
+  "https://www.google.com/maps/dir/?api=1&destination=#{latitude},#{longitude}"
+end
+
+def generate_price_range(price_level)
+  return nil unless price_level
+  
+  case price_level
+  when 1 then "$"
+  when 2 then "$$"
+  when 3 then "$$$"
+  when 4 then "$$$$"
+  else "$-$$"
+  end
+end
+
+def extract_categories_from_tags(tags)
+  categories = []
+  
+  tags.each do |tag|
+    if tag['type']&.include?('category')
+      categories << tag['name']
+    end
+  end
+  
+  categories.uniq
+end
+
+def extract_amenities_from_tags(tags)
+  amenities = []
+  
+  tags.each do |tag|
+    if tag['type']&.include?('amenity')
+      amenities << tag['name']
+    end
+  end
+  
+  amenities.uniq
+end
+
+def generate_enhanced_why_chosen(qloo_entity, parsed_vibe, qloo_keywords)
+  # Razón más detallada
+  matching_keywords = (parsed_vibe[:interests] & qloo_keywords)
+  popularity_score = ((qloo_entity['popularity'] || 0.8) * 100).round
+  
+  reasons = []
+  
+  if matching_keywords.any?
+    reasons << "Coincidencia directa con tus intereses: #{matching_keywords.join(', ')}"
+  end
+  
+  if popularity_score >= 80
+    reasons << "Alta popularidad cultural (#{popularity_score}%)"
+  end
+  
+  if qloo_keywords.any?
+    top_keywords = qloo_keywords.first(3)
+    reasons << "Elementos culturales clave: #{top_keywords.join(', ')}"
+  end
+  
+  reasons.any? ? reasons.join('. ') : "Curado especialmente para tu experiencia cultural única"
+end
+
+def extract_booking_info(properties)
+  booking_info = {}
+  
+  booking_info[:reservation_required] = properties['reservation_required'] if properties['reservation_required']
+  booking_info[:booking_url] = properties['booking_url'] if properties['booking_url']
+  booking_info[:advance_booking] = properties['advance_booking_recommended'] if properties['advance_booking_recommended']
+  
+  booking_info.any? ? booking_info : nil
+end
+
+def extract_accessibility_info(tags)
+  accessibility = []
+  
+  tags.each do |tag|
+    if tag['type']&.include?('accessibility') || tag['name']&.downcase&.include?('wheelchair')
+      accessibility << tag['name']
+    end
+  end
+  
+  accessibility.any? ? accessibility : nil
+end
+
+def extract_family_friendly_info(tags)
+  family_features = []
+  
+  tags.each do |tag|
+    tag_name = tag['name'].downcase
+    if tag_name.include?('kid') || tag_name.include?('family') || tag_name.include?('children')
+      family_features << tag['name']
+    end
+  end
+  
+  family_features.any? ? family_features : nil
+end
 
   def get_experience_image(index)
     images = [

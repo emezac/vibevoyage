@@ -25,6 +25,14 @@ class MapsApiTool
         'Content-Type' => 'application/json'
       }).get("#{API_SERVER}/textsearch/json", params: params)
 
+      # FIX: Verificar si es un ErrorResponse antes de acceder a status
+      if response.is_a?(HTTPX::ErrorResponse)
+        error_msg = response.error&.message || response.error.to_s || "Unknown HTTPX error"
+        Rails.logger.error "Google Places API HTTPX error: #{error_msg}"
+        return { success: false, error: "Network error: #{error_msg}" }
+      end
+
+      # Solo acceder a status si no es un ErrorResponse
       if response.status == 200
         data = JSON.parse(response.body.to_s)
         
@@ -51,6 +59,12 @@ class MapsApiTool
     response = HTTPX.with(headers: {
       'Content-Type' => 'application/json'
     }).get("#{API_SERVER}/textsearch/json", params: params.merge(key: API_KEY))
+
+    # FIX: Verificar si es un ErrorResponse antes de acceder a status
+    if response.is_a?(HTTPX::ErrorResponse)
+      error_msg = response.error&.message || response.error.to_s || "Unknown HTTPX error"
+      return { error: 'network_error', message: error_msg }
+    end
 
     if response.status == 200
       JSON.parse(response.body.to_s)
