@@ -3,19 +3,19 @@ class ProcessVibeJobIntelligent < ApplicationJob
   queue_as :default
 
 def perform(process_id, user_vibe)
-  puts "=== INICIANDO ProcessVibeJobIntelligent ==="
+  puts "=== STARTING ProcessVibeJobIntelligent ==="
   puts "Process ID: #{process_id}"
   puts "User vibe: #{user_vibe}"
   
   begin
-    # Paso 1: Análisis con LLM (25%)
-    update_status(process_id, 'analyzing', 'Analizando tu esencia cultural...', 25)
+    # Step 1: Analysis with LLM (25%)
+    update_status(process_id, 'analyzing', 'Analyzing your cultural essence...', 25)
     
     parsed_vibe = parse_vibe_with_rdawn(user_vibe, process_id)
     Rails.logger.info "--- Parsed Vibe from LLM: #{parsed_vibe.inspect}"
     
-    # Paso 2: Consulta a Qloo API (50%)
-    update_status(process_id, 'processing', 'Conectando con bases de datos culturales...', 50)
+    # Step 2: Qloo API Query (50%)
+    update_status(process_id, 'processing', 'Connecting to cultural databases...', 50)
     
     Rails.logger.info "--- Calling Qloo with: interests=#{parsed_vibe[:interests].inspect}, city=#{parsed_vibe[:city].inspect}, preferences=#{parsed_vibe[:preferences].inspect}"
     
@@ -33,35 +33,57 @@ def perform(process_id, user_vibe)
       return
     end
     
-    # Paso 3: Curación inteligente con explicaciones (75%)
-    update_status(process_id, 'curating', 'Curando experiencias con contexto cultural...', 75)
+    # Step 3: Intelligent curation with explanations (75%)
+    update_status(process_id, 'curating', 'Curating experiences with cultural context...', 75)
     
     curated_experiences = curate_experiences_with_explanations(
       parsed_vibe, 
       recommendations_result[:data]
     )
     
-    # Paso 4: Construir narrativa final (90%)
-    update_status(process_id, 'finalizing', 'Construyendo tu narrativa personalizada...', 90)
+    # Step 4: Build final narrative (90%)
+    update_status(process_id, 'finalizing', 'Building your personalized narrative...', 90)
     
     narrative = build_intelligent_narrative(parsed_vibe, user_vibe, curated_experiences)
     
-    # Paso 5: Guardar en base de datos con explicaciones culturales
+    # Step 5: Save to database with cultural explanations
     itinerary = save_intelligent_itinerary(user_vibe, parsed_vibe, narrative, curated_experiences)
     
-    # *** RESULTADO FINAL ACTUALIZADO CON TODOS LOS CAMPOS ***
+    # *** FINAL RESULT UPDATED WITH ALL FIELDS ***
+    user_language = parsed_vibe[:detected_language] || 'en'
+    
+    # Generate localized title
+    adventure_title = case user_language
+    when 'es' then "Tu Aventura en #{parsed_vibe[:city]}"
+    when 'fr' then "Votre Aventure à #{parsed_vibe[:city]}"
+    when 'pt' then "Sua Aventura em #{parsed_vibe[:city]}"
+    when 'it' then "La Tua Avventura a #{parsed_vibe[:city]}"
+    when 'de' then "Ihr Abenteuer in #{parsed_vibe[:city]}"
+    else "Your Adventure in #{parsed_vibe[:city]}"
+    end
+    
+    # Generate localized success message
+    success_message = case user_language
+    when 'es' then '¡Tu aventura cultural está lista!'
+    when 'fr' then 'Votre aventure culturelle est prête!'
+    when 'pt' then 'Sua aventura cultural está pronta!'
+    when 'it' then 'La tua avventura culturale è pronta!'
+    when 'de' then 'Ihr kulturelles Abenteuer ist bereit!'
+    else 'Your cultural adventure is ready!'
+    end
+    
     final_result = {
       status: 'complete',
-      message: '¡Tu aventura cultural está lista!',
+      message: success_message,
       progress: 100,
       itinerary: {
         id: itinerary.id,
-        title: "Tu Aventura en #{parsed_vibe[:city]}",
+        title: adventure_title,
         city: parsed_vibe[:city],
         narrative_html: narrative,
         experiences: curated_experiences.map.with_index do |exp, index|
           {
-            # *** CAMPOS BÁSICOS ***
+            # *** BASIC FIELDS ***
             id: itinerary.itinerary_stops[index]&.id,
             time: exp[:time],
             title: exp[:title],
@@ -74,13 +96,13 @@ def perform(process_id, user_vibe)
             rating: exp[:rating],
             image: exp[:image],
             
-            # *** DATOS PRINCIPALES DE QLOO ***
+            # *** MAIN QLOO DATA ***
             qloo_keywords: exp[:qloo_keywords] || [],
             qloo_entity_id: exp[:qloo_entity_id],
             qloo_popularity: exp[:qloo_popularity],
             why_chosen: exp[:why_chosen],
             
-            # *** INFORMACIÓN DE CONTACTO Y UBICACIÓN ***
+            # *** CONTACT AND LOCATION INFO ***
             website: exp[:website],
             phone: exp[:phone],
             address: exp[:address],
@@ -89,40 +111,40 @@ def perform(process_id, user_vibe)
             google_maps_url: exp[:google_maps_url],
             directions_url: exp[:directions_url],
             
-            # *** INFORMACIÓN OPERATIVA ***
+            # *** OPERATIONAL INFO ***
             hours: exp[:hours],
             price_level: exp[:price_level],
             price_range: exp[:price_range],
             
-            # *** CATEGORÍAS Y CARACTERÍSTICAS ***
+            # *** CATEGORIES AND FEATURES ***
             tags: exp[:tags] || [],
             categories: exp[:categories] || [],
             amenities: exp[:amenities] || [],
             accessibility: exp[:accessibility],
             family_friendly: exp[:family_friendly],
             
-            # *** INFORMACIÓN ADICIONAL ***
+            # *** ADDITIONAL INFO ***
             booking_info: exp[:booking_info]
           }.compact  # Remove nil values
         end
       }
     }
     
-    update_status(process_id, 'complete', '¡Tu aventura está lista!', 100, itinerary: final_result[:itinerary])
+    update_status(process_id, 'complete', success_message, 100, itinerary: final_result[:itinerary])
     
-    Rails.logger.info "ProcessVibeJobIntelligent completado para process_id: #{process_id}"
-    Rails.logger.info "--- Total campos por experiencia: #{final_result[:itinerary][:experiences].first&.keys&.size || 0}"
-    Rails.logger.info "--- Experiencias con coordenadas: #{final_result[:itinerary][:experiences].count { |e| e[:latitude] && e[:longitude] }}"
-    Rails.logger.info "--- Experiencias con website: #{final_result[:itinerary][:experiences].count { |e| e[:website] }}"
+    Rails.logger.info "ProcessVibeJobIntelligent completed for process_id: #{process_id}"
+    Rails.logger.info "--- Total fields per experience: #{final_result[:itinerary][:experiences].first&.keys&.size || 0}"
+    Rails.logger.info "--- Experiences with coordinates: #{final_result[:itinerary][:experiences].count { |e| e[:latitude] && e[:longitude] }}"
+    Rails.logger.info "--- Experiences with website: #{final_result[:itinerary][:experiences].count { |e| e[:website] }}"
     
   rescue => e
-    puts "=== ERROR en ProcessVibeJobIntelligent: #{e.message} ==="
-    Rails.logger.error "ProcessVibeJobIntelligent falló: #{e.message}\n#{e.backtrace.join("\n")}"
+    puts "=== ERROR in ProcessVibeJobIntelligent: #{e.message} ==="
+    Rails.logger.error "ProcessVibeJobIntelligent failed: #{e.message}\n#{e.backtrace.join("\n")}"
     
-    # *** MEJORAR EL FALLBACK ***
+    # *** IMPROVE FALLBACK ***
     begin
       puts "=== Attempting fallback response ==="
-      update_status(process_id, 'processing', 'Creando experiencia de fallback...', 75)
+      update_status(process_id, 'processing', 'Creating fallback experience...', 75)
       
       # Parse vibe with simpler method
       parsed_vibe = simple_vibe_parsing(user_vibe)
@@ -137,13 +159,35 @@ def perform(process_id, user_vibe)
       fallback_itinerary = save_fallback_itinerary(user_vibe, parsed_vibe, fallback_narrative, fallback_experiences)
       
       # Create final result with same enhanced structure
+      user_language = parsed_vibe[:detected_language] || 'en'
+      
+      # Generate localized fallback title
+      fallback_title = case user_language
+      when 'es' then "Tu Aventura en #{parsed_vibe[:city]}"
+      when 'fr' then "Votre Aventure à #{parsed_vibe[:city]}"
+      when 'pt' then "Sua Aventura em #{parsed_vibe[:city]}"
+      when 'it' then "La Tua Avventura a #{parsed_vibe[:city]}"
+      when 'de' then "Ihr Abenteuer in #{parsed_vibe[:city]}"
+      else "Your Adventure in #{parsed_vibe[:city]}"
+      end
+      
+      # Generate localized fallback message
+      fallback_message = case user_language
+      when 'es' then '¡Tu aventura está lista! (Modo offline)'
+      when 'fr' then 'Votre aventure est prête! (Mode hors ligne)'
+      when 'pt' then 'Sua aventura está pronta! (Modo offline)'
+      when 'it' then 'La tua avventura è pronta! (Modalità offline)'
+      when 'de' then 'Ihr Abenteuer ist bereit! (Offline-Modus)'
+      else 'Your adventure is ready! (Offline mode)'
+      end
+      
       final_result = {
         status: 'complete',
-        message: '¡Tu aventura está lista! (Modo offline)',
+        message: fallback_message,
         progress: 100,
         itinerary: {
           id: fallback_itinerary.id,
-          title: "Tu Aventura en #{parsed_vibe[:city]}",
+          title: fallback_title,
           city: parsed_vibe[:city],
           narrative_html: fallback_narrative,
           experiences: fallback_experiences.map.with_index do |exp, index|
@@ -187,12 +231,12 @@ def perform(process_id, user_vibe)
         }
       }
       
-      update_status(process_id, 'complete', '¡Tu aventura está lista!', 100, itinerary: final_result[:itinerary])
+      update_status(process_id, 'complete', fallback_message, 100, itinerary: final_result[:itinerary])
       puts "✅ Fallback response created successfully with enhanced data structure"
       
     rescue => fallback_error
       puts "=== FALLBACK ALSO FAILED: #{fallback_error.message} ==="
-      update_status(process_id, 'failed', "Error procesando tu vibe: #{e.message}", 100)
+      update_status(process_id, 'failed', "Error processing your vibe: #{e.message}", 100)
     end
   end
 end
@@ -213,6 +257,10 @@ end
 
   def parse_vibe_with_rdawn(user_vibe, process_id)
     begin
+      # First detect the language of the user input
+      detected_language = detect_user_language(user_vibe)
+      puts "=== DETECTED LANGUAGE: #{detected_language} ==="
+      
       vibe_parser_task_data = ::Workflows::VibeVoyageWorkflow.tasks.first
       parser_workflow = Rdawn::Workflow.new(workflow_id: "parser_#{process_id}", name: "Vibe Parser")
       
@@ -231,16 +279,24 @@ end
       parsing_result = agent.run
       llm_response_json = parsing_result.tasks.values.first.output_data[:llm_response]
       
-      return extract_json_from_llm_response(llm_response_json).deep_symbolize_keys
+      parsed_data = extract_json_from_llm_response(llm_response_json).deep_symbolize_keys
+      # Add detected language to parsed data
+      parsed_data[:detected_language] = detected_language
+      
+      return parsed_data
       
     rescue => e
-      Rails.logger.error "Error en workflow parsing: #{e.message}"
+      Rails.logger.error "Error in workflow parsing: #{e.message}"
       return parse_vibe_directly_with_llm(user_vibe)
     end
   end
 
   def parse_vibe_directly_with_llm(user_vibe)
-    puts "=== Usando LLM directo para parsing ==="
+    puts "=== Using direct LLM for parsing ==="
+    
+    # Detect language first
+    detected_language = detect_user_language(user_vibe)
+    puts "=== DETECTED LANGUAGE: #{detected_language} ==="
     
     prompt = <<-PROMPT.strip
       Analyze this text and extract cultural entities for a recommendation API.
@@ -271,7 +327,11 @@ end
     result = agent.run
     
     llm_response = result.tasks.values.first.output_data[:llm_response]
-    extract_json_from_llm_response(llm_response).deep_symbolize_keys
+    parsed_data = extract_json_from_llm_response(llm_response).deep_symbolize_keys
+    # Add detected language
+    parsed_data[:detected_language] = detected_language
+    
+    parsed_data
   end
 
   def extract_json_from_llm_response(response_text)
@@ -282,21 +342,72 @@ end
     raise e
   end
 
-  # *** FUNCIÓN HÍBRIDA: Usar coordenadas de Qloo + Google Places para enriquecer ***
+  def detect_user_language(user_text)
+    prompt = <<-PROMPT.strip
+      Detect the language of this text and respond with only the language code.
+      
+      Possible languages:
+      - "es" for Spanish
+      - "en" for English  
+      - "fr" for French
+      - "pt" for Portuguese
+      - "it" for Italian
+      - "de" for German
+      
+      Text: "#{user_text}"
+      
+      Respond with only the 2-letter language code (e.g., "es", "en", "fr"):
+    PROMPT
+
+    begin
+      llm_interface = Rdawn::LLMInterface.new(api_key: ENV['OPENAI_API_KEY'])
+      task = Rdawn::Task.new(
+        task_id: "detect_lang_#{SecureRandom.hex(4)}",
+        name: "Detect User Language",
+        is_llm_task: true,
+        input_data: { prompt: prompt }
+      )
+      
+      workflow = Rdawn::Workflow.new(workflow_id: "language_detector", name: "Language Detector")
+      workflow.add_task(task)
+      
+      agent = Rdawn::Agent.new(workflow: workflow, llm_interface: llm_interface)
+      result = agent.run
+      
+      detected_lang = result.tasks.values.first.output_data[:llm_response].strip.downcase
+      
+      # Validate the detected language
+      valid_languages = ['es', 'en', 'fr', 'pt', 'it', 'de']
+      if valid_languages.include?(detected_lang)
+        puts "--- Language detected: #{detected_lang}"
+        return detected_lang
+      else
+        puts "--- Invalid language detected (#{detected_lang}), defaulting to 'en'"
+        return 'en'
+      end
+      
+    rescue => e
+      puts "--- Error detecting language: #{e.message}, defaulting to 'en'"
+      Rails.logger.error "Language detection failed: #{e.message}"
+      return 'en' # Default to English
+    end
+  end
+
+  # *** HYBRID FUNCTION: Use Qloo coordinates + Google Places for enrichment ***
   def fetch_google_places_data(parsed_vibe, qloo_data)
     city = parsed_vibe[:city]
     interests = parsed_vibe[:interests]
     
-    puts "=== PROCESANDO DATOS DE QLOO CON ENRIQUECIMIENTO OPCIONAL ==="
-    puts "Ciudad: #{city}"
-    puts "Intereses: #{interests.inspect}"
+    puts "=== PROCESSING QLOO DATA WITH OPTIONAL ENRICHMENT ==="
+    puts "City: #{city}"
+    puts "Interests: #{interests.inspect}"
     puts "Qloo data present: #{qloo_data&.dig('results', 'entities')&.any? || false}"
     
     places_results = []
     
-    # Si tenemos datos de Qloo, usar esos datos como base
+    # If we have Qloo data, use that data as base
     if qloo_data && qloo_data.dig('results', 'entities')&.any?
-      puts "=== USANDO COORDENADAS DE QLOO + DATOS DE GOOGLE PLACES ==="
+      puts "=== USING QLOO COORDINATES + GOOGLE PLACES DATA ==="
       qloo_entities = qloo_data.dig('results', 'entities').first(3)
       
       qloo_entities.each_with_index do |entity, index|
@@ -304,23 +415,23 @@ end
         qloo_location = entity['location']
         qloo_address = entity.dig('properties', 'address')
         
-        puts "--- Procesando entidad #{index + 1}: #{place_name}"
-        puts "--- Coordenadas de Qloo: #{qloo_location.inspect}"
+        puts "--- Processing entity #{index + 1}: #{place_name}"
+        puts "--- Qloo coordinates: #{qloo_location.inspect}"
         
-        # Usar coordenadas de Qloo como fuente principal
+        # Use Qloo coordinates as primary source
         if qloo_location && qloo_location['lat'] && qloo_location['lon']
           coordinates = {
             'lat' => qloo_location['lat'].to_f,
             'lng' => qloo_location['lon'].to_f
           }
           
-          # Intentar enriquecer con datos de Google Places (opcional)
+          # Try to enrich with Google Places data (optional)
           google_data = try_enrich_with_google_places(place_name, city, coordinates)
           
-          # Si Google Places no funciona, usar datos de Qloo
+          # If Google Places doesn't work, use Qloo data
           final_google_data = google_data || create_google_data_from_qloo(entity, coordinates)
           
-          puts "--- ✅ USANDO COORDS DE QLOO: #{place_name} - Coords: #{coordinates.inspect}"
+          puts "--- ✅ USING QLOO COORDS: #{place_name} - Coords: #{coordinates.inspect}"
           
           places_results << {
             name: place_name,
@@ -328,9 +439,9 @@ end
             qloo_entity: entity
           }
         else
-          puts "--- ❌ No hay coordenadas en Qloo para: #{place_name}, buscando en Google..."
+          puts "--- ❌ No coordinates in Qloo for: #{place_name}, searching in Google..."
           
-          # Solo buscar en Google Places si Qloo no tiene coordenadas
+          # Only search in Google Places if Qloo doesn't have coordinates
           google_result = search_in_google_places_fallback(place_name, city)
           
           places_results << {
@@ -341,8 +452,8 @@ end
         end
       end
     else
-      # Fallback: buscar lugares genéricos cuando no hay datos de Qloo
-      puts "=== NO HAY DATOS DE QLOO - USANDO BÚSQUEDA GENÉRICA ==="
+      # Fallback: search for generic places when no Qloo data
+      puts "=== NO QLOO DATA - USING GENERIC SEARCH ==="
       generic_queries = build_fallback_queries(interests, city)
       
       generic_queries.each_with_index do |query, index|
@@ -356,7 +467,7 @@ end
             
             if best_place
               coordinates = best_place.dig('geometry', 'location')
-              puts "--- ✅ LUGAR GENÉRICO ENCONTRADO: #{best_place['name']} - Coords: #{coordinates.inspect}"
+              puts "--- ✅ GENERIC PLACE FOUND: #{best_place['name']} - Coords: #{coordinates.inspect}"
               
               places_results << {
                 name: best_place['name'],
@@ -366,30 +477,30 @@ end
             end
           end
         rescue => e
-          puts "--- ❌ ERROR en búsqueda genérica: #{e.message}"
+          puts "--- ❌ ERROR in generic search: #{e.message}"
         end
       end
     end
     
-    # Si no encontramos nada, crear fallback con LLM
+    # If we found nothing, create LLM fallback
     if places_results.empty? || places_results.all? { |r| r[:google_data].nil? }
-      puts "=== CREANDO FALLBACK CON LLM ==="
+      puts "=== CREATING LLM FALLBACK ==="
       fallback_place = create_fallback_place_with_coordinates(city, interests.first)
       places_results << fallback_place if fallback_place
     end
     
-    puts "=== RESULTADO FINAL ==="
-    puts "Total lugares encontrados: #{places_results.size}"
+    puts "=== FINAL RESULT ==="
+    puts "Total places found: #{places_results.size}"
     places_results.each_with_index do |result, index|
       coords = result[:google_data]&.dig('geometry', 'location')
-      puts "#{index + 1}. #{result[:name]} - Coords: #{coords&.inspect || 'SIN COORDENADAS'}"
+      puts "#{index + 1}. #{result[:name]} - Coords: #{coords&.inspect || 'NO COORDINATES'}"
     end
     
     Rails.logger.info "--- Total places found: #{places_results.size}"
     places_results
   end
 
-  # Función para crear datos de Google Places desde Qloo
+  # Function to create Google Places data from Qloo
   def create_google_data_from_qloo(entity, coordinates)
     {
       'name' => entity['name'],
@@ -403,9 +514,9 @@ end
     }
   end
 
-  # Función opcional para enriquecer con Google Places (puede fallar)
+  # Optional function to enrich with Google Places (may fail)
   def try_enrich_with_google_places(place_name, city, qloo_coordinates)
-    puts "--- Intentando enriquecer #{place_name} con Google Places..."
+    puts "--- Trying to enrich #{place_name} with Google Places..."
     
     begin
       query = "#{place_name} #{city}"
@@ -414,38 +525,38 @@ end
       if google_result[:success] && google_result[:data]&.dig('results')&.any?
         results = google_result[:data]['results']
         
-        # Buscar resultado que esté cerca de las coordenadas de Qloo
+        # Find result that's close to Qloo coordinates
         best_match = results.find do |place|
           google_coords = place.dig('geometry', 'location')
           next false unless google_coords
           
-          # Verificar si están cerca (dentro de ~1km)
+          # Check if they're close (within ~1km)
           distance = calculate_distance(
             qloo_coordinates['lat'], qloo_coordinates['lng'],
             google_coords['lat'], google_coords['lng']
           )
           
-          distance < 1.0 # Menos de 1km de diferencia
+          distance < 1.0 # Less than 1km difference
         end
         
         if best_match
-          # Usar coordenadas de Qloo pero otros datos de Google
+          # Use Qloo coordinates but other Google data
           best_match['geometry']['location'] = qloo_coordinates
-          puts "--- ✅ Enriquecido con Google Places: #{best_match['name']}"
+          puts "--- ✅ Enriched with Google Places: #{best_match['name']}"
           return best_match
         end
       end
       
-      puts "--- No se pudo enriquecer con Google Places"
+      puts "--- Could not enrich with Google Places"
       return nil
       
     rescue => e
-      puts "--- Error enriqueciendo con Google Places: #{e.message}"
+      puts "--- Error enriching with Google Places: #{e.message}"
       return nil
     end
   end
 
-  # Función para calcular distancia entre coordenadas
+  # Function to calculate distance between coordinates
   def calculate_distance(lat1, lon1, lat2, lon2)
     rad_per_deg = Math::PI / 180
     rlat1 = lat1 * rad_per_deg
@@ -456,10 +567,10 @@ end
     a = Math.sin(dlat/2)**2 + Math.cos(rlat1) * Math.cos(rlat2) * Math.sin(dlon/2)**2
     c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
     
-    6371 * c # Distancia en kilómetros
+    6371 * c # Distance in kilometers
   end
 
-  # Función para extraer tipos de lugar basándose en los tags de Qloo
+  # Function to extract place types based on Qloo tags
   def extract_types_from_qloo_entity(entity)
     tags = entity['tags'] || []
     types = []
@@ -486,7 +597,7 @@ end
     types.uniq
   end
 
-  # Fallback solo cuando Qloo no tiene coordenadas
+  # Fallback only when Qloo doesn't have coordinates
   def search_in_google_places_fallback(place_name, city)
     query = "#{place_name} #{city}"
     puts "--- Fallback Google search: #{query}"
@@ -496,35 +607,35 @@ end
       
       if google_result[:success] && google_result[:data]&.dig('results')&.any?
         best_place = find_best_matching_place(google_result[:data]['results'], city, place_name)
-        puts "--- ✅ Fallback encontrado: #{best_place['name']}" if best_place
+        puts "--- ✅ Fallback found: #{best_place['name']}" if best_place
         return best_place
       else
-        puts "--- ❌ No se encontró en Google Places: #{query}"
+        puts "--- ❌ Not found in Google Places: #{query}"
         return nil
       end
     rescue => e
-      puts "--- ❌ Error en fallback de Google: #{e.message}"
+      puts "--- ❌ Error in Google fallback: #{e.message}"
       return nil
     end
   end
 
-  # Nueva función para crear un lugar de fallback usando LLM para coordenadas
+  # New function to create fallback place using LLM for coordinates
   def create_fallback_place_with_coordinates(city, interest)
     prompt = <<-PROMPT.strip
-      Necesito las coordenadas aproximadas del centro de la ciudad para crear un marcador de fallback.
+      I need approximate coordinates of the city center to create a fallback marker.
       
-      Ciudad: #{city}
-      Interés del usuario: #{interest}
+      City: #{city}
+      User interest: #{interest}
       
-      Proporciona:
-      1. Latitud y longitud del centro histórico/turístico principal de #{city}
-      2. Un nombre apropiado para el lugar (ej: "Centro Cultural de [Ciudad]", "Plaza Principal de [Ciudad]")
+      Provide:
+      1. Latitude and longitude of the main historic/tourist center of #{city}
+      2. An appropriate name for the place (e.g., "Cultural Center of [City]", "Main Square of [City]")
       
-      Responde en formato JSON:
+      Respond in JSON format:
       {
         "latitude": 00.0000,
         "longitude": 00.0000,
-        "place_name": "Nombre del lugar"
+        "place_name": "Place name"
       }
     PROMPT
 
@@ -548,15 +659,15 @@ end
       
       latitude = coords_data['latitude'].to_f
       longitude = coords_data['longitude'].to_f
-      place_name = coords_data['place_name'] || "Centro Cultural de #{city}"
+      place_name = coords_data['place_name'] || "Cultural Center of #{city}"
       
-      puts "--- ✅ CREANDO FALLBACK con LLM: #{place_name} - Coords: {lat: #{latitude}, lng: #{longitude}}"
+      puts "--- ✅ CREATING LLM FALLBACK: #{place_name} - Coords: {lat: #{latitude}, lng: #{longitude}}"
       
       {
         name: place_name,
         google_data: {
           'name' => place_name,
-          'formatted_address' => "Centro, #{city}",
+          'formatted_address' => "Center, #{city}",
           'geometry' => {
             'location' => { 'lat' => latitude, 'lng' => longitude }
           },
@@ -567,15 +678,15 @@ end
       }
       
     rescue => e
-      puts "--- Error generando fallback con LLM: #{e.message}"
+      puts "--- Error generating LLM fallback: #{e.message}"
       Rails.logger.error "--- Error generating fallback coordinates: #{e.message}"
       
-      # Fallback del fallback - coordenadas muy básicas
+      # Fallback of fallback - very basic coordinates
       {
-        name: "Centro de #{city}",
+        name: "Center of #{city}",
         google_data: {
-          'name' => "Centro de #{city}",
-          'formatted_address' => "Centro, #{city}",
+          'name' => "Center of #{city}",
+          'formatted_address' => "Center, #{city}",
           'geometry' => {
             'location' => { 'lat' => 0.0, 'lng' => 0.0 }
           },
@@ -590,126 +701,71 @@ end
   def build_fallback_queries(interests, city)
     queries = []
     
-    # Construir búsquedas más específicas basadas en los intereses
+    # Build more specific searches based on interests
     interests.each do |interest|
       case interest
       when /soup|restaurant|food/
-        queries << "restaurantes #{city}"
-        queries << "comida tradicional #{city}"
-        queries << "restaurante auténtico #{city}"
+        queries << "restaurants #{city}"
+        queries << "traditional food #{city}"
+        queries << "authentic restaurant #{city}"
       when /tequila|mezcal|bar|craft beer/
         queries << "bar #{city}"
         queries << "cantina #{city}"
-        queries << "cerveza artesanal #{city}"
+        queries << "craft beer #{city}"
       when /art|museum/
-        queries << "museo #{city}"
-        queries << "galería de arte #{city}"
-        queries << "museo de arte #{city}"
+        queries << "museum #{city}"
+        queries << "art gallery #{city}"
+        queries << "art museum #{city}"
       when /cinema|movie/
-        queries << "cine #{city}"
         queries << "cinema #{city}"
-        queries << "teatro #{city}"
+        queries << "movie theater #{city}"
+        queries << "theater #{city}"
       when /culture/
-        queries << "centro cultural #{city}"
-        queries << "sitio histórico #{city}"
-        queries << "atracción cultural #{city}"
+        queries << "cultural center #{city}"
+        queries << "historic site #{city}"
+        queries << "cultural attraction #{city}"
       else
         queries << "#{interest} #{city}"
       end
     end
     
-    # Si no hay queries específicas, usar términos genéricos garantizados
+    # If no specific queries, use guaranteed generic terms
     if queries.empty?
       queries = [
-        "restaurantes #{city}",
-        "atracciones turísticas #{city}",
-        "lugares de interés #{city}"
+        "restaurants #{city}",
+        "tourist attractions #{city}",
+        "places of interest #{city}"
       ]
     end
     
-    # Asegurar que siempre tengamos al menos 3 queries diferentes
+    # Ensure we always have at least 3 different queries
     while queries.size < 3
       queries += [
-        "centro histórico #{city}",
-        "plaza principal #{city}",
-        "catedral #{city}",
-        "parque #{city}",
-        "mercado #{city}"
+        "historic center #{city}",
+        "main square #{city}",
+        "cathedral #{city}",
+        "park #{city}",
+        "market #{city}"
       ]
     end
     
-    puts "--- Queries generadas: #{queries.uniq.first(3).inspect}"
+    puts "--- Generated queries: #{queries.uniq.first(3).inspect}"
     queries.uniq.first(3)
   end
 
-  def build_fallback_queries(interests, city)
-    queries = []
-    
-    # Construir búsquedas más específicas basadas en los intereses
-    interests.each do |interest|
-      case interest
-      when /soup|restaurant|food/
-        queries << "restaurantes #{city}"
-        queries << "comida tradicional #{city}"
-        queries << "restaurante auténtico #{city}"
-      when /tequila|mezcal|bar|craft beer/
-        queries << "bar #{city}"
-        queries << "cantina #{city}"
-        queries << "cerveza artesanal #{city}"
-      when /art|museum/
-        queries << "museo #{city}"
-        queries << "galería de arte #{city}"
-        queries << "museo de arte #{city}"
-      when /cinema|movie/
-        queries << "cine #{city}"
-        queries << "cinema #{city}"
-        queries << "teatro #{city}"
-      when /culture/
-        queries << "centro cultural #{city}"
-        queries << "sitio histórico #{city}"
-        queries << "atracción cultural #{city}"
-      else
-        queries << "#{interest} #{city}"
-      end
-    end
-    
-    # Si no hay queries específicas, usar términos genéricos garantizados
-    if queries.empty?
-      queries = [
-        "restaurantes #{city}",
-        "atracciones turísticas #{city}",
-        "lugares de interés #{city}"
-      ]
-    end
-    
-    # Asegurar que siempre tengamos al menos 3 queries diferentes
-    while queries.size < 3
-      queries += [
-        "centro histórico #{city}",
-        "plaza principal #{city}",
-        "catedral #{city}",
-        "parque #{city}",
-        "mercado #{city}"
-      ]
-    end
-    
-    puts "--- Queries generadas: #{queries.uniq.first(3).inspect}"
-    queries.uniq.first(3)
-  end
-
-  # Nueva función para encontrar el mejor resultado usando LLM
+  # New function to find best result using LLM
   def find_best_matching_place(results, target_city, place_name = nil)
     return nil if results.empty?
     
     puts "--- Evaluating #{results.size} results for city: #{target_city} and place: #{place_name}"
     
-    # Si solo hay un resultado, usarlo directamente
+    # If only one result, use it directly
     if results.size == 1
       puts "--- Only one result, using it: #{results.first['name']}"
       return results.first
     end
     
-    # Usar LLM para encontrar el mejor match
+    # Use LLM to find best match
     places_data = results.map.with_index do |place, index|
       {
         index: index,
@@ -721,23 +777,23 @@ end
     end
     
     prompt = <<-PROMPT.strip
-      Necesito que selecciones el mejor lugar de esta lista basándote en los criterios dados.
+      I need you to select the best place from this list based on the given criteria.
 
-      CRITERIOS DE BÚSQUEDA:
-      - Ciudad objetivo: #{target_city}
-      - Lugar específico buscado: #{place_name || 'cualquier lugar relevante'}
+      SEARCH CRITERIA:
+      - Target city: #{target_city}
+      - Specific place searched: #{place_name || 'any relevant place'}
 
-      OPCIONES DISPONIBLES:
-      #{places_data.map { |p| "#{p[:index]}. #{p[:name]} - #{p[:address]} (Rating: #{p[:rating]} | Tipos: #{p[:types]})" }.join("\n")}
+      AVAILABLE OPTIONS:
+      #{places_data.map { |p| "#{p[:index]}. #{p[:name]} - #{p[:address]} (Rating: #{p[:rating]} | Types: #{p[:types]})" }.join("\n")}
 
-      INSTRUCCIONES:
-      1. Selecciona el lugar que mejor coincida con la ciudad objetivo "#{target_city}"
-      2. Si hay un nombre específico "#{place_name}", prioriza lugares con nombres similares
-      3. Considera la ubicación geográfica (la dirección debe estar en o cerca de #{target_city})
-      4. En caso de empate, prefiere el lugar con mejor rating
-      5. Responde SOLO con el número del índice (0, 1, 2, etc.)
+      INSTRUCTIONS:
+      1. Select the place that best matches the target city "#{target_city}"
+      2. If there's a specific name "#{place_name}", prioritize places with similar names
+      3. Consider geographic location (address should be in or near #{target_city})
+      4. In case of tie, prefer the place with better rating
+      5. Respond ONLY with the index number (0, 1, 2, etc.)
 
-      RESPUESTA (solo el número):
+      RESPONSE (only the number):
     PROMPT
 
     begin
@@ -771,30 +827,30 @@ end
       puts "--- Error using LLM for place matching: #{e.message}"
       Rails.logger.error "--- Error using LLM for place matching: #{e.message}"
       
-      # Fallback: usar el primer resultado
+      # Fallback: use first result
       puts "--- Using first result as fallback: #{results.first['name']}"
       return results.first
     end
   end
 
   def extract_area_from_google_data(google_data, city)
-    return "Centro" unless google_data&.dig('formatted_address')
+    return "Center" unless google_data&.dig('formatted_address')
     
     address = google_data['formatted_address']
     
     prompt = <<-PROMPT.strip
-      Extrae el nombre del área, barrio o distrito de esta dirección:
+      Extract the area, neighborhood or district name from this address:
       
-      Dirección: "#{address}"
-      Ciudad: #{city}
+      Address: "#{address}"
+      City: #{city}
       
-      Instrucciones:
-      - Extrae SOLO el nombre del área/barrio/distrito (ej: "Roma Norte", "Centro Histórico", "Polanco")
-      - NO incluyas códigos postales, números, o la ciudad principal
-      - Si no hay área específica, responde "Centro"
-      - Responde en máximo 3 palabras
+      Instructions:
+      - Extract ONLY the area/neighborhood/district name (e.g., "Roma Norte", "Historic Center", "Polanco")
+      - Do NOT include postal codes, numbers, or the main city
+      - If no specific area, respond "Center"
+      - Respond in maximum 3 words
       
-      Área:
+      Area:
     PROMPT
 
     begin
@@ -814,27 +870,27 @@ end
       
       area = result.tasks.values.first.output_data[:llm_response].strip
       
-      # Limpiar la respuesta
+      # Clean the response
       area = area.gsub(/['""]/, '').strip
-      area = area.split(',').first&.strip || "Centro"
+      area = area.split(',').first&.strip || "Center"
       
       puts "--- LLM extracted area: '#{area}' from address: #{address}"
       area
       
     rescue => e
       puts "--- Error extracting area with LLM: #{e.message}"
-      "Centro"
+      "Center"
     end
   end
 
   def calculate_vibe_match_with_google(qloo_entity, google_data, parsed_vibe)
-    # Calcular match basado en datos disponibles
+    # Calculate match based on available data
     base_score = qloo_entity ? calculate_vibe_match(qloo_entity, parsed_vibe) : 75
     
-    # Bonus por tener datos de Google Places
+    # Bonus for having Google Places data
     google_bonus = google_data ? 10 : 0
     
-    # Bonus por rating alto
+    # Bonus for high rating
     rating_bonus = if google_data&.dig('rating')
       rating = google_data['rating'].to_f
       case rating
@@ -847,7 +903,7 @@ end
       0
     end
     
-    # Bonus por relevancia de tipos
+    # Bonus for type relevance
     type_bonus = if google_data&.dig('types')
       types = google_data['types']
       relevant_types = ['restaurant', 'food', 'bar', 'cafe', 'museum', 'tourist_attraction']
@@ -862,60 +918,60 @@ end
     final_score
   end
 
-  # Eliminar las funciones de hardcoding
+  # Remove hardcoding functions
   def get_city_variations(city)
-    # Ya no necesitamos hardcodear variaciones
+    # No longer need to hardcode variations
     [city]
   end
 
   def similar_names?(name1, name2)
     return false unless name1 && name2
     
-    # Usar LLM para comparación más inteligente si es necesario
-    # Por ahora, comparación simple
+    # Use LLM for smarter comparison if needed
+    # For now, simple comparison
     name1.downcase.include?(name2.downcase) || name2.downcase.include?(name1.downcase)
   end
 
   def extract_area_from_google_data(google_data, city)
-    # Extraer área/distrito de la dirección de Google Places
+    # Extract area/district from Google Places address
     if google_data && google_data['formatted_address']
       address_parts = google_data['formatted_address'].split(',').map(&:strip)
       
-      # Buscar el área que no sea la ciudad principal
+      # Find area that's not the main city
       area_candidates = address_parts.reject do |part|
         part.downcase.include?(city.downcase) ||
-        part.match?(/^\d/) || # No códigos postales
-        part.length < 3 ||    # No partes muy cortas
+        part.match?(/^\d/) || # No postal codes
+        part.length < 3 ||    # No very short parts
         part.downcase.include?('mexico') ||
         part.downcase.include?('yuc') ||
         part.downcase.include?('n.l.')
       end
       
-      # Devolver la primera parte válida o un default
-      area_candidates.first || "Centro"
+      # Return first valid part or default
+      area_candidates.first || "Center"
     else
-      # Fallback basado en la ciudad
+      # Fallback based on city
       case city
       when "Mérida"
-        "Centro Histórico"
+        "Historic Center"
       when "Monterrey"
-        "Centro"
+        "Center"
       when "Mexico City"
         "Roma Norte"
       else
-        "Distrito 1"
+        "District 1"
       end
     end
   end
 
   def calculate_vibe_match_with_google(qloo_entity, google_data, parsed_vibe)
-    # Calcular match basado en datos de Qloo y Google
+    # Calculate match based on Qloo and Google data
     base_score = qloo_entity ? calculate_vibe_match(qloo_entity, parsed_vibe) : 85
     
-    # Bonus por tener datos de Google Places
+    # Bonus for having Google Places data
     google_bonus = google_data ? 10 : 0
     
-    # Bonus por rating alto
+    # Bonus for high rating
     rating_bonus = if google_data&.dig('rating')
       rating = google_data['rating'].to_f
       rating >= 4.5 ? 5 : rating >= 4.0 ? 3 : 0
@@ -926,9 +982,9 @@ end
     [base_score + google_bonus + rating_bonus, 100].min
   end
 
-  # *** FUNCIÓN ACTUALIZADA: Curate con ubicaciones de Google ***
+  # *** UPDATED FUNCTION: Curate with Google locations ***
 def curate_experiences_with_explanations(parsed_vibe, qloo_data)
-  puts "=== Curando experiencias con explicaciones culturales ==="
+  puts "=== Curating experiences with cultural explanations ==="
   
   city = parsed_vibe[:city]
   qloo_entities = qloo_data&.dig('results', 'entities') || []
@@ -939,23 +995,23 @@ def curate_experiences_with_explanations(parsed_vibe, qloo_data)
   end
   
   if qloo_entities.empty?
-    puts "=== No hay datos de Qloo, usando experiencias de fallback ==="
+    puts "=== No Qloo data, using fallback experiences ==="
     return create_fallback_experiences_with_explanations(parsed_vibe)
   end
 
   experiences = qloo_entities.first(3).map.with_index do |qloo_entity, index|
-    puts "--- Procesando experiencia #{index + 1}: #{qloo_entity['name']} ---"
+    puts "--- Processing experience #{index + 1}: #{qloo_entity['name']} ---"
     
-    # Extraer TODOS los datos de Qloo de forma más completa
+    # Extract ALL Qloo data more completely
     entity_properties = qloo_entity['properties'] || {}
     entity_location = qloo_entity['location'] || {}
     entity_tags = qloo_entity['tags'] || []
     
-    # Coordenadas de Qloo (prioritarias)
+    # Qloo coordinates (priority)
     latitude = entity_location['lat']&.to_f
     longitude = entity_location['lon']&.to_f
     
-    # Extraer keywords de Qloo de forma más robusta
+    # Extract Qloo keywords more robustly
     qloo_keywords = []
     if entity_properties['keywords'].is_a?(Array)
       qloo_keywords = entity_properties['keywords'].map { |k| k.is_a?(Hash) ? k['name'] : k.to_s }.compact
@@ -963,36 +1019,36 @@ def curate_experiences_with_explanations(parsed_vibe, qloo_data)
       qloo_keywords = entity_properties['keywords'].split(',').map(&:strip)
     end
     
-    # Si no hay keywords en properties, extraer de tags
+    # If no keywords in properties, extract from tags
     if qloo_keywords.empty? && entity_tags.any?
       qloo_keywords = entity_tags.map { |tag| tag['name'] }.compact.first(10)
     end
     
-    puts "--- Keywords extraídas: #{qloo_keywords.inspect}"
+    puts "--- Extracted keywords: #{qloo_keywords.inspect}"
     
-    # Extraer información de contacto completa
+    # Extract complete contact information
     website = entity_properties['website']
     phone = entity_properties['phone']
     address = entity_properties['address']
     
-    # Extraer información de horarios
+    # Extract hours information
     hours = entity_properties['hours']
     
-    # Extraer información de precios
+    # Extract price information
     price_level = entity_properties['price_level']&.to_i
     
-    # Extraer rating
+    # Extract rating
     rating = entity_properties['business_rating']&.to_f || 
              entity_properties['rating']&.to_f || 
              rand(4.0..5.0).round(1)
     
-    # Extraer descripción más completa
+    # Extract more complete description
     description = entity_properties['description'] || 
                   entity_properties['summary'] || 
                   entity_properties['editorial_summary'] ||
-                  "Una experiencia cultural única curada especialmente para tu vibe."
+                  "A unique cultural experience curated specifically for your vibe."
     
-    # Extraer imágenes
+    # Extract images
     images = entity_properties['images'] || []
     main_image = if images.any?
       images.first.is_a?(Hash) ? images.first['url'] : images.first
@@ -1000,7 +1056,7 @@ def curate_experiences_with_explanations(parsed_vibe, qloo_data)
       get_experience_image(index)
     end
     
-    # Generar explicación cultural usando LLM
+    # Generate cultural explanation using LLM
     cultural_explanation = generate_cultural_explanation(
       qloo_entity, 
       parsed_vibe, 
@@ -1008,16 +1064,16 @@ def curate_experiences_with_explanations(parsed_vibe, qloo_data)
       index
     )
     
-    # Extraer área de forma más inteligente
+    # Extract area more intelligently
     area = extract_area_from_qloo_entity(qloo_entity, city)
     
-    # Calcular vibe match más sofisticado
+    # Calculate more sophisticated vibe match
     vibe_match = calculate_enhanced_vibe_match(qloo_entity, parsed_vibe, qloo_keywords)
     
-    # Crear experiencia con TODOS los datos
+    # Create experience with ALL data
     experience = {
       time: ["10:00 AM", "02:00 PM", "07:30 PM"][index],
-      title: generate_experience_title(qloo_entity, index),
+      title: generate_localized_experience_title(qloo_entity, index, parsed_vibe[:detected_language] || 'en'),
       location: qloo_entity['name'],
       description: description,
       cultural_explanation: cultural_explanation,
@@ -1027,68 +1083,104 @@ def curate_experiences_with_explanations(parsed_vibe, qloo_data)
       rating: rating,
       image: main_image,
       
-      # *** DATOS COMPLETOS DE QLOO ***
+      # *** COMPLETE QLOO DATA ***
       qloo_keywords: qloo_keywords,
       qloo_entity_id: qloo_entity['entity_id'],
       qloo_popularity: qloo_entity['popularity'],
       
-      # *** INFORMACIÓN DE CONTACTO ***
+      # *** CONTACT INFORMATION ***
       website: website,
       phone: phone,
       address: address,
       
-      # *** COORDENADAS Y MAPAS ***
+      # *** COORDINATES AND MAPS ***
       latitude: latitude,
       longitude: longitude,
       google_maps_url: generate_google_maps_url(latitude, longitude, qloo_entity['name']),
       directions_url: generate_directions_url(latitude, longitude),
       
-      # *** INFORMACIÓN OPERATIVA ***
+      # *** OPERATIONAL INFORMATION ***
       hours: hours,
       price_level: price_level,
       price_range: generate_price_range(price_level),
       
-      # *** TAGS Y CATEGORÍAS ***
+      # *** TAGS AND CATEGORIES ***
       tags: entity_tags,
       categories: extract_categories_from_tags(entity_tags),
       amenities: extract_amenities_from_tags(entity_tags),
       
-      # *** INFORMACIÓN ADICIONAL ***
+      # *** ADDITIONAL INFORMATION ***
       why_chosen: generate_enhanced_why_chosen(qloo_entity, parsed_vibe, qloo_keywords),
       booking_info: extract_booking_info(entity_properties),
       accessibility: extract_accessibility_info(entity_tags),
       family_friendly: extract_family_friendly_info(entity_tags),
       
-      # *** DATOS RAW PARA DEBUG ***
+      # *** RAW DATA FOR DEBUG ***
       qloo_raw_data: qloo_entity
     }
     
-    puts "--- ✅ Experiencia #{index + 1} creada con #{qloo_keywords.size} keywords y coordenadas: #{latitude}, #{longitude}"
+    puts "--- ✅ Experience #{index + 1} created with #{qloo_keywords.size} keywords and coordinates: #{latitude}, #{longitude}"
     puts "--- Website: #{website || 'N/A'}, Phone: #{phone || 'N/A'}"
     puts "--- Google Maps URL: #{experience[:google_maps_url]}"
     
     experience
   end
   
-  puts "✅ Curadas #{experiences.size} experiencias con datos completos de Qloo"
+  puts "✅ Curated #{experiences.size} experiences with complete Qloo data"
   experiences
 end
 
   def generate_cultural_explanation(entity, parsed_vibe, qloo_keywords, index)
+    user_language = parsed_vibe[:detected_language] || 'en'
+    
+    # Language-specific prompts
+    language_prompts = {
+      'es' => {
+        role: "Eres un curador cultural experto.",
+        explanation: "Explica en un párrafo evocador (máximo 100 palabras) por qué este lugar es perfecto para #{index == 0 ? 'comenzar' : index == 1 ? 'continuar' : 'culminar'} su aventura cultural.",
+        instructions: "Conecta los keywords de Qloo con la experiencia personal del usuario. Usa un tono cálido y poético. Responde solo con el párrafo explicativo."
+      },
+      'en' => {
+        role: "You are an expert cultural curator.",
+        explanation: "Explain in an evocative paragraph (maximum 100 words) why this place is perfect to #{index == 0 ? 'begin' : index == 1 ? 'continue' : 'culminate'} their cultural adventure.",
+        instructions: "Connect Qloo keywords with the user's personal experience. Use a warm and poetic tone. Respond only with the explanatory paragraph."
+      },
+      'fr' => {
+        role: "Vous êtes un curateur culturel expert.",
+        explanation: "Expliquez dans un paragraphe évocateur (maximum 100 mots) pourquoi cet endroit est parfait pour #{index == 0 ? 'commencer' : index == 1 ? 'continuer' : 'culminer'} leur aventure culturelle.",
+        instructions: "Connectez les mots-clés de Qloo avec l'expérience personnelle de l'utilisateur. Utilisez un ton chaleureux et poétique. Répondez seulement avec le paragraphe explicatif."
+      },
+      'pt' => {
+        role: "Você é um curador cultural especialista.",
+        explanation: "Explique em um parágrafo evocativo (máximo 100 palavras) por que este lugar é perfeito para #{index == 0 ? 'começar' : index == 1 ? 'continuar' : 'culminar'} sua aventura cultural.",
+        instructions: "Conecte as palavras-chave do Qloo com a experiência pessoal do usuário. Use um tom caloroso e poético. Responda apenas com o parágrafo explicativo."
+      },
+      'it' => {
+        role: "Sei un curatore culturale esperto.",
+        explanation: "Spiega in un paragrafo evocativo (massimo 100 parole) perché questo posto è perfetto per #{index == 0 ? 'iniziare' : index == 1 ? 'continuare' : 'culminare'} la loro avventura culturale.",
+        instructions: "Collega le parole chiave di Qloo con l'esperienza personale dell'utente. Usa un tono caldo e poetico. Rispondi solo con il paragrafo esplicativo."
+      },
+      'de' => {
+        role: "Sie sind ein erfahrener Kulturkurator.",
+        explanation: "Erklären Sie in einem eindringlichen Absatz (maximal 100 Wörter), warum dieser Ort perfekt ist, um #{index == 0 ? 'zu beginnen' : index == 1 ? 'fortzusetzen' : 'zu vollenden'} ihr kulturelles Abenteuer.",
+        instructions: "Verbinden Sie Qloo-Schlüsselwörter mit der persönlichen Erfahrung des Benutzers. Verwenden Sie einen warmen und poetischen Ton. Antworten Sie nur mit dem erklärenden Absatz."
+      }
+    }
+    
+    # Get language-specific strings or default to English
+    lang_strings = language_prompts[user_language] || language_prompts['en']
+    
     prompt = <<-PROMPT.strip
-      Eres un curador cultural experto. Basándote en estos datos:
+      #{lang_strings[:role]}
 
-      Usuario busca: #{parsed_vibe[:interests].join(', ')} en #{parsed_vibe[:city]}
-      Lugar: #{entity['name']}
-      Descripción: #{entity.dig('properties', 'description') || entity.dig('properties', 'summary')}
-      Keywords culturales: #{qloo_keywords.join(', ')}
+      #{user_language == 'es' ? 'Usuario busca' : user_language == 'fr' ? 'L\'utilisateur cherche' : user_language == 'pt' ? 'Usuário busca' : user_language == 'it' ? 'L\'utente cerca' : user_language == 'de' ? 'Benutzer sucht' : 'User seeks'}: #{parsed_vibe[:interests].join(', ')} #{user_language == 'es' ? 'en' : user_language == 'fr' ? 'à' : user_language == 'pt' ? 'em' : user_language == 'it' ? 'a' : user_language == 'de' ? 'in' : 'in'} #{parsed_vibe[:city]}
+      #{user_language == 'es' ? 'Lugar' : user_language == 'fr' ? 'Lieu' : user_language == 'pt' ? 'Local' : user_language == 'it' ? 'Posto' : user_language == 'de' ? 'Ort' : 'Place'}: #{entity['name']}
+      #{user_language == 'es' ? 'Descripción' : user_language == 'fr' ? 'Description' : user_language == 'pt' ? 'Descrição' : user_language == 'it' ? 'Descrizione' : user_language == 'de' ? 'Beschreibung' : 'Description'}: #{entity.dig('properties', 'description') || entity.dig('properties', 'summary')}
+      #{user_language == 'es' ? 'Keywords culturales' : user_language == 'fr' ? 'Mots-clés culturels' : user_language == 'pt' ? 'Palavras-chave culturais' : user_language == 'it' ? 'Parole chiave culturali' : user_language == 'de' ? 'Kulturelle Schlüsselwörter' : 'Cultural keywords'}: #{qloo_keywords.join(', ')}
       
-      Explica en un párrafo evocador (máximo 100 palabras) por qué este lugar es perfecto para #{index == 0 ? 'comenzar' : index == 1 ? 'continuar' : 'culminar'} su aventura cultural. 
+      #{lang_strings[:explanation]}
       
-      Conecta los keywords de Qloo con la experiencia personal del usuario.
-      Usa un tono cálido y poético.
-      
-      Responde solo con el párrafo explicativo.
+      #{lang_strings[:instructions]}
     PROMPT
 
     begin
@@ -1107,76 +1199,255 @@ end
       result = agent.run
       
       explanation = result.tasks.values.first.output_data[:llm_response]
-      explanation.strip.gsub(/^["']|["']$/, '') # Limpiar comillas
+      explanation.strip.gsub(/^["']|["']$/, '') # Clean quotes
       
     rescue => e
-      puts "❌ Error generando explicación cultural: #{e.message}"
-      "Este lugar conecta perfectamente con tu búsqueda de #{parsed_vibe[:interests].join(' y ')} en #{parsed_vibe[:city]}."
+      puts "❌ Error generating cultural explanation: #{e.message}"
+      # Fallback in user's language
+      fallback_messages = {
+        'es' => "Este lugar conecta perfectamente con tu búsqueda de #{parsed_vibe[:interests].join(' y ')} en #{parsed_vibe[:city]}.",
+        'en' => "This place connects perfectly with your search for #{parsed_vibe[:interests].join(' and ')} in #{parsed_vibe[:city]}.",
+        'fr' => "Cet endroit se connecte parfaitement avec votre recherche de #{parsed_vibe[:interests].join(' et ')} à #{parsed_vibe[:city]}.",
+        'pt' => "Este lugar se conecta perfeitamente com sua busca por #{parsed_vibe[:interests].join(' e ')} em #{parsed_vibe[:city]}.",
+        'it' => "Questo posto si collega perfettamente con la tua ricerca di #{parsed_vibe[:interests].join(' e ')} a #{parsed_vibe[:city]}.",
+        'de' => "Dieser Ort verbindet sich perfekt mit Ihrer Suche nach #{parsed_vibe[:interests].join(' und ')} in #{parsed_vibe[:city]}."
+      }
+      fallback_messages[user_language] || fallback_messages['en']
     end
   end
 
   def generate_experience_title(entity, index)
-    time_prefixes = ["Mañana:", "Tarde:", "Noche:"]
-    descriptors = ["Descubrimiento Cultural", "Inmersión Auténtica", "Culminación Perfecta"]
+    # This will be called with parsed_vibe, so we need to update the calling function
+    # For now, keeping English titles since this is called without language context
+    time_prefixes = ["Morning:", "Afternoon:", "Evening:"]
+    descriptors = ["Cultural Discovery", "Authentic Immersion", "Perfect Culmination"]
     
     "#{time_prefixes[index]} #{descriptors[index]}"
   end
 
+  def generate_localized_experience_title(entity, index, user_language)
+    titles = case user_language
+    when 'es'
+      {
+        time_prefixes: ["Mañana:", "Tarde:", "Noche:"],
+        descriptors: ["Descubrimiento Cultural", "Inmersión Auténtica", "Culminación Perfecta"]
+      }
+    when 'fr'
+      {
+        time_prefixes: ["Matin:", "Après-midi:", "Soir:"],
+        descriptors: ["Découverte Culturelle", "Immersion Authentique", "Culmination Parfaite"]
+      }
+    when 'pt'
+      {
+        time_prefixes: ["Manhã:", "Tarde:", "Noite:"],
+        descriptors: ["Descoberta Cultural", "Imersão Autêntica", "Culminação Perfeita"]
+      }
+    when 'it'
+      {
+        time_prefixes: ["Mattina:", "Pomeriggio:", "Sera:"],
+        descriptors: ["Scoperta Culturale", "Immersione Autentica", "Culminazione Perfetta"]
+      }
+    when 'de'
+      {
+        time_prefixes: ["Morgen:", "Nachmittag:", "Abend:"],
+        descriptors: ["Kulturelle Entdeckung", "Authentische Immersion", "Perfekte Kulmination"]
+      }
+    else # Default to English
+      {
+        time_prefixes: ["Morning:", "Afternoon:", "Evening:"],
+        descriptors: ["Cultural Discovery", "Authentic Immersion", "Perfect Culmination"]
+      }
+    end
+    
+    "#{titles[:time_prefixes][index]} #{titles[:descriptors][index]}"
+  end
+
   def generate_why_chosen(entity, parsed_vibe, qloo_keywords)
-    # Razón breve de por qué se eligió este lugar
+    # Brief reason why this place was chosen
     matching_keywords = (parsed_vibe[:interests] & qloo_keywords).any? ? 
-      "Coincidencia directa con tus intereses" : 
-      "Complementa perfectamente tu búsqueda cultural"
+      "Direct match with your interests" : 
+      "Perfectly complements your cultural search"
     
     "#{matching_keywords}. #{qloo_keywords.first(3).join(', ')}"
   end
 
   def create_fallback_experiences_with_explanations(parsed_vibe)
-    city = parsed_vibe[:city] || 'tu destino'
+    city = parsed_vibe[:city] || 'your destination'
     interests = parsed_vibe[:interests].join(', ')
+    user_language = parsed_vibe[:detected_language] || 'en'
+    
+    # Language-specific content
+    content = case user_language
+    when 'es'
+      {
+        titles: ["Mañana: Descubrimiento Local", "Tarde: Experiencia Auténtica", "Noche: Culminación Cultural"],
+        locations: ["Centro Cultural de #{city}", "Restaurante Tradicional", "Espacio Cultural Nocturno"],
+        descriptions: [
+          "Comienza explorando el corazón cultural de #{city}.",
+          "Una pausa gastronómica que conecta con la tradición local.",
+          "Cierra tu día en un ambiente que captura la esencia nocturna de #{city}."
+        ],
+        explanations: [
+          "Este lugar representa la esencia cultural de #{city}, perfectamente alineado con tu búsqueda de #{interests}.",
+          "La gastronomía local es una ventana al alma de #{city}, y este lugar encarna esa esencia.",
+          "La noche revela otra faceta de #{city}, y este lugar es el epítome de esa transformación cultural."
+        ],
+        areas: ["Centro", "Distrito Histórico", "Zona de Entretenimiento"],
+        why_chosen: [
+          "Seleccionado por su relevancia cultural en #{city}",
+          "Elegido por su autenticidad gastronómica",
+          "Perfecto para culminar tu jornada cultural"
+        ]
+      }
+    when 'fr'
+      {
+        titles: ["Matin: Découverte Locale", "Après-midi: Expérience Authentique", "Soir: Culmination Culturelle"],
+        locations: ["Centre Culturel de #{city}", "Restaurant Traditionnel", "Espace Culturel Nocturne"],
+        descriptions: [
+          "Commencez en explorant le cœur culturel de #{city}.",
+          "Une pause gastronomique qui se connecte à la tradition locale.",
+          "Terminez votre journée dans une atmosphère qui capture l'essence nocturne de #{city}."
+        ],
+        explanations: [
+          "Cet endroit représente l'essence culturelle de #{city}, parfaitement aligné avec votre recherche de #{interests}.",
+          "La gastronomie locale est une fenêtre sur l'âme de #{city}, et cet endroit incarne cette essence.",
+          "La nuit révèle une autre facette de #{city}, et cet endroit est l'épitome de cette transformation culturelle."
+        ],
+        areas: ["Centre", "District Historique", "Zone de Divertissement"],
+        why_chosen: [
+          "Sélectionné pour sa pertinence culturelle à #{city}",
+          "Choisi pour son authenticité gastronomique",
+          "Parfait pour culminer votre parcours culturel"
+        ]
+      }
+    when 'pt'
+      {
+        titles: ["Manhã: Descoberta Local", "Tarde: Experiência Autêntica", "Noite: Culminação Cultural"],
+        locations: ["Centro Cultural de #{city}", "Restaurante Tradicional", "Espaço Cultural Noturno"],
+        descriptions: [
+          "Comece explorando o coração cultural de #{city}.",
+          "Uma pausa gastronômica que conecta com a tradição local.",
+          "Termine seu dia em um ambiente que captura a essência noturna de #{city}."
+        ],
+        explanations: [
+          "Este lugar representa a essência cultural de #{city}, perfeitamente alinhado com sua busca por #{interests}.",
+          "A gastronomia local é uma janela para a alma de #{city}, e este lugar incorpora essa essência.",
+          "A noite revela outra faceta de #{city}, e este lugar é o epítome dessa transformação cultural."
+        ],
+        areas: ["Centro", "Distrito Histórico", "Zona de Entretenimento"],
+        why_chosen: [
+          "Selecionado por sua relevância cultural em #{city}",
+          "Escolhido por sua autenticidade gastronômica",
+          "Perfeito para culminar sua jornada cultural"
+        ]
+      }
+    when 'it'
+      {
+        titles: ["Mattina: Scoperta Locale", "Pomeriggio: Esperienza Autentica", "Sera: Culminazione Culturale"],
+        locations: ["Centro Culturale di #{city}", "Ristorante Tradizionale", "Spazio Culturale Notturno"],
+        descriptions: [
+          "Inizia esplorando il cuore culturale di #{city}.",
+          "Una pausa gastronomica che si collega alla tradizione locale.",
+          "Chiudi la tua giornata in un'atmosfera che cattura l'essenza notturna di #{city}."
+        ],
+        explanations: [
+          "Questo posto rappresenta l'essenza culturale di #{city}, perfettamente allineato con la tua ricerca di #{interests}.",
+          "La gastronomia locale è una finestra sull'anima di #{city}, e questo posto incarna quell'essenza.",
+          "La notte rivela un'altra sfaccettatura di #{city}, e questo posto è l'epitome di quella trasformazione culturale."
+        ],
+        areas: ["Centro", "Distretto Storico", "Zona di Intrattenimento"],
+        why_chosen: [
+          "Selezionato per la sua rilevanza culturale a #{city}",
+          "Scelto per la sua autenticità gastronomica",
+          "Perfetto per culminare il tuo percorso culturale"
+        ]
+      }
+    when 'de'
+      {
+        titles: ["Morgen: Lokale Entdeckung", "Nachmittag: Authentische Erfahrung", "Abend: Kulturelle Kulmination"],
+        locations: ["Kulturzentrum von #{city}", "Traditionelles Restaurant", "Nächtlicher Kulturraum"],
+        descriptions: [
+          "Beginnen Sie mit der Erkundung des kulturellen Herzens von #{city}.",
+          "Eine gastronomische Pause, die sich mit der lokalen Tradition verbindet.",
+          "Beenden Sie Ihren Tag in einer Atmosphäre, die die nächtliche Essenz von #{city} einfängt."
+        ],
+        explanations: [
+          "Dieser Ort repräsentiert die kulturelle Essenz von #{city}, perfekt abgestimmt auf Ihre Suche nach #{interests}.",
+          "Die lokale Gastronomie ist ein Fenster zur Seele von #{city}, und dieser Ort verkörpert diese Essenz.",
+          "Die Nacht offenbart eine andere Facette von #{city}, und dieser Ort ist der Inbegriff dieser kulturellen Transformation."
+        ],
+        areas: ["Zentrum", "Historisches Viertel", "Unterhaltungszone"],
+        why_chosen: [
+          "Ausgewählt für seine kulturelle Relevanz in #{city}",
+          "Gewählt für seine gastronomische Authentizität",
+          "Perfekt, um Ihre kulturelle Reise zu vollenden"
+        ]
+      }
+    else # Default to English
+      {
+        titles: ["Morning: Local Discovery", "Afternoon: Authentic Experience", "Evening: Cultural Culmination"],
+        locations: ["Cultural Center of #{city}", "Traditional Restaurant", "Nocturnal Cultural Space"],
+        descriptions: [
+          "Begin exploring the cultural heart of #{city}.",
+          "A gastronomic pause that connects with local tradition.",
+          "Close your day in an atmosphere that captures the nocturnal essence of #{city}."
+        ],
+        explanations: [
+          "This place represents the cultural essence of #{city}, perfectly aligned with your search for #{interests}.",
+          "Local gastronomy is a window to the soul of #{city}, and this place embodies that essence.",
+          "The night reveals another facet of #{city}, and this place is the epitome of that cultural transformation."
+        ],
+        areas: ["Center", "Historic District", "Entertainment Zone"],
+        why_chosen: [
+          "Selected for its cultural relevance in #{city}",
+          "Chosen for its gastronomic authenticity",
+          "Perfect to culminate your cultural journey"
+        ]
+      }
+    end
     
     [
       {
         time: "10:00 AM",
-        title: "Mañana: Descubrimiento Local",
-        location: "Centro Cultural de #{city}",
-        description: "Comienza explorando el corazón cultural de #{city}.",
-        cultural_explanation: "Este lugar representa la esencia cultural de #{city}, perfectamente alineado con tu búsqueda de #{interests}.",
+        title: content[:titles][0],
+        location: content[:locations][0],
+        description: content[:descriptions][0],
+        cultural_explanation: content[:explanations][0],
         duration: "2 hours",
-        area: "Centro",
+        area: content[:areas][0],
         vibe_match: 85,
         rating: 4.2,
         image: get_experience_image(0),
         qloo_keywords: [],
-        why_chosen: "Seleccionado por su relevancia cultural en #{city}"
+        why_chosen: content[:why_chosen][0]
       },
       {
         time: "02:00 PM",
-        title: "Tarde: Experiencia Auténtica",
-        location: "Restaurante Tradicional",
-        description: "Una pausa gastronómica que conecta con la tradición local.",
-        cultural_explanation: "La gastronomía local es una ventana al alma de #{city}, y este lugar encarna esa esencia.",
+        title: content[:titles][1],
+        location: content[:locations][1],
+        description: content[:descriptions][1],
+        cultural_explanation: content[:explanations][1],
         duration: "2.5 hours",
-        area: "Distrito Histórico",
+        area: content[:areas][1],
         vibe_match: 88,
         rating: 4.4,
         image: get_experience_image(1),
         qloo_keywords: [],
-        why_chosen: "Elegido por su autenticidad gastronómica"
+        why_chosen: content[:why_chosen][1]
       },
       {
         time: "07:30 PM",
-        title: "Noche: Culminación Cultural",
-        location: "Espacio Cultural Nocturno",
-        description: "Cierra tu día en un ambiente que captura la esencia nocturna de #{city}.",
-        cultural_explanation: "La noche revela otra faceta de #{city}, y este lugar es el epítome de esa transformación cultural.",
+        title: content[:titles][2],
+        location: content[:locations][2],
+        description: content[:descriptions][2],
+        cultural_explanation: content[:explanations][2],
         duration: "3 hours",
-        area: "Zona de Entretenimiento",
+        area: content[:areas][2],
         vibe_match: 82,
         rating: 4.1,
         image: get_experience_image(2),
         qloo_keywords: [],
-        why_chosen: "Perfecto para culminar tu jornada cultural"
+        why_chosen: content[:why_chosen][2]
       }
     ]
   end
@@ -1184,14 +1455,73 @@ end
   def build_intelligent_narrative(parsed_vibe, user_vibe, experiences)
     city = parsed_vibe[:city]
     interests = parsed_vibe[:interests].join(', ')
+    user_language = parsed_vibe[:detected_language] || 'en'
+    
+    # Language-specific content
+    content = case user_language
+    when 'es'
+      {
+        title: "🌟 Tu Aventura Cultural en #{city}",
+        original_vibe: "Tu vibe original:",
+        destination: "Destino Identificado",
+        interests_label: "Intereses Detectados", 
+        curation: "Curación Inteligente",
+        description: "Usando datos culturales de Qloo API y análisis de IA, hemos diseñado #{experiences.size} experiencias que capturan la esencia de #{city} y resuenan con tu búsqueda personal."
+      }
+    when 'fr'
+      {
+        title: "🌟 Votre Aventure Culturelle à #{city}",
+        original_vibe: "Votre vibe original:",
+        destination: "Destination Identifiée",
+        interests_label: "Intérêts Détectés",
+        curation: "Curation Intelligente", 
+        description: "En utilisant les données culturelles de l'API Qloo et l'analyse IA, nous avons conçu #{experiences.size} expériences qui capturent l'essence de #{city} et résonnent avec votre recherche personnelle."
+      }
+    when 'pt'
+      {
+        title: "🌟 Sua Aventura Cultural em #{city}",
+        original_vibe: "Seu vibe original:",
+        destination: "Destino Identificado",
+        interests_label: "Interesses Detectados",
+        curation: "Curadoria Inteligente",
+        description: "Usando dados culturais da API Qloo e análise de IA, projetamos #{experiences.size} experiências que capturam a essência de #{city} e ressoam com sua busca pessoal."
+      }
+    when 'it'
+      {
+        title: "🌟 La Tua Avventura Culturale a #{city}",
+        original_vibe: "Il tuo vibe originale:",
+        destination: "Destinazione Identificata", 
+        interests_label: "Interessi Rilevati",
+        curation: "Curazione Intelligente",
+        description: "Utilizzando i dati culturali dell'API Qloo e l'analisi AI, abbiamo progettato #{experiences.size} esperienze che catturano l'essenza di #{city} e risuonano con la tua ricerca personale."
+      }
+    when 'de'
+      {
+        title: "🌟 Ihr Kulturelles Abenteuer in #{city}",
+        original_vibe: "Ihr ursprüngliches Vibe:",
+        destination: "Identifiziertes Ziel",
+        interests_label: "Erkannte Interessen",
+        curation: "Intelligente Kuration", 
+        description: "Mit kulturellen Daten aus der Qloo-API und KI-Analyse haben wir #{experiences.size} Erfahrungen entworfen, die die Essenz von #{city} erfassen und mit Ihrer persönlichen Suche in Resonanz stehen."
+      }
+    else # Default to English
+      {
+        title: "🌟 Your Cultural Adventure in #{city}",
+        original_vibe: "Your original vibe:",
+        destination: "Identified Destination",
+        interests_label: "Detected Interests",
+        curation: "Intelligent Curation",
+        description: "Using Qloo API cultural data and AI analysis, we've designed #{experiences.size} experiences that capture the essence of #{city} and resonate with your personal search."
+      }
+    end
     
     <<~HTML
       <div class="narrative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-8 rounded-2xl">
-        <h2 class="text-3xl font-bold mb-6 gradient-text">🌟 Tu Aventura Cultural en #{city}</h2>
+        <h2 class="text-3xl font-bold mb-6 gradient-text">#{content[:title]}</h2>
         
         <div class="glass-card p-6 mb-6">
           <p class="text-lg text-slate-300 mb-4">
-            <strong class="text-white">Tu vibe original:</strong> 
+            <strong class="text-white">#{content[:original_vibe]}</strong> 
             <em>"#{user_vibe}"</em>
           </p>
         </div>
@@ -1199,14 +1529,14 @@ end
         <div class="grid md:grid-cols-2 gap-6 mb-6">
           <div class="glass-card p-6">
             <h3 class="text-xl font-bold mb-3 flex items-center gap-2">
-              📍 <span style="color: var(--accent-terracotta);">Destino Identificado</span>
+              📍 <span style="color: var(--accent-terracotta);">#{content[:destination]}</span>
             </h3>
             <p class="text-slate-300">#{city}</p>
           </div>
           
           <div class="glass-card p-6">
             <h3 class="text-xl font-bold mb-3 flex items-center gap-2">
-              🎯 <span style="color: var(--accent-sage);">Intereses Detectados</span>
+              🎯 <span style="color: var(--accent-sage);">#{content[:interests_label]}</span>
             </h3>
             <p class="text-slate-300">#{interests}</p>
           </div>
@@ -1214,11 +1544,10 @@ end
         
         <div class="glass-card p-6">
           <h3 class="text-xl font-bold mb-3 flex items-center gap-2">
-            ✨ <span style="color: var(--accent-gold);">Curación Inteligente</span>
+            ✨ <span style="color: var(--accent-gold);">#{content[:curation]}</span>
           </h3>
           <p class="text-slate-300">
-            Usando datos culturales de Qloo API y análisis de IA, hemos diseñado #{experiences.size} experiencias 
-            que capturan la esencia de #{city} y resuenan con tu búsqueda personal.
+            #{content[:description]}
           </p>
         </div>
       </div>
@@ -1230,13 +1559,24 @@ end
 def save_intelligent_itinerary(user_vibe, parsed_vibe, narrative, experiences)
   city = parsed_vibe[:city] || 'Unknown City'
   preferences = parsed_vibe[:preferences]&.join(', ') || 'various preferences'
+  user_language = parsed_vibe[:detected_language] || 'en'
+  
+  # Generate localized itinerary name
+  itinerary_name = case user_language
+  when 'es' then "Aventura Cultural en #{city}"
+  when 'fr' then "Aventure Culturelle à #{city}"
+  when 'pt' then "Aventura Cultural em #{city}"
+  when 'it' then "Avventura Culturale a #{city}"
+  when 'de' then "Kulturelles Abenteuer in #{city}"
+  else "Cultural Adventure in #{city}"
+  end
   
   itinerary = Itinerary.create!(
     user_id: 1,
     description: user_vibe,
     city: city,
     location: city,
-    name: "Aventura Cultural en #{city}",
+    name: itinerary_name,
     narrative_html: narrative,
     themes: preferences
   )
@@ -1344,15 +1684,15 @@ def save_intelligent_itinerary(user_vibe, parsed_vibe, narrative, experiences)
       # Create the stop with all available data
       stop = itinerary.itinerary_stops.create!(attributes)
       
-      puts "✅ Enhanced stop creado: #{exp[:location]} (ID: #{stop.id})"
+      puts "✅ Enhanced stop created: #{exp[:location]} (ID: #{stop.id})"
       puts "   - Coords: #{exp[:latitude]}, #{exp[:longitude]}"
       puts "   - Website: #{exp[:website] || 'N/A'}"
       puts "   - Phone: #{exp[:phone] || 'N/A'}"
       puts "   - Keywords: #{exp[:qloo_keywords]&.size || 0}"
       
     rescue => e
-      puts "❌ Error creando enhanced stop: #{e.message}"
-      puts "=== Columnas disponibles: #{ItineraryStop.column_names.inspect}"
+      puts "❌ Error creating enhanced stop: #{e.message}"
+      puts "=== Available columns: #{ItineraryStop.column_names.inspect}"
       
       # Fallback: try with minimal data
       begin
@@ -1365,29 +1705,29 @@ def save_intelligent_itinerary(user_vibe, parsed_vibe, narrative, experiences)
         minimal_attributes[:position] = index + 1 if column_names.include?('position')
         
         fallback_stop = itinerary.itinerary_stops.create!(minimal_attributes)
-        puts "✅ Fallback stop creado: #{exp[:location]} (ID: #{fallback_stop.id})"
+        puts "✅ Fallback stop created: #{exp[:location]} (ID: #{fallback_stop.id})"
         
       rescue => fallback_error
-        puts "❌ Error en fallback stop: #{fallback_error.message}"
+        puts "❌ Error in fallback stop: #{fallback_error.message}"
       end
     end
   end
   
-  puts "✅ Enhanced itinerary guardado con ID: #{itinerary.id}"
-  puts "   - Experiencias: #{experiences.size}"
-  puts "   - Keywords totales: #{experiences.sum { |e| e[:qloo_keywords]&.size || 0 }}"
-  puts "   - Lugares con coordenadas: #{experiences.count { |e| e[:latitude] && e[:longitude] }}"
-  puts "   - Lugares con website: #{experiences.count { |e| e[:website] }}"
-  puts "   - Lugares con teléfono: #{experiences.count { |e| e[:phone] }}"
+  puts "✅ Enhanced itinerary saved with ID: #{itinerary.id}"
+  puts "   - Experiences: #{experiences.size}"
+  puts "   - Total keywords: #{experiences.sum { |e| e[:qloo_keywords]&.size || 0 }}"
+  puts "   - Places with coordinates: #{experiences.count { |e| e[:latitude] && e[:longitude] }}"
+  puts "   - Places with website: #{experiences.count { |e| e[:website] }}"
+  puts "   - Places with phone: #{experiences.count { |e| e[:phone] }}"
   
   itinerary
 end
 
   def calculate_vibe_match(entity, parsed_vibe)
-    # Calcular match basado en popularidad de Qloo y coincidencias de intereses
+    # Calculate match based on Qloo popularity and interest matches
     base_score = (entity['popularity'].to_f * 100).round
     
-    # Bonus por coincidencias de keywords
+    # Bonus for keyword matches
     entity_keywords = entity.dig('properties', 'keywords') || []
     matches = (parsed_vibe[:interests] & entity_keywords).size
     bonus = matches * 5
@@ -1396,10 +1736,10 @@ end
   end
 
   def extract_area_from_entity(entity, city)
-    # Intentar extraer área de los datos de Qloo
+    # Try to extract area from Qloo data
     area = entity.dig('properties', 'geocode', 'name') ||
            entity.dig('properties', 'address')&.split(',')&.first ||
-           'Centro'
+           'Center'
     
     area.strip if area
   end
@@ -1439,7 +1779,7 @@ end
 end
 
   def extract_area_from_qloo_entity(qloo_entity, city)
-  # Intentar extraer área de múltiples fuentes en Qloo
+  # Try to extract area from multiple Qloo sources
   area_candidates = [
     qloo_entity.dig('properties', 'geocode', 'name'),
     qloo_entity.dig('properties', 'neighborhood'),
@@ -1449,20 +1789,20 @@ end
     qloo_entity.dig('properties', 'address')&.split(',')&.first
   ].compact.map(&:strip)
   
-  # Filtrar candidatos válidos
+  # Filter valid candidates
   valid_area = area_candidates.find do |candidate|
     candidate.length > 2 && 
     !candidate.downcase.include?(city.downcase) &&
-    !candidate.match?(/^\d+/) # No códigos postales
+    !candidate.match?(/^\d+/) # No postal codes
   end
   
-  valid_area || "Centro"
+  valid_area || "Center"
 end
 
   def generate_google_maps_url(latitude, longitude, place_name)
   return nil unless latitude && longitude
   
-  # URL para abrir en Google Maps
+  # URL to open in Google Maps
   encoded_name = CGI.escape(place_name || "")
   "https://www.google.com/maps/search/?api=1&query=#{latitude},#{longitude}&query_place_id=#{encoded_name}"
 end
@@ -1470,7 +1810,7 @@ end
 def generate_directions_url(latitude, longitude)
   return nil unless latitude && longitude
   
-  # URL para obtener direcciones
+  # URL to get directions
   "https://www.google.com/maps/dir/?api=1&destination=#{latitude},#{longitude}"
 end
 
@@ -1511,26 +1851,26 @@ def extract_amenities_from_tags(tags)
 end
 
 def generate_enhanced_why_chosen(qloo_entity, parsed_vibe, qloo_keywords)
-  # Razón más detallada
+  # More detailed reason
   matching_keywords = (parsed_vibe[:interests] & qloo_keywords)
   popularity_score = ((qloo_entity['popularity'] || 0.8) * 100).round
   
   reasons = []
   
   if matching_keywords.any?
-    reasons << "Coincidencia directa con tus intereses: #{matching_keywords.join(', ')}"
+    reasons << "Direct match with your interests: #{matching_keywords.join(', ')}"
   end
   
   if popularity_score >= 80
-    reasons << "Alta popularidad cultural (#{popularity_score}%)"
+    reasons << "High cultural popularity (#{popularity_score}%)"
   end
   
   if qloo_keywords.any?
     top_keywords = qloo_keywords.first(3)
-    reasons << "Elementos culturales clave: #{top_keywords.join(', ')}"
+    reasons << "Key cultural elements: #{top_keywords.join(', ')}"
   end
   
-  reasons.any? ? reasons.join('. ') : "Curado especialmente para tu experiencia cultural única"
+  reasons.any? ? reasons.join('. ') : "Curated specifically for your unique cultural experience"
 end
 
 def extract_booking_info(properties)
@@ -1575,5 +1915,104 @@ end
       "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&auto=format&fit=crop&ixlib=rb-4.0.3"
     ]
     images[index] || images.first
+  end
+
+  # Missing fallback methods that need to be added
+  def simple_vibe_parsing(user_vibe)
+    # Simple parsing fallback
+    detected_language = detect_user_language(user_vibe)
+    
+    {
+      city: extract_city_from_text(user_vibe),
+      interests: extract_interests_from_text(user_vibe),
+      preferences: ['culture', 'authentic'],
+      detected_language: detected_language
+    }
+  end
+
+  def extract_city_from_text(text)
+    # Simple city extraction
+    cities = ['Mexico City', 'Toronto', 'New York', 'London', 'Paris', 'Tokyo']
+    cities.find { |city| text.downcase.include?(city.downcase) } || 'Mexico City'
+  end
+
+  def extract_interests_from_text(text)
+    # Simple interest extraction
+    interests = []
+    interests << 'restaurant' if text.downcase.include?('food') || text.downcase.include?('restaurant')
+    interests << 'bar' if text.downcase.include?('drink') || text.downcase.include?('bar')
+    interests << 'museum' if text.downcase.include?('art') || text.downcase.include?('museum')
+    interests << 'culture' if interests.empty?
+    interests
+  end
+
+  def create_comprehensive_fallback(parsed_vibe)
+    create_fallback_experiences_with_explanations(parsed_vibe)
+  end
+
+  def create_fallback_narrative(parsed_vibe, user_vibe)
+    city = parsed_vibe[:city]
+    user_language = parsed_vibe[:detected_language] || 'en'
+    
+    # Language-specific content
+    content = case user_language
+    when 'es'
+      {
+        title: "🌟 Tu Aventura Cultural en #{city}",
+        original_vibe: "Tu vibe original:",
+        description: "Hemos creado una experiencia cultural curada para ti en #{city} basada en tus preferencias."
+      }
+    when 'fr'
+      {
+        title: "🌟 Votre Aventure Culturelle à #{city}",
+        original_vibe: "Votre vibe original:",
+        description: "Nous avons créé une expérience culturelle curatée pour vous à #{city} basée sur vos préférences."
+      }
+    when 'pt'
+      {
+        title: "🌟 Sua Aventura Cultural em #{city}",
+        original_vibe: "Seu vibe original:",
+        description: "Criamos uma experiência cultural curada para você em #{city} baseada nas suas preferências."
+      }
+    when 'it'
+      {
+        title: "🌟 La Tua Avventura Culturale a #{city}",
+        original_vibe: "Il tuo vibe originale:",
+        description: "Abbiamo creato un'esperienza culturale curata per te a #{city} basata sulle tue preferenze."
+      }
+    when 'de'
+      {
+        title: "🌟 Ihr Kulturelles Abenteuer in #{city}",
+        original_vibe: "Ihr ursprüngliches Vibe:",
+        description: "Wir haben eine kuratierte kulturelle Erfahrung für Sie in #{city} basierend auf Ihren Präferenzen erstellt."
+      }
+    else # Default to English
+      {
+        title: "🌟 Your Cultural Adventure in #{city}",
+        original_vibe: "Your original vibe:",
+        description: "We've created a curated cultural experience for you in #{city} based on your preferences."
+      }
+    end
+    
+    <<~HTML
+      <div class="narrative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-8 rounded-2xl">
+        <h2 class="text-3xl font-bold mb-6 gradient-text">#{content[:title]}</h2>
+        <div class="glass-card p-6 mb-6">
+          <p class="text-lg text-slate-300 mb-4">
+            <strong class="text-white">#{content[:original_vibe]}</strong> 
+            <em>"#{user_vibe}"</em>
+          </p>
+        </div>
+        <div class="glass-card p-6">
+          <p class="text-slate-300">
+            #{content[:description]}
+          </p>
+        </div>
+      </div>
+    HTML
+  end
+
+  def save_fallback_itinerary(user_vibe, parsed_vibe, narrative, experiences)
+    save_intelligent_itinerary(user_vibe, parsed_vibe, narrative, experiences)
   end
 end

@@ -1,6 +1,6 @@
-<%# app/views/home/index.html.erb - Vista Principal Mejorada %>
+<%# app/views/home/index.html.erb - Enhanced Main View %>
 
-<%# Turbo Stream para actualizaciones en tiempo real %>
+<%# Turbo Stream for real-time updates %>
 <%#= turbo_stream_from "itinerary_channel:#{current_user&.id || session.id}" %> >
 
 <!-- Hero Section -->
@@ -283,7 +283,7 @@
             
             transitionToSection(processingSection);
             
-            // Llamada al controller de Rails
+            // Call to Rails controller
             fetch('<%= app_create_real_journey_path %>', {
                 method: 'POST',
                 body: formData,
@@ -299,12 +299,12 @@
                     currentProcessId = data.process_id;
                     startStatusPolling();
                 } else {
-                    showError(data.message || 'Error procesando tu vibe');
+                    showError(data.message || 'Error processing your vibe');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                showError('Error de conexión');
+                showError('Connection error');
             });
         });
 
@@ -343,13 +343,13 @@
                         } else if (data.status === 'failed' || data.status === 'error') {
                             clearInterval(statusInterval);
                             statusInterval = null;
-                            showError(data.message || 'Error procesando tu vibe');
+                            showError(data.message || 'Error processing your vibe');
                         }
                     })
                     .catch(error => {
                         console.error('Status error:', error);
                         clearInterval(statusInterval);
-                        showError('Error obteniendo estado');
+                        showError('Error getting status');
                     });
             }, 2000);
         }
@@ -405,7 +405,7 @@
 
         function showItineraryResults(itinerary) {
             const experiences = itinerary.experiences || [];
-            const title = itinerary.title || 'Tu Aventura';
+            const title = itinerary.title || 'Your Adventure';
             const city = itinerary.city || 'Cultural';
             const narrativeHtml = itinerary.narrative_html;
             
@@ -432,7 +432,7 @@
             if (experiences.length > 0) {
                 timelineContent.innerHTML = generateTimelineHTML(experiences);
             } else {
-                timelineContent.innerHTML = '<div class="text-center text-slate-400 py-20">No se encontraron experiencias.</div>';
+                timelineContent.innerHTML = '<div class="text-center text-slate-400 py-20">No experiences found.</div>';
             }
             
             transitionToSection(timelineSection);
@@ -445,7 +445,7 @@
 
 function generateTimelineHTML(experiences) {
     if (!experiences || experiences.length === 0) {
-        return '<div class="text-center text-slate-400 py-20">No se encontraron experiencias</div>';
+        return '<div class="text-center text-slate-400 py-20">No experiences found</div>';
     }
 
     const experiencesHTML = experiences.map((exp, index) => {
@@ -455,12 +455,12 @@ function generateTimelineHTML(experiences) {
         
         // Extract enhanced data with fallbacks
         const time = exp.time || `${9 + index * 3}:00 ${index < 2 ? 'AM' : 'PM'}`;
-        const title = exp.title || 'Experiencia Cultural';
-        const description = exp.description || 'Una experiencia única curada especialmente para ti';
-        const location = exp.location || exp.title || 'Ubicación Especial';
-        const area = exp.area || 'Centro';
-        const duration = exp.duration || '1-2 horas';
-        const cultural_explanation = exp.cultural_explanation || exp.why_chosen || 'Curada específicamente para tu vibe cultural único.';
+        const title = exp.title || 'Cultural Experience';
+        const description = exp.description || 'A unique experience curated specifically for you';
+        const location = exp.location || exp.title || 'Special Location';
+        const area = exp.area || 'Center';
+        const duration = exp.duration || '1-2 hours';
+        const cultural_explanation = exp.cultural_explanation || exp.why_chosen || 'Curated specifically for your unique cultural vibe.';
         const vibe_match = exp.vibe_match || 95;
         const rating = exp.rating || '4.5';
         const image = exp.image || 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400';
@@ -741,10 +741,10 @@ function generateTimelineHTML(experiences) {
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                         </svg>
                     </div>
-                    <h3 class="text-3xl font-bold text-white mb-4">😕 Algo salió mal</h3>
+                    <h3 class="text-3xl font-bold text-white mb-4">😕 Something went wrong</h3>
                     <p class="text-xl text-slate-400 mb-8">${message}</p>
                     <button onclick="startNewJourney()" class="font-bold py-4 px-8 rounded-xl transition-all duration-300 text-lg" style="background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage)); color: white;">
-                        Intentar de nuevo
+                        Try again
                     </button>
                 </div>
             `;
