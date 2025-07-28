@@ -84,4 +84,6 @@ group :test do
   gem "selenium-webdriver"
 end
 
-gem "redis", "~> 5.4"
+gem "redis", "~> 5.0"
+gem 'hiredis' 
+gem 'connection_pool' # Para conexiones optimizadas

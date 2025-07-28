@@ -10,6 +10,12 @@ Rails.application.routes.draw do
   # Rutas para explicaciones culturales
   post '/app/explain_choice', to: 'app#explain_choice', as: :app_explain_choice
   
+  namespace :admin do
+    get 'analytics/dashboard', to: 'analytics#dashboard'
+    get 'analytics/health', to: 'analytics#health'
+    get 'analytics/languages', to: 'analytics#languages'
+  end
+
   # Rutas de itinerarios (para funcionalidad adicional)
   resources :itineraries do
     member do

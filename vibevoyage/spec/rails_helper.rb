@@ -24,8 +24,7 @@ require 'factory_bot_rails'
 # of increasing the boot-up time by auto-requiring all files in the support
 # directory. Alternatively, in the individual `*_spec.rb` files, manually
 # require only the support files necessary.
-#
-Dir[Rails.root.join('spec/support/**/*.rb')].sort.each { |f| require f }
+# Dir[Rails.root.join('spec/support/**/*.rb')].sort.each { |f| require f }
 
 # Ensures that the test database schema matches the current schema file.
 # If there are pending migrations it will invoke `db:test:prepare` to
@@ -46,6 +45,52 @@ RSpec.configure do |config|
   config.use_transactional_fixtures = true
 
   config.include FactoryBot::Syntax::Methods
+  
+  config.before(:each) do
+
+    # Mock LLMService methods if the service is defined
+    if defined?(LLMService)
+      allow(LLMService).to receive(:execute_llm_task).and_return('mock response')
+      allow(LLMService).to receive(:detect_language).and_return('en')
+      allow(LLMService).to receive(:parse_vibe).and_return({ 
+        city: 'Test City', 
+        interests: ['test'], 
+        detected_language: 'en' 
+      })
+      allow(LLMService).to receive(:generate_cultural_explanation).and_return('Test explanation')
+      allow(LLMService).to receive(:find_best_place_match).and_return(nil)
+      allow(LLMService).to receive(:extract_area_from_address).and_return('Center')
+      allow(LLMService).to receive(:generate_fallback_coordinates).and_return({
+        latitude: 40.7128,
+        longitude: -74.0060,
+        place_name: 'Test Place'
+      })
+    end
+    
+    # Mock RdawnApiService methods if defined
+    if defined?(RdawnApiService)
+      allow(RdawnApiService).to receive(:qloo_recommendations).and_return({ 
+        success: true, 
+        data: { 'results' => { 'entities' => [] } } 
+      })
+      allow(RdawnApiService).to receive(:google_places).and_return({ 
+        success: true, 
+        data: { 'results' => [] } 
+      })
+    end
+    
+    # Mock AnalyticsService if defined
+    if defined?(AnalyticsService)
+      allow(AnalyticsService).to receive(:track_journey_processing).and_return({})
+      allow(AnalyticsService).to receive(:track_llm_performance).and_return({})
+      allow(AnalyticsService).to receive(:track_curation_effectiveness).and_return({})
+      allow(AnalyticsService).to receive(:track_error).and_return({})
+    end
+  end
+
+  config.after(:each) do
+    Rails.cache.clear
+  end
 
   # config.use_active_record = false
   # config.infer_spec_type_from_file_location!
@@ -60,5 +105,3 @@ Shoulda::Matchers.configure do |config|
     with.library :rails
   end
 end
-
-
