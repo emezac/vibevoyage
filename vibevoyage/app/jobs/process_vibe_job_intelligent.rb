@@ -10,8 +10,8 @@ class ProcessVibeJobIntelligent < ApplicationJob
     puts "User vibe: #{user_vibe}"
     
     begin
-      # Step 1: Parse user vibe with language detection (25%)
-      update_status(process_id, 'analyzing', 'Analyzing your cultural essence...', 25)
+      # Step 1: Parse user vibe with enhanced feedback (15%)
+      update_qloo_status(process_id, 'analyzing', 'analyzing_vibe', 15)
       
       vibe_parse_start = Time.current
       parsed_vibe = parse_user_vibe(user_vibe, process_id)
@@ -22,103 +22,93 @@ class ProcessVibeJobIntelligent < ApplicationJob
       Rails.logger.info "--- Parsed Vibe: #{parsed_vibe.inspect}"
       Rails.logger.info "--- Detected Language: #{language}"
       
-      # Track LLM performance for vibe parsing
-      AnalyticsService.track_llm_performance(
-        'vibe_parsing', 
-        vibe_parse_duration, 
-        true, 
+      # Show what we discovered about the user's vibe (25%)
+      vibe_summary_message = LocalizationService.format_vibe_discovery(
+        parsed_vibe[:interests], 
+        parsed_vibe[:city], 
         language
       )
+      update_qloo_status(process_id, 'analyzing', 'vibe_discovered', 25, {
+        discovery: vibe_summary_message,
+        interests: parsed_vibe[:interests],
+        city: parsed_vibe[:city]
+      })
       
-      # Step 2: Query Qloo API (50%)
-      update_status(process_id, 'processing', 'Connecting to cultural databases...', 50)
+      # Track LLM performance for vibe parsing
+      AnalyticsService.track_llm_performance('vibe_parsing', vibe_parse_duration, true, language)
+      
+      # Step 2: Query Qloo API with dramatic presentation (35%)
+      update_qloo_status(process_id, 'querying_qloo', 'querying_qloo', 35, {
+        interests_count: parsed_vibe[:interests].size
+      })
+      
+      # Add small delay to build anticipation
+      sleep(0.8)
       
       qloo_start = Time.current
+      update_qloo_status(process_id, 'querying_qloo', 'qloo_thinking', 40, {
+        interests_count: parsed_vibe[:interests].size
+      })
+      
       recommendations_result = fetch_qloo_recommendations(parsed_vibe)
       qloo_duration = Time.current - qloo_start
       
       unless recommendations_result[:success]
-        # Track failed Qloo call
-        AnalyticsService.track_error(
-          'qloo_api', 
-          'recommendations', 
-          StandardError.new(recommendations_result[:error]),
-          { process_id: process_id, city: parsed_vibe[:city] }
-        )
+        AnalyticsService.track_error('qloo_api', 'recommendations', StandardError.new(recommendations_result[:error]), { process_id: process_id, city: parsed_vibe[:city] })
         handle_qloo_error(process_id, recommendations_result[:error])
         return
       end
       
-      # Step 3: Process and enrich places data (60%)
-      update_status(process_id, 'enriching', 'Enriching places with detailed information...', 60)
+      # Step 3: Show Qloo discoveries (50%)
+      qloo_entities = recommendations_result[:data]&.dig('results', 'entities') || []
+      if qloo_entities.any?
+        show_qloo_discoveries(process_id, qloo_entities, parsed_vibe, 50)
+      end
+      
+      # Step 4: Process and enrich places data (65%)
+      update_qloo_status(process_id, 'enriching', 'enriching_places', 65)
       
       places_start = Time.current
-      places_results = PlacesEnrichmentService.process_places_data(
-        parsed_vibe, 
-        recommendations_result[:data]
-      )
+      places_results = PlacesEnrichmentService.process_places_data(parsed_vibe, recommendations_result[:data])
       places_duration = Time.current - places_start
       
-      # Step 4: Curate experiences with cultural explanations (75%)
-      update_status(process_id, 'curating', 'Curating experiences with cultural context...', 75)
+      # Step 5: Curate experiences with cultural explanations (80%)
+      update_qloo_status(process_id, 'curating', 'building_narrative', 80)
       
       curation_start = Time.current
-      curated_experiences = CulturalCurationService.curate_experiences(
-        parsed_vibe, 
-        recommendations_result[:data]
-      )
+      curated_experiences = CulturalCurationService.curate_experiences(parsed_vibe, recommendations_result[:data])
       curation_duration = Time.current - curation_start
       
       # Enrich experiences with places data
-      enhanced_experiences = enhance_experiences_with_places_data(
-        curated_experiences, 
-        places_results, 
-        parsed_vibe
-      )
+      enhanced_experiences = enhance_experiences_with_places_data(curated_experiences, places_results, parsed_vibe)
       
       # Track curation effectiveness
       AnalyticsService.track_curation_effectiveness(enhanced_experiences)
       
-      # Step 5: Build narrative (90%)
-      update_status(process_id, 'finalizing', 'Building your personalized narrative...', 90)
+      # Step 6: Build narrative with cultural synthesis (95%)
+      update_qloo_status(process_id, 'finalizing', 'cultural_synthesis', 95)
       
       narrative = build_localized_narrative(parsed_vibe, user_vibe, enhanced_experiences)
       
-      # Step 6: Save to database
+      # Step 7: Save to database
       itinerary = save_enhanced_itinerary(user_vibe, parsed_vibe, narrative, enhanced_experiences)
       
       # Calculate total processing time
       total_duration = Time.current - start_time
       
       # Track comprehensive journey metrics
-      AnalyticsService.track_journey_processing(
-        process_id,
-        user_vibe,
-        parsed_vibe,
-        enhanced_experiences,
-        total_duration
-      )
+      AnalyticsService.track_journey_processing(process_id, user_vibe, parsed_vibe, enhanced_experiences, total_duration)
       
-      # Final result with localized messages
+      # Final result with enhanced data
       final_result = build_final_result(itinerary, parsed_vibe, enhanced_experiences)
       
-      success_message = LocalizationService.success_message(language: language)
-      update_status(process_id, 'complete', success_message, 100, itinerary: final_result[:itinerary])
+      success_message = LocalizationService.get_progress_messages(language)[:ready]
+      update_qloo_status(process_id, 'complete', 'ready', 100, { itinerary: final_result[:itinerary] })
       
       log_completion_stats(process_id, final_result, total_duration)
       
     rescue => e
-      # Track error analytics
-      AnalyticsService.track_error(
-        'process_vibe_job', 
-        'full_processing', 
-        e,
-        { 
-          process_id: process_id, 
-          user_vibe_length: user_vibe.length,
-          processing_stage: determine_processing_stage(e)
-        }
-      )
+      AnalyticsService.track_error('process_vibe_job', 'full_processing', e, { process_id: process_id, user_vibe_length: user_vibe.length, processing_stage: determine_processing_stage(e) })
       handle_processing_error(e, process_id, user_vibe)
     end
   end
@@ -806,5 +796,148 @@ class ProcessVibeJobIntelligent < ApplicationJob
       data_sources: exp[:data_sources],
       coordinate_precision: exp[:coordinate_precision]
     }.compact
+  end
+
+  # Enhanced status update method with Qloo context
+  def update_qloo_status(process_id, status, message_key, progress, extra_data = {})
+    language = extra_data[:language] || 'en'
+    
+    # Get localized message
+    messages = LocalizationService.get_progress_messages(language)
+    base_message = messages[message_key.to_sym] || message_key.to_s.humanize
+    
+    # Apply interpolations if needed
+    if extra_data[:interests_count]
+      base_message = base_message % { interests_count: extra_data[:interests_count] }
+    end
+    
+    status_data = { 
+      status: status, 
+      message: base_message, 
+      progress: progress,
+      qloo_data: extra_data.except(:language, :interests_count)
+    }.compact
+    
+    # Add itinerary if complete
+    if extra_data[:itinerary]
+      status_data[:itinerary] = extra_data[:itinerary]
+    end
+    
+    Rails.cache.write("journey_#{process_id}", status_data, expires_in: 15.minutes)
+    puts "=== Enhanced Status Update: #{progress}% - #{base_message} ==="
+  end
+
+  # Show Qloo discoveries with dramatic effect
+  def show_qloo_discoveries(process_id, qloo_entities, parsed_vibe, base_progress)
+    language = parsed_vibe[:detected_language]
+    user_interests = parsed_vibe[:interests] || []
+    
+    # Collect all keywords from Qloo entities
+    all_keywords = []
+    entity_discoveries = []
+    
+    qloo_entities.first(3).each do |entity|
+      entity_name = entity['name']
+      entity_keywords = extract_qloo_keywords_for_display(entity)
+      
+      if entity_keywords.any?
+        all_keywords.concat(entity_keywords)
+        entity_discoveries << {
+          name: entity_name,
+          keywords: entity_keywords.first(4) # Limit for display
+        }
+      end
+    end
+    
+    # Show discoveries for each user interest
+    user_interests.each_with_index do |interest, index|
+      progress = base_progress + (index * 3) # Increment progress slightly
+      
+      # Find related keywords for this interest
+      related_keywords = find_related_keywords(interest, all_keywords)
+      
+      if related_keywords.any?
+        discovery_message = LocalizationService.format_qloo_discovery(
+          interest, 
+          related_keywords, 
+          language
+        )
+        
+        update_qloo_status(process_id, 'querying_qloo', 'qloo_discovery', progress, {
+          language: language,
+          discovery: discovery_message,
+          interest: interest,
+          related_keywords: related_keywords,
+          entity_discoveries: entity_discoveries
+        })
+        
+        # Small delay for dramatic effect
+        sleep(0.6)
+      end
+    end
+    
+    # Final connections summary
+    total_connections = all_keywords.uniq.size
+    connections_message = LocalizationService.format_qloo_connections(total_connections, language)
+    
+    update_qloo_status(process_id, 'querying_qloo', 'qloo_connections', base_progress + 8, {
+      language: language,
+      discovery: connections_message,
+      total_connections: total_connections,
+      all_keywords: all_keywords.uniq.first(10) # Show top 10 for display
+    })
+    
+    sleep(0.5)
+  end
+
+  # Extract keywords from Qloo entity for display
+  def extract_qloo_keywords_for_display(entity)
+    keywords = []
+    
+    # Get from properties
+    if entity.dig('properties', 'keywords').is_a?(Array)
+      keywords = entity['properties']['keywords'].map { |k| 
+        k.is_a?(Hash) ? k['name'] : k.to_s 
+      }.compact
+    end
+    
+    # Get from tags if no keywords
+    if keywords.empty? && entity['tags']&.any?
+      keywords = entity['tags'].map { |tag| tag['name'] }.compact.first(8)
+    end
+    
+    keywords.map(&:downcase).uniq
+  end
+
+  # Find keywords related to a user interest
+  def find_related_keywords(user_interest, all_keywords)
+    interest_lower = user_interest.downcase
+    related = []
+    
+    # Exact matches
+    exact_matches = all_keywords.select { |kw| kw.include?(interest_lower) }
+    related.concat(exact_matches)
+    
+    # Semantic matches (simple keyword associations)
+    semantic_matches = case interest_lower
+    when /art|arte/
+      all_keywords.select { |kw| kw.match?(/gallery|museo|exhibition|modern|contemporary/) }
+    when /food|restaurant|gastrono/
+      all_keywords.select { |kw| kw.match?(/cuisine|chef|dining|gourmet|local/) }
+    when /bar|drink|cocktail/
+      all_keywords.select { |kw| kw.match?(/mixology|craft|spirits|wine|beer/) }
+    when /music|musique/
+      all_keywords.select { |kw| kw.match?(/concert|jazz|electronic|indie|venue/) }
+    when /culture|cultural/
+      all_keywords.select { |kw| kw.match?(/heritage|traditional|historic|artistic/) }
+    when /cinema|film/
+      all_keywords.select { |kw| kw.match?(/director|indie|arthouse|festival/) }
+    else
+      # Generic cultural keywords
+      all_keywords.select { |kw| kw.match?(/creative|artistic|cultural|authentic/) }
+    end
+    
+    related.concat(semantic_matches)
+    related.uniq.first(6) # Limit to 6 most relevant
   end
 end

@@ -346,6 +346,77 @@ class LocalizationService
   }.freeze
 
   class << self
+
+    # Enhanced progress messages with Qloo insights
+    def get_progress_messages(language)
+      case language
+      when 'fr'
+        {
+          analyzing_vibe: "Analysons votre essence culturelle...",
+          vibe_discovered: "Vibe découvert: \"%{vibe_summary}\"",
+          querying_qloo: "Consultation de l'oracle culturel Qloo...",
+          qloo_thinking: "Qloo analyse %{interests_count} intérêts culturels...",
+          qloo_discovery: "✨ Découverte! Les fans de \"%{interest}\" aiment aussi: %{discoveries}",
+          qloo_connections: "🧠 Qloo a trouvé %{connections_count} connexions culturelles",
+          enriching_places: "Enrichissement des lieux avec données détaillées...",
+          building_narrative: "Tissage de votre tapisserie narrative...",
+          cultural_synthesis: "Synthèse de votre symphonie culturelle...",
+          ready: "Votre voyage culturel est prêt!"
+        }
+      when 'es'
+        {
+          analyzing_vibe: "Analizando tu esencia cultural...",
+          vibe_discovered: "Vibe descubierto: \"%{vibe_summary}\"",
+          querying_qloo: "Consultando el oráculo cultural de Qloo...",
+          qloo_thinking: "Qloo analiza %{interests_count} intereses culturales...",
+          qloo_discovery: "✨ ¡Descubrimiento! A los fans de \"%{interest}\" también les gusta: %{discoveries}",
+          qloo_connections: "🧠 Qloo encontró %{connections_count} conexiones culturales",
+          enriching_places: "Enriqueciendo lugares con datos detallados...",
+          building_narrative: "Tejiendo tu tapiz narrativo...",
+          cultural_synthesis: "Sintetizando tu sinfonía cultural...",
+          ready: "¡Tu aventura cultural está lista!"
+        }
+      else # English
+        {
+          analyzing_vibe: "Analyzing your cultural essence...",
+          vibe_discovered: "Vibe discovered: \"%{vibe_summary}\"",
+          querying_qloo: "Querying Qloo's cultural oracle...",
+          qloo_thinking: "Qloo analyzing %{interests_count} cultural interests...",
+          qloo_discovery: "✨ Discovery! Fans of \"%{interest}\" also love: %{discoveries}",
+          qloo_connections: "🧠 Qloo found %{connections_count} cultural connections",
+          enriching_places: "Enriching places with detailed data...",
+          building_narrative: "Weaving your narrative tapestry...",
+          cultural_synthesis: "Synthesizing your cultural symphony...",
+          ready: "Your cultural adventure is ready!"
+        }
+      end
+    end
+
+    # Generate dynamic Qloo discovery message
+    def format_qloo_discovery(interest, related_keywords, language)
+      messages = get_progress_messages(language)
+      discoveries = related_keywords.first(3).join(', ')
+      
+      messages[:qloo_discovery] % { 
+        interest: interest, 
+        discoveries: discoveries 
+      }
+    end
+
+    # Generate connections summary
+    def format_qloo_connections(connections_count, language)
+      messages = get_progress_messages(language)
+      messages[:qloo_connections] % { connections_count: connections_count }
+    end
+
+    # Generate vibe summary message
+    def format_vibe_discovery(interests, city, language)
+      messages = get_progress_messages(language)
+      vibe_summary = "#{interests.first(2).join(' + ')} en #{city}"
+      
+      messages[:vibe_discovered] % { vibe_summary: vibe_summary }
+    end
+    
     # Language detection and validation
     def detect_language(text)
       return DEFAULT_LANGUAGE if text.blank?

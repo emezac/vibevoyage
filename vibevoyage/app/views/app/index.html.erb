@@ -363,7 +363,7 @@
             
             const progress = data.progress || 0;
             
-            // Update linear progress
+            // Update progress indicators
             progressBar.style.width = `${progress}%`;
             progressPercent.textContent = `${progress}%`;
             circlePercent.textContent = `${progress}%`;
@@ -373,34 +373,100 @@
             const offset = circumference - (progress / 100) * circumference;
             progressCircle.style.strokeDashoffset = offset;
             
-            // Enhanced logs simulation
-            const enhancedLogs = [
-                { progress: 5, message: '🎭 Analyzing your cultural essence...', color: 'text-blue-400' },
-                { progress: 15, message: '🔍 Deconstructing cultural preferences via LLM...', color: 'text-green-400' },
-                { progress: 25, message: '🌐 Querying Qloo\'s cultural universe...', color: 'text-yellow-400' },
-                { progress: 40, message: '🎨 Processing: "gothic cinema" → Art gallery recommendations', color: 'text-purple-400' },
-                { progress: 55, message: '🍷 Mapping affinities: mezcal + hidden speakeasies', color: 'text-cyan-400' },
-                { progress: 70, message: '📚 Cultural synthesis: bookshops + vinyl records', color: 'text-orange-400' },
-                { progress: 85, message: '✨ Weaving your narrative tapestry...', color: 'text-pink-400' },
-                { progress: 95, message: '🎼 Orchestrating final cultural symphony...', color: 'text-indigo-400' },
-                { progress: 100, message: '✅ Your cultural journey is ready!', color: 'text-green-400' }
-            ];
-            
-            const currentLog = enhancedLogs.find(log => log.progress <= progress) || enhancedLogs[0];
-            
-            if (processingLogs.children.length === 0 || progress > parseInt(progressPercent.textContent)) {
-                const logEntry = document.createElement('div');
-                const statusColor = (data.status === 'complete') ? 'text-green-400' : currentLog.color;
-                const icon = (data.status === 'complete') ? 
-                    `<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>` :
-                    `<div class="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>`;
-
-                logEntry.className = `flex items-center gap-3 ${statusColor} mb-3 fade-in-up`;
-                logEntry.innerHTML = `${icon} <span>${data.message || currentLog.message}</span>`;
-                
-                processingLogs.appendChild(logEntry);
-                processingLogs.scrollTop = processingLogs.scrollHeight;
+            // *** ENHANCED: Handle different types of updates ***
+            if (data.qloo_data && data.qloo_data.discovery) {
+                addQlooDiscoveryLog(data.qloo_data, data.message);
+            } else if (data.qloo_data && data.qloo_data.interests) {
+                addVibeDiscoveryLog(data.qloo_data, data.message);
+            } else if (data.qloo_data && data.qloo_data.total_connections) {
+                addConnectionsSummaryLog(data.qloo_data, data.message);
+            } else {
+                addStandardLog(data.message, data.status, progress);
             }
+            
+            // Auto-scroll to bottom
+            processingLogs.scrollTop = processingLogs.scrollHeight;
+        }
+
+        function addQlooDiscoveryLog(qlooData, message) {
+            const processingLogs = document.getElementById('processing-logs');
+            const logEntry = document.createElement('div');
+            
+            logEntry.className = 'qloo-discovery-entry mb-4 p-4 rounded-lg fade-in-up';
+            logEntry.style.background = 'linear-gradient(135deg, rgba(139, 69, 19, 0.3), rgba(75, 85, 99, 0.3))';
+            logEntry.style.border = '1px solid rgba(255, 215, 0, 0.3)';
+            
+            // If it's a discovery with keywords
+            if (qlooData.related_keywords && qlooData.interest) {
+                logEntry.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <div class="qloo-icon animate-pulse">
+                            ✨
+                        </div>
+                        <div class="flex-1">
+                            <div class="text-yellow-300 font-bold text-sm mb-2">
+                                QLOO DISCOVERY
+                            </div>
+                            <div class="text-white mb-3">
+                                Fans of <span class="font-bold text-yellow-200">"${qlooData.interest}"</span> also love:
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                ${qlooData.related_keywords.map(keyword => `
+                                    <span class="keyword-badge px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-yellow-400 to-orange-400 text-black">
+                                        ${keyword}
+                                    </span>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Generic discovery message
+                logEntry.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="qloo-icon animate-pulse">✨</div>
+                        <span class="text-yellow-300">${message}</span>
+                    </div>
+                `;
+            }
+            
+            processingLogs.appendChild(logEntry);
+            
+            // Add entrance animation
+            setTimeout(() => {
+                logEntry.style.transform = 'translateX(0)';
+                logEntry.style.opacity = '1';
+            }, 100);
+        }
+
+        function addVibeDiscoveryLog(qlooData, message) {
+            const processingLogs = document.getElementById('processing-logs');
+            const logEntry = document.createElement('div');
+            
+            logEntry.className = 'vibe-discovery-entry mb-4 p-4 rounded-lg fade-in-up';
+            logEntry.style.background = 'linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(139, 92, 246, 0.3))';
+            logEntry.style.border = '1px solid rgba(59, 130, 246, 0.5)';
+            
+            logEntry.innerHTML = `
+                <div class="flex items-start gap-3">
+                    <div class="text-2xl animate-bounce">🎭</div>
+                    <div class="flex-1">
+                        <div class="text-blue-300 font-bold text-sm mb-2">
+                            CULTURAL ESSENCE DECODED
+                        </div>
+                        <div class="text-white mb-3">
+                            ${message}
+                        </div>
+                        ${qlooData.interests ? `
+                            <div class="text-sm text-blue-200">
+                                Interests: ${qlooData.interests.join(' • ')} in ${qlooData.city}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+            
+            processingLogs.appendChild(logEntry);
         }
 
         function showItineraryResults(itinerary) {
@@ -435,6 +501,86 @@
             } else {
                 showTimelineAfterNarrative(title, city, experiences);
             }
+        }
+
+        function addConnectionsSummaryLog(qlooData, message) {
+            const processingLogs = document.getElementById('processing-logs');
+            const logEntry = document.createElement('div');
+            
+            logEntry.className = 'connections-summary-entry mb-4 p-4 rounded-lg fade-in-up';
+            logEntry.style.background = 'linear-gradient(135deg, rgba(34, 197, 94, 0.3), rgba(59, 130, 246, 0.3))';
+            logEntry.style.border = '1px solid rgba(34, 197, 94, 0.5)';
+            
+            logEntry.innerHTML = `
+                <div class="flex items-start gap-3">
+                    <div class="text-2xl animate-pulse">🧠</div>
+                    <div class="flex-1">
+                        <div class="text-green-300 font-bold text-sm mb-2">
+                            QLOO NEURAL NETWORK
+                        </div>
+                        <div class="text-white mb-3">
+                            ${message}
+                        </div>
+                        ${qlooData.all_keywords ? `
+                            <div class="text-sm text-green-200 mb-2">
+                                Cultural connections discovered:
+                            </div>
+                            <div class="flex flex-wrap gap-1">
+                                ${qlooData.all_keywords.slice(0, 8).map(keyword => `
+                                    <span class="px-2 py-1 rounded text-xs bg-green-800 text-green-100">
+                                        ${keyword}
+                                    </span>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+            
+            processingLogs.appendChild(logEntry);
+        }
+
+        function addStandardLog(message, status, progress) {
+            const processingLogs = document.getElementById('processing-logs');
+            const logEntry = document.createElement('div');
+            
+            // Determine icon and color based on status
+            let icon, colorClass;
+            
+            switch (status) {
+                case 'analyzing':
+                    icon = '<div class="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>';
+                    colorClass = 'text-blue-400';
+                    break;
+                case 'querying_qloo':
+                    icon = '🔍';
+                    colorClass = 'text-purple-400';
+                    break;
+                case 'enriching':
+                    icon = '⚙️';
+                    colorClass = 'text-orange-400';
+                    break;
+                case 'curating':
+                    icon = '🎨';
+                    colorClass = 'text-pink-400';
+                    break;
+                case 'finalizing':
+                    icon = '✨';
+                    colorClass = 'text-yellow-400';
+                    break;
+                case 'complete':
+                    icon = '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>';
+                    colorClass = 'text-green-400';
+                    break;
+                default:
+                    icon = '<div class="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>';
+                    colorClass = 'text-slate-400';
+            }
+
+            logEntry.className = `flex items-center gap-3 ${colorClass} mb-3 fade-in-up`;
+            logEntry.innerHTML = `${icon} <span>${message}</span>`;
+            
+            processingLogs.appendChild(logEntry);
         }
 
         function getTranslation(key, fallback) {
@@ -821,6 +967,273 @@
             currentProcessId = null;
         }
 
+        function createQlooConnectionsVisualizer(connections, centerInterest) {
+            const visualizer = document.createElement('div');
+            visualizer.className = 'qloo-connections-graph mt-4 p-4 rounded-lg';
+            visualizer.style.background = 'radial-gradient(circle, rgba(139, 69, 19, 0.2), rgba(75, 85, 99, 0.1))';
+            visualizer.style.border = '1px solid rgba(255, 215, 0, 0.3)';
+            visualizer.style.position = 'relative';
+            visualizer.style.minHeight = '120px';
+            
+            // Center node (user's interest)
+            const centerNode = document.createElement('div');
+            centerNode.className = 'center-node';
+            centerNode.textContent = centerInterest;
+            centerNode.style.cssText = `
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: linear-gradient(135deg, #f59e0b, #ea580c);
+                color: black;
+                padding: 8px 16px;
+                border-radius: 20px;
+                font-weight: bold;
+                font-size: 12px;
+                animation: centerPulse 2s ease-in-out infinite;
+                box-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+            `;
+            
+            visualizer.appendChild(centerNode);
+            
+            // Connected nodes (Qloo discoveries)
+            connections.forEach((connection, index) => {
+                const angle = (index / connections.length) * 2 * Math.PI;
+                const radius = 60;
+                const x = 50 + Math.cos(angle) * 35; // Percentage position
+                const y = 50 + Math.sin(angle) * 35;
+                
+                // Connection line
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', '50%');
+                line.setAttribute('y1', '50%');
+                line.setAttribute('x2', `${x}%`);
+                line.setAttribute('y2', `${y}%`);
+                line.setAttribute('stroke', 'rgba(255, 215, 0, 0.6)');
+                line.setAttribute('stroke-width', '2');
+                line.style.animation = `drawLine 1s ease-out ${index * 0.2}s both`;
+                
+                // SVG container for lines
+                if (!visualizer.querySelector('svg')) {
+                    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                    svg.style.cssText = `
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        pointer-events: none;
+                    `;
+                    visualizer.appendChild(svg);
+                }
+                visualizer.querySelector('svg').appendChild(line);
+                
+                // Connection node
+                const node = document.createElement('div');
+                node.className = 'connection-node';
+                node.textContent = connection;
+                node.style.cssText = `
+                    position: absolute;
+                    top: ${y}%;
+                    left: ${x}%;
+                    transform: translate(-50%, -50%);
+                    background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(139, 92, 246, 0.8));
+                    color: white;
+                    padding: 4px 8px;
+                    border-radius: 12px;
+                    font-size: 10px;
+                    white-space: nowrap;
+                    animation: nodeAppear 0.5s ease-out ${index * 0.3}s both;
+                    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+                `;
+                
+                visualizer.appendChild(node);
+            });
+            
+            return visualizer;
+        }
+
+        // *** NEW: Create Qloo intelligence summary ***
+        function createQlooIntelligenceSummary(totalConnections, discoveries, language) {
+            const summary = document.createElement('div');
+            summary.className = 'qloo-intelligence-summary mt-6 p-6 rounded-xl fade-in-up';
+            summary.style.background = 'linear-gradient(135deg, rgba(139, 69, 19, 0.4), rgba(75, 85, 99, 0.4))';
+            summary.style.border = '2px solid rgba(255, 215, 0, 0.5)';
+            
+            const title = language === 'fr' ? 'Intelligence Culturelle Qloo' :
+                        language === 'es' ? 'Inteligencia Cultural Qloo' :
+                        'Qloo Cultural Intelligence';
+            
+            const connectionsText = language === 'fr' ? 'connexions culturelles' :
+                                language === 'es' ? 'conexiones culturales' :
+                                'cultural connections';
+            
+            const discoveredText = language === 'fr' ? 'découvertes' :
+                                language === 'es' ? 'descubrimientos' :
+                                'discoveries';
+            
+            summary.innerHTML = `
+                <div class="text-center">
+                    <div class="flex items-center justify-center gap-3 mb-4">
+                        <div class="qloo-logo text-4xl animate-pulse">🧠</div>
+                        <h3 class="text-2xl font-bold gradient-text">${title}</h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-6 mb-6">
+                        <div class="stat-card">
+                            <div class="text-3xl font-bold text-yellow-400">${totalConnections}</div>
+                            <div class="text-sm text-slate-300">${connectionsText}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="text-3xl font-bold text-blue-400">${discoveries.length}</div>
+                            <div class="text-sm text-slate-300">${discoveredText}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-sm text-slate-400 leading-relaxed">
+                        ${language === 'fr' ? 
+                        'Qloo a analysé votre profil culturel et découvert des connexions uniques que les algorithmes traditionnels auraient manquées.' :
+                        language === 'es' ?
+                        'Qloo analizó tu perfil cultural y descubrió conexiones únicas que los algoritmos tradicionales habrían perdido.' :
+                        'Qloo analyzed your cultural profile and discovered unique connections that traditional algorithms would have missed.'
+                        }
+                    </div>
+                </div>
+            `;
+            
+            return summary;
+        }
+
+        // *** NEW: Enhanced processing section update ***
+        function enhanceProcessingSectionForQloo() {
+            const processingSection = document.getElementById('processing-section');
+            const existingContent = processingSection.querySelector('.glass-card-strong');
+            
+            // Add Qloo branding to the processing section
+            const qlooCredit = document.createElement('div');
+            qlooCredit.className = 'qloo-credit text-center mt-6 p-4 rounded-lg';
+            qlooCredit.style.background = 'rgba(139, 69, 19, 0.2)';
+            qlooCredit.style.border = '1px solid rgba(255, 215, 0, 0.3)';
+            
+            qlooCredit.innerHTML = `
+                <div class="flex items-center justify-center gap-3 text-yellow-300">
+                    <div class="text-2xl animate-pulse">⚡</div>
+                    <span class="font-semibold">Powered by Qloo Cultural Intelligence</span>
+                    <div class="text-2xl animate-pulse">⚡</div>
+                </div>
+                <div class="text-xs text-slate-400 mt-2">
+                    Real-time cultural graph analysis in progress...
+                </div>
+            `;
+            
+            existingContent.appendChild(qlooCredit);
+        }
+
+        // *** NEW: Add CSS animations for Qloo components ***
+        const qlooStyle = document.createElement('style');
+        qlooStyle.textContent = `
+            @keyframes centerPulse {
+                0%, 100% { transform: translate(-50%, -50%) scale(1); }
+                50% { transform: translate(-50%, -50%) scale(1.1); }
+            }
+            
+            @keyframes nodeAppear {
+                from {
+                    opacity: 0;
+                    transform: translate(-50%, -50%) scale(0.5);
+                }
+                to {
+                    opacity: 1;
+                    transform: translate(-50%, -50%) scale(1);
+                }
+            }
+            
+            @keyframes drawLine {
+                from {
+                    stroke-dasharray: 100;
+                    stroke-dashoffset: 100;
+                }
+                to {
+                    stroke-dasharray: 100;
+                    stroke-dashoffset: 0;
+                }
+            }
+            
+            .stat-card {
+                padding: 1rem;
+                background: rgba(0, 0, 0, 0.3);
+                border-radius: 0.5rem;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            
+            .qloo-connections-graph {
+                animation: graphAppear 1s ease-out;
+            }
+            
+            @keyframes graphAppear {
+                from {
+                    opacity: 0;
+                    transform: scale(0.9);
+                }
+                to {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+            }
+        `;
+        document.head.appendChild(qlooStyle);
+
+        // *** NEW: Initialize Qloo enhancements when page loads ***
+        document.addEventListener('DOMContentLoaded', function() {
+            // Enhance the processing section with Qloo branding
+            enhanceProcessingSectionForQloo();
+        });
+
+        // *** MODIFIED: Enhanced addQlooDiscoveryLog to include visualizer ***
+        function addQlooDiscoveryLogWithGraph(qlooData, message) {
+            const processingLogs = document.getElementById('processing-logs');
+            const logEntry = document.createElement('div');
+            
+            logEntry.className = 'qloo-discovery-entry mb-6 p-4 rounded-lg fade-in-up';
+            logEntry.style.background = 'linear-gradient(135deg, rgba(139, 69, 19, 0.3), rgba(75, 85, 99, 0.3))';
+            logEntry.style.border = '1px solid rgba(255, 215, 0, 0.3)';
+            
+            // Basic discovery info
+            const discoveryHeader = document.createElement('div');
+            discoveryHeader.innerHTML = `
+                <div class="flex items-start gap-3 mb-4">
+                    <div class="qloo-icon animate-pulse">✨</div>
+                    <div class="flex-1">
+                        <div class="text-yellow-300 font-bold text-sm mb-2">
+                            QLOO DISCOVERY ENGINE
+                        </div>
+                        <div class="text-white">
+                            ${message}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            logEntry.appendChild(discoveryHeader);
+            
+            // Add connection visualizer if we have keywords
+            if (qlooData.related_keywords && qlooData.interest) {
+                const visualizer = createQlooConnectionsVisualizer(
+                    qlooData.related_keywords, 
+                    qlooData.interest
+                );
+                logEntry.appendChild(visualizer);
+            }
+            
+            processingLogs.appendChild(logEntry);
+            
+            // Add entrance animation
+            setTimeout(() => {
+                logEntry.style.transform = 'translateX(0)';
+                logEntry.style.opacity = '1';
+            }, 100);
+        }
+            
         window.startNewJourney = function() {
             transitionToSection(heroSection);
             form.reset();
@@ -840,4 +1253,55 @@
             });
         };
     });
+
+    const style = document.createElement('style');
+    style.textContent = `
+        .qloo-discovery-entry {
+            transform: translateX(-20px);
+            opacity: 0;
+            transition: all 0.5s ease-out;
+        }
+        
+        .vibe-discovery-entry {
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: all 0.5s ease-out;
+        }
+        
+        .connections-summary-entry {
+            transform: scale(0.95);
+            opacity: 0;
+            transition: all 0.5s ease-out;
+        }
+        
+        .keyword-badge {
+            animation: keywordPulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes keywordPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .qloo-icon {
+            font-size: 1.5rem;
+            filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+        }
+        
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    `;
+    document.head.appendChild(style);
 </script>
