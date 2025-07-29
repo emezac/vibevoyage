@@ -5,109 +5,72 @@ class ProcessVibeJobIntelligent < ApplicationJob
   def perform(process_id, user_vibe)
     start_time = Time.current
     
-    puts "=== STARTING ProcessVibeJobIntelligent ==="
+    puts "=== STARTING ProcessVibeJobIntelligent (Corrected Flow) ==="
     puts "Process ID: #{process_id}"
     puts "User vibe: #{user_vibe}"
     
     begin
-      # Step 1: Parse user vibe with enhanced feedback (15%)
+      # PASO 1: ANALIZAR VIBE DEL USUARIO (15%)
+      # Se determina el idioma, la ciudad y los intereses.
       update_qloo_status(process_id, 'analyzing', 'analyzing_vibe', 15)
-      
-      vibe_parse_start = Time.current
       parsed_vibe = parse_user_vibe(user_vibe, process_id)
-      vibe_parse_duration = Time.current - vibe_parse_start
-      
       language = parsed_vibe[:detected_language]
       
-      Rails.logger.info "--- Parsed Vibe: #{parsed_vibe.inspect}"
-      Rails.logger.info "--- Detected Language: #{language}"
-      
-      # Show what we discovered about the user's vibe (25%)
-      vibe_summary_message = LocalizationService.format_vibe_discovery(
-        parsed_vibe[:interests], 
-        parsed_vibe[:city], 
-        language
-      )
-      update_qloo_status(process_id, 'analyzing', 'vibe_discovered', 25, {
-        discovery: vibe_summary_message,
-        interests: parsed_vibe[:interests],
-        city: parsed_vibe[:city]
-      })
-      
-      # Track LLM performance for vibe parsing
-      AnalyticsService.track_llm_performance('vibe_parsing', vibe_parse_duration, true, language)
-      
-      # Step 2: Query Qloo API with dramatic presentation (35%)
-      update_qloo_status(process_id, 'querying_qloo', 'querying_qloo', 35, {
-        interests_count: parsed_vibe[:interests].size
-      })
-      
-      # Add small delay to build anticipation
-      sleep(0.8)
-      
-      qloo_start = Time.current
-      update_qloo_status(process_id, 'querying_qloo', 'qloo_thinking', 40, {
-        interests_count: parsed_vibe[:interests].size
-      })
-      
+      # PASO 2: OBTENER DATOS BRUTOS DE QLOO (35%)
+      # Se consultan las recomendaciones iniciales de Qloo.
+      update_qloo_status(process_id, 'querying_qloo', 'querying_qloo', 35, { language: language })
       recommendations_result = fetch_qloo_recommendations(parsed_vibe)
-      qloo_duration = Time.current - qloo_start
       
       unless recommendations_result[:success]
-        AnalyticsService.track_error('qloo_api', 'recommendations', StandardError.new(recommendations_result[:error]), { process_id: process_id, city: parsed_vibe[:city] })
         handle_qloo_error(process_id, recommendations_result[:error])
         return
       end
       
-      # Step 3: Show Qloo discoveries (50%)
-      qloo_entities = recommendations_result[:data]&.dig('results', 'entities') || []
-      if qloo_entities.any?
-        show_qloo_discoveries(process_id, qloo_entities, parsed_vibe, 50)
-      end
+      qloo_data = recommendations_result[:data]
+      show_qloo_discoveries(process_id, qloo_data.dig('results', 'entities') || [], parsed_vibe, 50)
+
+      # PASO 3: GENERAR PERFIL DE ADN CULTURAL (60%)
+      # Usando los intereses y los datos de Qloo, el LLM crea el perfil de ADN.
+      service = LlmService.new
+      #cultural_dna_data = service.generate_cultural_dna_profile(parsed_vibe, qloo_data)
+      update_qloo_status(process_id, 'analyzing', 'dna_analysis', 60, { message: "Decoding cultural genome..." })
+      cultural_dna_data = LlmService.generate_cultural_dna_profile(parsed_vibe, qloo_data)
+
+      # PASO 4: ENRIQUECER LUGARES CON GOOGLE PLACES (65%)
+      # Se toman las entidades de Qloo y se enriquecen con datos verificados (dirección, sitio web, etc.).
+      update_qloo_status(process_id, 'enriching', 'enriching_places', 65, { language: language })
+      enriched_places = PlacesEnrichmentService.process_places_data(parsed_vibe, qloo_data)
       
-      # Step 4: Process and enrich places data (65%)
-      update_qloo_status(process_id, 'enriching', 'enriching_places', 65)
+      # PASO 5: CURAR EXPERIENCIAS (80%)
+      # Se toma la lista de lugares YA ENRIQUECIDOS y se les añade la capa narrativa y cultural.
+      update_qloo_status(process_id, 'curating', 'building_narrative', 80, { language: language })
+      final_experiences = CulturalCurationService.curate_experiences_from_enriched_places(
+        enriched_places, 
+        parsed_vibe
+      )
       
-      places_start = Time.current
-      places_results = PlacesEnrichmentService.process_places_data(parsed_vibe, recommendations_result[:data])
-      places_duration = Time.current - places_start
+      AnalyticsService.track_curation_effectiveness(final_experiences)
+
+      # PASO 6: CONSTRUIR NARRATIVA Y GUARDAR EN BASE DE DATOS (95%)
+      # Se crea el HTML narrativo y se guarda el itinerario completo.
+      update_qloo_status(process_id, 'finalizing', 'cultural_synthesis', 95, { language: language })
+      narrative = build_localized_narrative(parsed_vibe, user_vibe, final_experiences)
+      itinerary = save_enhanced_itinerary(user_vibe, parsed_vibe, narrative, final_experiences)
       
-      # Step 5: Curate experiences with cultural explanations (80%)
-      update_qloo_status(process_id, 'curating', 'building_narrative', 80)
-      
-      curation_start = Time.current
-      curated_experiences = CulturalCurationService.curate_experiences(parsed_vibe, recommendations_result[:data])
-      curation_duration = Time.current - curation_start
-      
-      # Enrich experiences with places data
-      enhanced_experiences = enhance_experiences_with_places_data(curated_experiences, places_results, parsed_vibe)
-      
-      # Track curation effectiveness
-      AnalyticsService.track_curation_effectiveness(enhanced_experiences)
-      
-      # Step 6: Build narrative with cultural synthesis (95%)
-      update_qloo_status(process_id, 'finalizing', 'cultural_synthesis', 95)
-      
-      narrative = build_localized_narrative(parsed_vibe, user_vibe, enhanced_experiences)
-      
-      # Step 7: Save to database
-      itinerary = save_enhanced_itinerary(user_vibe, parsed_vibe, narrative, enhanced_experiences)
-      
-      # Calculate total processing time
+      # PASO 7: TRACKING DE ANALYTICS
+      # Se registran las métricas del proceso completo.
       total_duration = Time.current - start_time
+      AnalyticsService.track_journey_processing(process_id, user_vibe, parsed_vibe, final_experiences, total_duration)
       
-      # Track comprehensive journey metrics
-      AnalyticsService.track_journey_processing(process_id, user_vibe, parsed_vibe, enhanced_experiences, total_duration)
-      
-      # Final result with enhanced data
-      final_result = build_final_result(itinerary, parsed_vibe, enhanced_experiences)
-      
-      success_message = LocalizationService.get_progress_messages(language)[:ready]
+      # PASO 8: CONSTRUIR Y ENVIAR RESULTADO FINAL AL FRONTEND (100%)
+      # Se ensambla el objeto JSON final que el frontend espera.
+      final_result = build_final_result(itinerary, parsed_vibe, final_experiences, cultural_dna_data)
       update_qloo_status(process_id, 'complete', 'ready', 100, { itinerary: final_result[:itinerary] })
       
       log_completion_stats(process_id, final_result, total_duration)
-      
+
     rescue => e
+      # Manejo de errores para todo el proceso.
       AnalyticsService.track_error('process_vibe_job', 'full_processing', e, { process_id: process_id, user_vibe_length: user_vibe.length, processing_stage: determine_processing_stage(e) })
       handle_processing_error(e, process_id, user_vibe)
     end
@@ -401,18 +364,9 @@ class ProcessVibeJobIntelligent < ApplicationJob
     Rails.logger.info "✅ Fallback stop created: #{exp[:location]} (ID: #{fallback_stop.id})"
   end
 
-  def build_final_result(itinerary, parsed_vibe, curated_experiences)
+  def build_final_result(itinerary, parsed_vibe, curated_experiences, cultural_dna_data) # <--- NUEVO PARÁMETRO
     language = parsed_vibe[:detected_language] || LocalizationService::DEFAULT_LANGUAGE
-    
-    # *** LOGGING PARA DEBUG ***
-    Rails.logger.info "=== BUILDING FINAL RESULT ==="
-    Rails.logger.info "Detected language: #{language}"
-    Rails.logger.info "City: #{parsed_vibe[:city]}"
-    Rails.logger.info "Experiences count: #{curated_experiences.size}"
-    
-    # *** OBTENER TRADUCCIONES DE UI ***
     ui_translations = LocalizationService.get_ui_translations(language)
-    Rails.logger.info "UI translations keys: #{ui_translations.keys}"
     
     {
       status: 'complete',
@@ -422,9 +376,12 @@ class ProcessVibeJobIntelligent < ApplicationJob
         id: itinerary.id,
         title: LocalizationService.adventure_title(parsed_vibe[:city], language),
         city: parsed_vibe[:city],
-        language: language, # *** AGREGAR IDIOMA ***
-        ui_translations: ui_translations, # *** AGREGAR TRADUCCIONES ***
-        narrative_html: itinerary.narrative_html,
+        language: language,
+        ui_translations: ui_translations,
+        
+        # ¡AQUÍ ESTÁ LA MAGIA! AHORA USAMOS LOS DATOS DINÁMICOS
+        cultural_dna: cultural_dna_data,
+        
         experiences: curated_experiences.map.with_index do |exp, index|
           build_comprehensive_experience_response(exp, itinerary, index)
         end
@@ -802,20 +759,25 @@ class ProcessVibeJobIntelligent < ApplicationJob
   def update_qloo_status(process_id, status, message_key, progress, extra_data = {})
     language = extra_data[:language] || 'en'
     
-    # Get localized message
-    messages = LocalizationService.get_progress_messages(language)
-    base_message = messages[message_key.to_sym] || message_key.to_s.humanize
-    
-    # Apply interpolations if needed
-    if extra_data[:interests_count]
-      base_message = base_message % { interests_count: extra_data[:interests_count] }
+    # Use the discovery message directly if provided
+    if extra_data[:discovery]
+      base_message = extra_data[:discovery]
+    else
+      # Get localized message
+      messages = LocalizationService.get_progress_messages(language)
+      base_message = messages[message_key.to_sym] || message_key.to_s.humanize
+      
+      # Apply interpolations if needed
+      if extra_data[:interests_count]
+        base_message = base_message % { interests_count: extra_data[:interests_count] }
+      end
     end
     
     status_data = { 
       status: status, 
       message: base_message, 
       progress: progress,
-      qloo_data: extra_data.except(:language, :interests_count)
+      qloo_data: extra_data.except(:language, :interests_count, :discovery)
     }.compact
     
     # Add itinerary if complete
@@ -826,7 +788,7 @@ class ProcessVibeJobIntelligent < ApplicationJob
     Rails.cache.write("journey_#{process_id}", status_data, expires_in: 15.minutes)
     puts "=== Enhanced Status Update: #{progress}% - #{base_message} ==="
   end
-
+  
   # Show Qloo discoveries with dramatic effect
   def show_qloo_discoveries(process_id, qloo_entities, parsed_vibe, base_progress)
     language = parsed_vibe[:detected_language]
@@ -857,11 +819,15 @@ class ProcessVibeJobIntelligent < ApplicationJob
       related_keywords = find_related_keywords(interest, all_keywords)
       
       if related_keywords.any?
-        discovery_message = LocalizationService.format_qloo_discovery(
-          interest, 
-          related_keywords, 
-          language
-        )
+        # Fixed interpolation - do it manually instead of using LocalizationService
+        case language
+        when 'fr'
+          discovery_message = "✨ Découverte! Les fans de \"#{interest}\" aiment aussi: #{related_keywords.join(', ')}"
+        when 'es'
+          discovery_message = "✨ ¡Descubrimiento! A los fans de \"#{interest}\" también les gusta: #{related_keywords.join(', ')}"
+        else
+          discovery_message = "✨ Discovery! Fans of \"#{interest}\" also love: #{related_keywords.join(', ')}"
+        end
         
         update_qloo_status(process_id, 'querying_qloo', 'qloo_discovery', progress, {
           language: language,
@@ -878,7 +844,15 @@ class ProcessVibeJobIntelligent < ApplicationJob
     
     # Final connections summary
     total_connections = all_keywords.uniq.size
-    connections_message = LocalizationService.format_qloo_connections(total_connections, language)
+    
+    case language
+    when 'fr'
+      connections_message = "🧠 Qloo a trouvé #{total_connections} connexions culturelles"
+    when 'es'
+      connections_message = "🧠 Qloo encontró #{total_connections} conexiones culturales"
+    else
+      connections_message = "🧠 Qloo found #{total_connections} cultural connections"
+    end
     
     update_qloo_status(process_id, 'querying_qloo', 'qloo_connections', base_progress + 8, {
       language: language,

@@ -46,4 +46,24 @@ class RdawnApiService
       return { success: false, error: "Tool execution failed: #{e.message}" }
     end
   end
+
+    def self.google_place_details(place_id:)
+      return { success: false, error: 'No place_id provided' } unless place_id.present?
+      
+      api_key = ENV['GOOGLE_PLACES_API_KEY']
+      fields = 'formatted_phone_number,international_phone_number,website,opening_hours,price_level,rating,user_ratings_total,formatted_address,geometry'
+      
+      url = "https://maps.googleapis.com/maps/api/place/details/json?place_id=#{place_id}&fields=#{fields}&key=#{api_key}"
+      
+      response = HTTParty.get(url)
+      
+      if response.success?
+        { success: true, data: response.parsed_response }
+      else
+        { success: false, error: response.message }
+      end
+    rescue => e
+      Rails.logger.error "Google Place Details API error: #{e.message}"
+      { success: false, error: e.message }
+  end
 end

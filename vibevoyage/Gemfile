@@ -87,3 +87,4 @@ end
 gem "redis", "~> 5.0"
 gem 'hiredis' 
 gem 'connection_pool' # Para conexiones optimizadas
+gem 'whatlanguage', '~> 1.0', '>= 1.0.6'

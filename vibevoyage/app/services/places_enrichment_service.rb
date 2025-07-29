@@ -70,10 +70,17 @@ class PlacesEnrichmentService
     # Search Google Places as fallback when Qloo data is insufficient
     def search_google_places_fallback(place_name, city)
       query = build_search_query(place_name, city)
-      cache_key = generate_cache_key('google_search', query)
+      cache_key = generate_cache_key('google_search_with_details', query)
       
       Rails.cache.fetch(cache_key, expires_in: CACHE_EXPIRES_IN) do
-        perform_google_search(query, city, place_name)
+        result = perform_google_search(query, city, place_name)
+        
+        # NUEVO: Enriquecer con detalles si encontramos un lugar
+        if result && result['place_id']
+          enrich_with_place_details(result)
+        else
+          result
+        end
       end
     rescue => e
       Rails.logger.error "Google Places fallback search failed: #{e.message}"
@@ -311,10 +318,49 @@ class PlacesEnrichmentService
         
         # Find the best match based on name similarity and location
         best_match = find_best_google_match(results, qloo_entity, city)
-        return best_match if best_match
+        
+        # NUEVO: Enriquecer con detalles del lugar
+        if best_match && best_match['place_id']
+          enriched_match = enrich_with_place_details(best_match)
+          return enriched_match if enriched_match
+        end
+        
+        return best_match
       end
       
       nil
+    end
+
+    def enrich_with_place_details(place_data)
+      return place_data unless place_data['place_id']
+      
+      # Verificar si ya tenemos los datos completos
+      return place_data if place_data['formatted_phone_number'] || place_data['website']
+      
+      Rails.logger.info "Fetching place details for: #{place_data['name']} (#{place_data['place_id']})"
+      
+      # Hacer llamada a Place Details
+      details_result = RdawnApiService.google_place_details(place_id: place_data['place_id'])
+      
+      if details_result[:success] && details_result[:data]&.dig('result')
+        details = details_result[:data]['result']
+        
+        # Combinar los datos
+        place_data.merge!(
+          'formatted_phone_number' => details['formatted_phone_number'],
+          'international_phone_number' => details['international_phone_number'],
+          'website' => details['website'],
+          'opening_hours' => details['opening_hours'],
+          'price_level' => details['price_level'] || place_data['price_level'],
+          'rating' => details['rating'] || place_data['rating'],
+          'user_ratings_total' => details['user_ratings_total']
+        )
+      end
+      
+      place_data
+    rescue => e
+      Rails.logger.error "Error fetching place details: #{e.message}"
+      place_data
     end
 
     def find_best_google_match(results, qloo_entity, city)

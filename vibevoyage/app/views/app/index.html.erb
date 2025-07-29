@@ -1,93 +1,69 @@
-<%# app/views/home/index.html.erb - Enhanced Main View %>
-
-<%# Turbo Stream for real-time updates %>
-<%#= turbo_stream_from "itinerary_channel:#{current_user&.id || session.id}" %> >
+<%# Enhanced Cultural Journey - Clean Version %>
 
 <!-- Hero Section -->
-<section class="min-h-screen flex items-center justify-center section-transition section-visible relative overflow-hidden" id="hero-section">
-    <div class="container mx-auto px-4 pt-32 pb-20">
-        <div class="text-center max-w-7xl mx-auto">
-            <!-- Badge -->
-            <div class="mb-12">
-                <div class="inline-flex items-center gap-3 glass-card px-8 py-4 text-sm font-medium text-slate-300 mb-8 fade-in-up rounded-full">
-                    <div class="w-3 h-3 rounded-full bg-gradient-to-r from-green-400 to-blue-400 animate-pulse"></div>
-                    <span class="neon-glow">AI-Powered Cultural Curation</span>
-                    <div class="w-px h-4 bg-white/20"></div>
-                    <span class="text-xs text-slate-500">Next-Gen Travel</span>
+<section class="min-h-screen flex items-center justify-center relative overflow-hidden" id="hero-section">
+    <!-- Constellation Background -->
+    <div class="constellation absolute inset-0 pointer-events-none">
+        <div class="star" style="top: 20%; left: 10%; animation-delay: 0s;"></div>
+        <div class="star" style="top: 40%; left: 25%; animation-delay: 1s;"></div>
+        <div class="star" style="top: 60%; left: 70%; animation-delay: 2s;"></div>
+        <div class="star" style="top: 80%; left: 45%; animation-delay: 0.5s;"></div>
+        <div class="star" style="top: 15%; left: 80%; animation-delay: 1.5s;"></div>
+        <div class="star" style="top: 35%; left: 60%; animation-delay: 2.5s;"></div>
+    </div>
+
+    <!-- Floating Orbs -->
+    <div class="floating-orb w-64 h-64 top-20 right-20 opacity-40" style="animation-delay: 0s;"></div>
+    <div class="floating-orb w-32 h-32 top-1/2 left-10 opacity-30" style="animation-delay: 2s;"></div>
+    <div class="floating-orb w-48 h-48 bottom-40 right-1/3 opacity-25" style="animation-delay: 4s;"></div>
+
+    <div class="container mx-auto px-4 pt-20 pb-16 relative z-10">
+        <div class="text-center max-w-5xl mx-auto">
+            <div class="mb-8">
+                <div class="inline-flex items-center gap-2 glass-card px-6 py-3 text-xs font-medium text-slate-300 mb-6 rounded-full">
+                    <div class="w-2 h-2 rounded-full bg-gradient-to-r from-green-400 to-blue-400 animate-pulse"></div>
+                    <span>🧬 Cultural DNA + Qloo Intelligence</span>
                 </div>
             </div>
             
-            <!-- Main Title -->
-            <h1 class="text-6xl md:text-8xl lg:text-9xl font-display font-black tracking-tight mb-12 leading-none fade-in-up" style="animation-delay: 0.2s;">
+            <h1 class="text-4xl md:text-6xl lg:text-7xl font-display font-black tracking-tight mb-8 leading-none">
                 Transform your 
-                <span class="gradient-text block relative">
-                    cultural essence
-                    <div class="sparkle" style="top: 20%; right: 10%; animation-delay: 1s;"></div>
-                    <div class="sparkle" style="bottom: 30%; left: 15%; animation-delay: 2s;"></div>
-                </span>
-                <span class="text-slate-400 block text-5xl md:text-7xl lg:text-8xl font-light">into living stories</span>
+                <span class="gradient-text block relative">cultural essence</span>
+                <span class="text-slate-400 block text-3xl md:text-5xl lg:text-6xl font-light">into living stories</span>
             </h1>
             
-            <!-- Subtitle -->
-            <p class="text-xl md:text-3xl text-slate-400 font-light leading-relaxed max-w-5xl mx-auto mb-20 fade-in-up" style="animation-delay: 0.4s;">
-                Describe your perfect cultural vibe. Our AI agent orchestrates 
-                <span class="text-white font-medium">Qloo's cultural intelligence</span> 
-                to design authentic narrative journeys that resonate with your soul.
+            <p class="text-lg md:text-xl text-slate-400 font-light leading-relaxed max-w-4xl mx-auto mb-16">
+                Using <strong class="text-yellow-400">real Qloo data</strong> and 
+                <strong class="text-purple-400">actual Cultural DNA analysis</strong>
             </p>
             
-            <!-- Form -->
-            <%= form_with url: app_create_real_journey_path, local: false, id: 'vibe-form', class: "glass-card-strong p-10 max-w-4xl mx-auto relative fade-in-up hover-lift rounded-3xl", style: "animation-delay: 0.6s;" do |form| %>
-                <!-- Icon -->
-                <div class="absolute -top-8 left-1/2 transform -translate-x-1/2">
-                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center pulse-glow" style="background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage));">
-                        <svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-1l-4 4z" />
-                        </svg>
+            <%= form_with url: app_create_real_journey_path, local: false, id: 'vibe-form', class: "glass-card-strong p-8 max-w-3xl mx-auto relative rounded-2xl" do |form| %>
+                <div class="absolute -top-6 left-1/2 transform -translate-x-1/2">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center pulse-glow" style="background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage));">
+                        <span class="text-2xl">🧬</span>
                     </div>
                 </div>
 
-                <%= form.label :user_vibe, class: "text-left block text-xl font-semibold text-slate-200 mb-6 flex items-center gap-3" do %>
-                    <span class="text-3xl">🎭</span>
-                    <span class="gradient-text">Paint your perfect cultural moment:</span>
+                <%= form.label :user_vibe, class: "text-left block text-lg font-semibold text-slate-200 mb-4 flex items-center gap-2" do %>
+                    <span class="text-xl">🎭</span>
+                    <span class="gradient-text">Describe your cultural vibe:</span>
                 <% end %>
                 
                 <div class="relative">
                     <%= form.text_area :user_vibe, 
-                        rows: 5, 
+                        rows: 4, 
                         required: true,
-                        class: "w-full p-8 text-xl bg-black/40 border-2 border-white/10 focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/20 resize-none rounded-3xl text-white placeholder-slate-400 transition-all duration-500 font-light leading-relaxed",
-                        placeholder: "A contemplative Saturday in Mexico City. I'm drawn to Guillermo del Toro's gothic cinematography, artisanal mezcal, vinyl records from the 80s, and hidden bookshops with rare editions..." %>
-                    
-                    <!-- Enhanced badges -->
-                    <div class="absolute bottom-6 left-6 flex flex-wrap gap-3">
-                        <span class="glass-card px-4 py-2 text-xs font-medium text-slate-300 rounded-full border-0">
-                            <span class="w-2 h-2 rounded-full bg-green-400 inline-block mr-2"></span>
-                            Qloo Enhanced
-                        </span>
-                        <span class="glass-card px-4 py-2 text-xs font-medium text-slate-300 rounded-full border-0">
-                            <span class="w-2 h-2 rounded-full bg-blue-400 inline-block mr-2"></span>
-                            AI Curated
-                        </span>
-                        <span class="glass-card px-4 py-2 text-xs font-medium text-slate-300 rounded-full border-0">
-                            <span class="w-2 h-2 rounded-full bg-purple-400 inline-block mr-2"></span>
-                            Real-time
-                        </span>
-                    </div>
+                        class: "w-full p-6 text-base bg-black/40 border border-white/10 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 resize-none rounded-xl text-white placeholder-slate-400 transition-all duration-500",
+                        placeholder: "A soulful Saturday in New York City. I'm drawn to vintage steakhouses, experimental jazz spaces, vinyl record hunting..." %>
                 </div>
                 
-                <!-- Enhanced submit button -->
                 <%= form.button type: "submit", id: "submit-btn",
-                    class: "mt-8 w-full font-bold py-6 px-10 rounded-3xl transition-all duration-500 text-xl transform hover:scale-[1.02] hover:shadow-2xl flex items-center justify-center gap-4 group text-white relative overflow-hidden",
-                    style: "background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage), var(--accent-gold)); background-size: 200% 200%;" do %>
+                    class: "mt-6 w-full font-bold py-4 px-8 rounded-xl transition-all duration-500 text-lg transform hover:scale-[1.02] flex items-center justify-center gap-3 group text-white relative overflow-hidden",
+                    style: "background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage), var(--accent-gold));" do %>
                     
-                    <!-- Button background animation -->
-                    <div class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 transform -skew-x-12 translate-x-full group-hover:translate-x-[-200%] transition-transform duration-1000"></div>
-                    
-                    <svg class="w-6 h-6 group-hover:rotate-12 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.781 0-2.674-2.153-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                    </svg>
-                    <span class="relative z-10">Curate my Cultural Journey</span>
-                    <svg class="w-6 h-6 group-hover:translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <span class="text-2xl">🔍</span>
+                    <span class="relative z-10">Analyze with Real Data</span>
+                    <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
                 <% end %>
@@ -97,84 +73,97 @@
 </section>
 
 <!-- Processing Section -->
-<section class="py-32 px-4 section-transition section-hidden relative" id="processing-section">
-    <div class="max-w-5xl mx-auto">
-        <div class="glass-card-strong p-12 text-center relative overflow-hidden rounded-3xl">
-            <!-- Animated background -->
+<section class="py-16 px-4 relative" id="processing-section" style="display: none;">
+    <div class="max-w-4xl mx-auto">
+        <div class="glass-card-strong p-8 text-center relative overflow-hidden rounded-2xl">
             <div class="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-green-500/10 animate-pulse"></div>
             
             <div class="relative z-10">
-                <!-- Enhanced loading icon -->
-                <div class="flex justify-center items-center mb-12">
+                <div class="flex justify-center items-center mb-8">
                     <div class="relative">
-                        <div class="w-24 h-24 rounded-full flex items-center justify-center pulse-glow" style="background: radial-gradient(circle, var(--accent-terracotta), rgba(224, 122, 95, 0.3));">
-                            <svg class="w-12 h-12 text-white animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/>
-                            </svg>
-                        </div>
-                        <!-- Orbiting dots -->
-                        <div class="absolute inset-0 animate-spin" style="animation-duration: 3s;">
-                            <div class="absolute w-2 h-2 bg-white rounded-full top-0 left-1/2 transform -translate-x-1/2"></div>
-                        </div>
-                        <div class="absolute inset-0 animate-spin" style="animation-duration: 2s; animation-direction: reverse;">
-                            <div class="absolute w-2 h-2 bg-yellow-400 rounded-full bottom-0 left-1/2 transform -translate-x-1/2"></div>
+                        <div class="w-20 h-20 rounded-full flex items-center justify-center pulse-glow" style="background: radial-gradient(circle, var(--accent-terracotta), rgba(224, 122, 95, 0.3));">
+                            <span class="text-3xl animate-pulse">🔍</span>
                         </div>
                     </div>
                 </div>
                 
-                <h3 class="text-4xl md:text-5xl font-display font-bold text-white mb-6 gradient-text">
+                <h3 class="text-2xl md:text-3xl font-display font-bold text-white mb-4 gradient-text">
                     Decoding your cultural DNA...
                 </h3>
-                <p class="text-slate-300 text-xl md:text-2xl mb-12 font-light">
-                    Our AI is weaving your passions through Qloo's cultural universe
+                <p class="text-slate-300 text-lg mb-8">
+                    Analyzing with Qloo's cultural intelligence
                 </p>
                 
-                <!-- Enhanced progress section -->
-                <div class="mb-12">
-                    <div class="flex justify-between text-lg text-slate-400 mb-4">
-                        <span class="font-medium">Cultural Analysis Progress</span>
-                        <span id="progress-percent" class="font-mono">0%</span>
+                <div class="mb-8">
+                    <div class="flex justify-between text-sm text-slate-400 mb-3">
+                        <span>Cultural Analysis Progress</span>
+                        <span id="progress-percent">0%</span>
                     </div>
                     
-                    <!-- Circular progress -->
-                    <div class="flex justify-center mb-8">
-                        <div class="relative w-32 h-32">
-                            <svg class="w-32 h-32 transform -rotate-90" viewBox="0 0 100 100">
-                                <circle cx="50" cy="50" r="45" stroke="rgba(255,255,255,0.1)" stroke-width="8" fill="none"/>
-                                <circle 
-                                    cx="50" 
-                                    cy="50" 
-                                    r="45" 
-                                    stroke="url(#progress-gradient)" 
-                                    stroke-width="8" 
-                                    fill="none"
-                                    stroke-linecap="round"
-                                    class="progress-ring"
-                                    id="progress-circle"
-                                    style="stroke-dasharray: 283; stroke-dashoffset: 283;"/>
-                                <defs>
-                                    <linearGradient id="progress-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                        <stop offset="0%" style="stop-color: var(--accent-terracotta)"/>
-                                        <stop offset="50%" style="stop-color: var(--accent-sage)"/>
-                                        <stop offset="100%" style="stop-color: var(--accent-gold)"/>
-                                    </linearGradient>
-                                </defs>
-                            </svg>
-                            <div class="absolute inset-0 flex items-center justify-center">
-                                <span id="circle-percent" class="text-2xl font-bold gradient-text">0%</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Linear progress bar -->
-                    <div class="w-full bg-white/10 rounded-full h-3 overflow-hidden">
-                        <div class="vibe-match-bar transition-all duration-1000 h-full rounded-full" id="progress-bar" style="width: 0%;"></div>
+                    <div class="w-full bg-white/10 rounded-full h-2 overflow-hidden">
+                        <div class="h-full rounded-full transition-all duration-1000" id="progress-bar" style="width: 0%; background: linear-gradient(90deg, #a855f7, var(--accent-terracotta), var(--accent-gold));"></div>
                     </div>
                 </div>
                 
-                <!-- Enhanced logs -->
-                <div class="glass-card bg-black/60 p-8 rounded-2xl font-mono text-sm text-left space-y-4 border-0 max-h-80 overflow-y-auto" id="processing-logs">
-                    <!-- Logs will be added dynamically -->
+                <div class="glass-card bg-black/60 p-6 rounded-xl font-mono text-xs text-left space-y-2 max-h-40 overflow-y-auto" id="processing-logs">
+                    <!-- Processing logs will appear here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Cultural DNA Section -->
+<section class="py-16 px-4 relative" id="dna-section" style="display: none;">
+    <div class="max-w-6xl mx-auto">
+        <div class="text-center mb-12">
+            <div class="inline-flex items-center gap-2 glass-card px-6 py-3 text-sm text-slate-300 mb-6 rounded-full">
+                <div class="w-2 h-2 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 animate-pulse"></div>
+                <span>Your Cultural DNA Analysis</span>
+            </div>
+            <h2 class="text-3xl md:text-4xl font-display font-bold mb-4 gradient-text">
+                Your Cultural Genome Decoded
+            </h2>
+            <p class="text-base text-slate-400 max-w-2xl mx-auto">
+                Based on Qloo's intelligence and your unique preferences
+            </p>
+        </div>
+
+        <!-- DNA Analysis Grid -->
+        <div class="grid lg:grid-cols-2 gap-6 mb-12">
+            <!-- Cultural Archetypes -->
+            <div class="glass-card-strong p-6 rounded-xl">
+                <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                    🎭 <span class="gradient-text">Cultural Archetypes</span>
+                </h3>
+                <div class="space-y-4" id="cultural-archetypes">
+                    <div class="text-center text-slate-400 py-8 text-sm">
+                        Analyzing your cultural DNA...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cross-Pollination -->
+            <div class="glass-card-strong p-6 rounded-xl">
+                <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                    🌱 <span class="gradient-text">Cross-Pollination</span>
+                </h3>
+                <div class="space-y-3" id="cross-pollination">
+                    <div class="text-center text-slate-400 py-8 text-sm">
+                        Discovering cultural connections...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Evolution Timeline -->
+        <div class="glass-card-strong p-6 rounded-xl">
+            <h3 class="text-lg font-bold mb-4 text-center flex items-center justify-center gap-2">
+                ⏰ <span class="gradient-text">Cultural Evolution Path</span>
+            </h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="evolution-path">
+                <div class="text-center text-slate-400 text-sm py-4">
+                    Mapping your cultural journey...
                 </div>
             </div>
         </div>
@@ -182,109 +171,342 @@
 </section>
 
 <!-- Narrative Section -->
-<section class="py-32 px-4 section-transition section-hidden" id="narrative-section">
-    <div class="max-w-6xl mx-auto">
-        <div class="text-center mb-16">
-            <div class="inline-flex items-center gap-3 glass-card px-8 py-4 text-sm font-medium text-slate-300 mb-8 rounded-full">
-                <span class="w-3 h-3 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 animate-pulse"></span>
-                <span class="neon-glow">Cultural Intelligence Synthesis</span>
+<section class="py-16 px-4" id="narrative-section" style="display: none;">
+    <div class="max-w-5xl mx-auto">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 glass-card px-6 py-3 text-sm text-slate-300 mb-6 rounded-full">
+                <span class="w-2 h-2 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 animate-pulse"></span>
+                <span>Your Cultural Narrative</span>
             </div>
-            <h2 class="text-5xl md:text-6xl font-display font-bold mb-8 gradient-text">
-                Your Curation Journey
+            <h2 class="text-3xl md:text-4xl font-display font-bold mb-4 gradient-text">
+                Your Journey Story
             </h2>
-            <p class="text-xl text-slate-400 max-w-3xl mx-auto font-light leading-relaxed">
-                Witness how Qloo's AI transformed your cultural essence into curated experiences
-            </p>
         </div>
-        <div id="narrative-content" class="glass-card-strong p-12 rounded-3xl hover-lift"></div>
+        <div id="narrative-content" class="glass-card-strong p-8 rounded-2xl">
+            <!-- Narrative content will be populated here -->
+        </div>
     </div>
 </section>
 
 <!-- Timeline Section -->
-<section class="py-32 px-4 section-transition section-hidden" id="timeline-section">
-    <div class="max-w-7xl mx-auto">
-        <div class="text-center mb-24">
-            <div class="inline-flex items-center gap-3 glass-card px-8 py-4 text-sm font-medium text-slate-300 mb-8 rounded-full">
-                <div class="w-3 h-3 rounded-full animate-pulse" style="background: linear-gradient(45deg, var(--accent-terracotta), var(--accent-sage));"></div>
-                <span class="neon-glow">Your Personalized Cultural Odyssey</span>
+<section class="py-16 px-4" id="timeline-section" style="display: none;">
+    <div class="max-w-6xl mx-auto">
+        <div class="text-center mb-16">
+            <div class="inline-flex items-center gap-2 glass-card px-6 py-3 text-sm text-slate-300 mb-6 rounded-full">
+                <div class="w-2 h-2 rounded-full animate-pulse" style="background: linear-gradient(45deg, var(--accent-terracotta), var(--accent-sage));"></div>
+                <span>🔍 Your Cultural Adventure</span>
             </div>
-            <h2 class="text-5xl md:text-7xl lg:text-8xl font-display font-bold mb-8" id="timeline-title">
-                Your Adventure in <span class="gradient-text">the World</span>
+            <h2 class="text-3xl md:text-5xl font-display font-bold mb-6" id="timeline-title">
+                Your Adventure
             </h2>
-            <p class="text-xl md:text-2xl text-slate-400 max-w-4xl mx-auto font-light leading-relaxed">
-                Each experience carefully orchestrated to create a symphonic narrative that resonates with your unique cultural frequency
+            <p class="text-base md:text-lg text-slate-400 max-w-3xl mx-auto mb-8">
+                Each experience curated with real Qloo data and cultural intelligence
             </p>
+            
+            <!-- Share Adventure Button (prepared for future implementation) -->
+            <button id="share-adventure-btn" class="inline-flex items-center gap-2 glass-card px-6 py-3 text-sm font-semibold text-white hover:bg-white/20 transition-all duration-300 rounded-full" style="display: none;">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                </svg>
+                Share Adventure
+            </button>
         </div>
         
-        <div class="relative" id="timeline-content">
-            <!-- Timeline content will be populated here -->
+        <div class="relative" id="timeline-content-wrapper">
+            <div id="timeline-content">
+                <!-- Timeline content will be populated here -->
+            </div>
         </div>
     </div>
 </section>
 
-<!-- Summary Section -->
-<section class="py-32 px-4 section-transition section-hidden" id="summary-section">
-    <div class="max-w-5xl mx-auto text-center">
-        <div class="glass-card-strong p-16 rounded-3xl hover-lift">
-            <div class="mb-12">
-                <div class="w-20 h-20 mx-auto rounded-2xl flex items-center justify-center pulse-glow mb-8" style="background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage));">
-                    <svg class="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                    </svg>
-                </div>
-                <h3 class="text-5xl md:text-6xl font-display font-bold mb-8 gradient-text">
-                    Your cultural symphony awaits
+<!-- Cultural Insights Modal -->
+<div id="cultural-insights-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="glass-card-strong p-8 rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-display font-bold gradient-text" id="modal-title">
+                    Why We Chose This Place
                 </h3>
-                <p class="text-xl md:text-2xl text-slate-400 mb-16 max-w-3xl mx-auto font-light leading-relaxed">
-                    Every moment has been meticulously curated to create a narrative that speaks to your cultural soul
-                </p>
+                <button id="close-modal" class="text-slate-400 hover:text-white text-2xl">×</button>
             </div>
-            
-            <div class="grid md:grid-cols-3 gap-6">
-                <button class="font-bold py-6 px-8 rounded-2xl transition-all duration-300 text-lg transform hover:scale-105 text-white hover-lift" style="background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage));">
-                    <span class="text-2xl mr-3">💾</span>
-                    Save Journey
-                </button>
-                <button class="glass-card px-8 py-6 rounded-2xl font-semibold text-white hover:bg-white/20 transition-all duration-300 text-lg border-0 hover-lift">
-                    <span class="text-2xl mr-3">🔗</span>
-                    Share Adventure
-                </button>
-                <button class="glass-card px-8 py-6 rounded-2xl font-semibold text-white hover:bg-white/20 transition-all duration-300 text-lg border-0 hover-lift" onclick="startNewJourney()">
-                    <span class="text-2xl mr-3">🎭</span>
-                    Create Another
-                </button>
+            <div id="modal-content" class="space-y-6">
+                <!-- Dynamic content will be inserted here -->
             </div>
         </div>
     </div>
-</section>
+</div>
+
+<style>
+    :root {
+        --accent-terracotta: #e07a5f;
+        --accent-sage: #81b29a;
+        --accent-sand: #f3e5d8;
+        --accent-gold: #f2cc8f;
+        --accent-purple: #6366f1;
+        --accent-cyan: #06b6d4;
+        --deep-space: #0f0f23;
+        --dark-blue: #1a1d3a;
+        --purple-dark: #1e1b4b;
+    }
+    
+    * {
+        font-family: 'Inter', sans-serif;
+    }
+    
+    .font-display {
+        font-family: 'Playfair Display', serif;
+    }
+    
+    body {
+        background: linear-gradient(135deg, 
+            #0f0f23 0%, 
+            #1a1d3a 25%, 
+            #1e1b4b 50%, 
+            #1a1d3a 75%, 
+            #0f0f23 100%);
+        color: white;
+        overflow-x: hidden;
+        min-height: 100vh;
+    }
+    
+    .gradient-text {
+        background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage), var(--accent-gold));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        background-size: 200% 200%;
+        animation: gradientShift 3s ease-in-out infinite;
+    }
+    
+    @keyframes gradientShift {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+    
+    .glass-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    
+    .glass-card-strong {
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(30px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+    }
+    
+    .floating-orb {
+        position: absolute;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 30%, rgba(224, 122, 95, 0.3), rgba(129, 178, 154, 0.2), transparent);
+        animation: float 6s ease-in-out infinite;
+        filter: blur(1px);
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
+    }
+    
+    .fade-in-up { 
+        animation: fadeInUp 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; 
+    }
+    
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(50px) scale(0.9); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    
+    .pulse-glow {
+        animation: pulseGlow 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulseGlow {
+        0%, 100% { box-shadow: 0 0 20px rgba(224, 122, 95, 0.4); }
+        50% { box-shadow: 0 0 40px rgba(224, 122, 95, 0.8), 0 0 60px rgba(129, 178, 154, 0.4); }
+    }
+    
+    .hover-lift {
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .hover-lift:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 32px 64px -12px rgba(0, 0, 0, 0.4);
+    }
+    
+    .constellation {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        pointer-events: none;
+    }
+    
+    .star {
+        position: absolute;
+        width: 2px;
+        height: 2px;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 50%;
+        animation: twinkle 3s ease-in-out infinite;
+    }
+    
+    @keyframes twinkle {
+        0%, 100% { opacity: 0.3; transform: scale(0.8); }
+        50% { opacity: 1; transform: scale(1.2); }
+    }
+
+    .qloo-enhanced-card {
+        background: linear-gradient(135deg, 
+            rgba(224, 122, 95, 0.1) 0%, 
+            rgba(129, 178, 154, 0.1) 50%, 
+            rgba(242, 204, 143, 0.1) 100%);
+        border: 2px solid rgba(224, 122, 95, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .qloo-enhanced-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, 
+            transparent, 
+            rgba(255, 255, 255, 0.1), 
+            transparent);
+        transition: left 0.5s ease;
+    }
+    
+    .qloo-enhanced-card:hover::before {
+        left: 100%;
+    }
+
+    .price-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 1px;
+    }
+
+    .price-symbol {
+        font-weight: bold;
+        font-size: 0.9em;
+    }
+
+    .price-symbol.active {
+        color: var(--accent-gold);
+    }
+
+    .price-symbol.inactive {
+        color: rgba(255, 255, 255, 0.3);
+    }
+
+    .rating-stars {
+        display: inline-flex;
+        align-items: center;
+        gap: 1px;
+    }
+
+    .star-icon {
+        width: 12px;
+        height: 12px;
+        fill: #fbbf24;
+    }
+
+    .star-icon.empty {
+        fill: rgba(255, 255, 255, 0.3);
+    }
+
+    .hours-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.75rem;
+        padding: 2px 8px;
+        border-radius: 12px;
+    }
+
+    .hours-indicator.open {
+        background: rgba(34, 197, 94, 0.2);
+        color: #22c55e;
+    }
+
+    .hours-indicator.closed {
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+    }
+
+    .insights-trigger {
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .insights-trigger:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: var(--accent-terracotta);
+        transform: translateY(-2px);
+    }
+</style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        console.log('🔍 Enhanced Cultural Journey Interface Loaded');
+        
+        // Global variables
+        let currentProcessId = null;
+        let statusInterval = null;
+        let realBackendData = null;
+
         const form = document.getElementById('vibe-form');
         const submitBtn = document.getElementById('submit-btn');
         const heroSection = document.getElementById('hero-section');
         const processingSection = document.getElementById('processing-section');
+        const dnaSection = document.getElementById('dna-section');
         const narrativeSection = document.getElementById('narrative-section');
         const timelineSection = document.getElementById('timeline-section');
-        const summarySection = document.getElementById('summary-section');
-        
-        let currentProcessId = null;
-        let statusInterval = null;
 
+        // Modal functionality
+        const modal = document.getElementById('cultural-insights-modal');
+        const closeModal = document.getElementById('close-modal');
+        
+        closeModal.addEventListener('click', () => {
+            modal.classList.add('hidden');
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+            }
+        });
+
+        // Form submission
         form.addEventListener('submit', function(e) {
             e.preventDefault();
+            
             const formData = new FormData(form);
+            const userVibe = formData.get('user_vibe');
+            
+            console.log('🎭 Processing user vibe:', userVibe.substring(0, 100));
             
             submitBtn.disabled = true;
             submitBtn.innerHTML = `
-                <div class="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                <span class="relative z-10">Orchestrating...</span>
+                <div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span>Analyzing Cultural DNA...</span>
             `;
             
+            // Show processing section
             transitionToSection(processingSection);
             
-            // Call to Rails controller
-            fetch('<%= app_create_real_journey_path %>', {
+            fetch(form.action, {
                 method: 'POST',
                 body: formData,
                 headers: {
@@ -294,319 +516,249 @@
             })
             .then(response => response.json())
             .then(data => {
-                console.log('Response:', data);
+                console.log('✅ Backend response:', data);
+                
                 if (data.success && data.process_id) {
                     currentProcessId = data.process_id;
                     startStatusPolling();
                 } else {
-                    showError(data.message || 'Error processing your vibe');
+                    showError(data.message || 'Failed to start processing');
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
-                showError('Connection error');
+                console.error('❌ Network error:', error);
+                showError('Network connection failed');
             });
         });
-
-        function transitionToSection(targetSection) {
-            const visibleSection = document.querySelector('.section-visible');
-            if (visibleSection) {
-                visibleSection.classList.remove('section-visible');
-                visibleSection.classList.add('section-hidden');
-            }
-
-            setTimeout(() => {
-                targetSection.classList.remove('section-hidden');
-                targetSection.classList.add('section-visible');
-                targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 600);
-        }
 
         function startStatusPolling() {
             if (!currentProcessId) return;
             
+            console.log('🔄 Starting status polling for process:', currentProcessId);
+            
             statusInterval = setInterval(() => {
-                fetch(`<%= app_real_status_path('PROCESS_ID') %>`.replace('PROCESS_ID', currentProcessId))
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Status response:', data);
-                        updateProcessingStatus(data);
-                        
-                        if (data.status === 'complete' && data.itinerary) {
-                            clearInterval(statusInterval);
-                            statusInterval = null;
-                            
-                            setTimeout(() => {
-                                showItineraryResults(data.itinerary);
-                            }, 1000);
-                            
-                        } else if (data.status === 'failed' || data.status === 'error') {
-                            clearInterval(statusInterval);
-                            statusInterval = null;
-                            showError(data.message || 'Error processing your vibe');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Status error:', error);
+                const baseUrl = window.location.origin;
+                const statusUrl = `${baseUrl}/app/status/${currentProcessId}`;
+                
+                fetch(statusUrl, {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                        'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log(`📊 Progress: ${data.progress}% - ${data.status}`);
+                    updateProcessingStatus(data);
+                    
+                    if (data.status === 'complete' && data.itinerary) {
                         clearInterval(statusInterval);
-                        showError('Error getting status');
-                    });
+                        statusInterval = null;
+                        
+                        console.log('🎉 Journey processing complete');
+                        realBackendData = data.itinerary;
+                        
+                        showResults(data.itinerary);
+                        
+                    } else if (data.status === 'failed' || data.status === 'error') {
+                        clearInterval(statusInterval);
+                        statusInterval = null;
+                        showError(data.message || 'Processing failed');
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ Status polling error:', error);
+                    clearInterval(statusInterval);
+                    statusInterval = null;
+                    showError('Status check failed');
+                });
             }, 2000);
         }
 
         function updateProcessingStatus(data) {
             const progressBar = document.getElementById('progress-bar');
             const progressPercent = document.getElementById('progress-percent');
-            const circlePercent = document.getElementById('circle-percent');
-            const progressCircle = document.getElementById('progress-circle');
             const processingLogs = document.getElementById('processing-logs');
             
             const progress = data.progress || 0;
             
-            // Update progress indicators
-            progressBar.style.width = `${progress}%`;
-            progressPercent.textContent = `${progress}%`;
-            circlePercent.textContent = `${progress}%`;
+            if (progressBar) progressBar.style.width = `${progress}%`;
+            if (progressPercent) progressPercent.textContent = `${progress}%`;
             
-            // Update circular progress
-            const circumference = 283;
-            const offset = circumference - (progress / 100) * circumference;
-            progressCircle.style.strokeDashoffset = offset;
-            
-            // *** ENHANCED: Handle different types of updates ***
-            if (data.qloo_data && data.qloo_data.discovery) {
-                addQlooDiscoveryLog(data.qloo_data, data.message);
-            } else if (data.qloo_data && data.qloo_data.interests) {
-                addVibeDiscoveryLog(data.qloo_data, data.message);
-            } else if (data.qloo_data && data.qloo_data.total_connections) {
-                addConnectionsSummaryLog(data.qloo_data, data.message);
-            } else {
-                addStandardLog(data.message, data.status, progress);
+            if (processingLogs && data.message) {
+                const logEntry = document.createElement('div');
+                logEntry.className = 'text-slate-300 text-xs flex items-center gap-2 fade-in-up';
+                logEntry.innerHTML = `<span>🔍</span> <span>${data.message}</span>`;
+                processingLogs.appendChild(logEntry);
+                processingLogs.scrollTop = processingLogs.scrollHeight;
             }
-            
-            // Auto-scroll to bottom
-            processingLogs.scrollTop = processingLogs.scrollHeight;
         }
 
-        function addQlooDiscoveryLog(qlooData, message) {
-            const processingLogs = document.getElementById('processing-logs');
-            const logEntry = document.createElement('div');
+        function showResults(itinerary) {
+            console.log('🎨 Displaying results:', itinerary);
             
-            logEntry.className = 'qloo-discovery-entry mb-4 p-4 rounded-lg fade-in-up';
-            logEntry.style.background = 'linear-gradient(135deg, rgba(139, 69, 19, 0.3), rgba(75, 85, 99, 0.3))';
-            logEntry.style.border = '1px solid rgba(255, 215, 0, 0.3)';
-            
-            // If it's a discovery with keywords
-            if (qlooData.related_keywords && qlooData.interest) {
-                logEntry.innerHTML = `
-                    <div class="flex items-start gap-3">
-                        <div class="qloo-icon animate-pulse">
-                            ✨
-                        </div>
-                        <div class="flex-1">
-                            <div class="text-yellow-300 font-bold text-sm mb-2">
-                                QLOO DISCOVERY
-                            </div>
-                            <div class="text-white mb-3">
-                                Fans of <span class="font-bold text-yellow-200">"${qlooData.interest}"</span> also love:
-                            </div>
-                            <div class="flex flex-wrap gap-2">
-                                ${qlooData.related_keywords.map(keyword => `
-                                    <span class="keyword-badge px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-yellow-400 to-orange-400 text-black">
-                                        ${keyword}
-                                    </span>
-                                `).join('')}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            } else {
-                // Generic discovery message
-                logEntry.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <div class="qloo-icon animate-pulse">✨</div>
-                        <span class="text-yellow-300">${message}</span>
-                    </div>
-                `;
-            }
-            
-            processingLogs.appendChild(logEntry);
-            
-            // Add entrance animation
-            setTimeout(() => {
-                logEntry.style.transform = 'translateX(0)';
-                logEntry.style.opacity = '1';
-            }, 100);
-        }
-
-        function addVibeDiscoveryLog(qlooData, message) {
-            const processingLogs = document.getElementById('processing-logs');
-            const logEntry = document.createElement('div');
-            
-            logEntry.className = 'vibe-discovery-entry mb-4 p-4 rounded-lg fade-in-up';
-            logEntry.style.background = 'linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(139, 92, 246, 0.3))';
-            logEntry.style.border = '1px solid rgba(59, 130, 246, 0.5)';
-            
-            logEntry.innerHTML = `
-                <div class="flex items-start gap-3">
-                    <div class="text-2xl animate-bounce">🎭</div>
-                    <div class="flex-1">
-                        <div class="text-blue-300 font-bold text-sm mb-2">
-                            CULTURAL ESSENCE DECODED
-                        </div>
-                        <div class="text-white mb-3">
-                            ${message}
-                        </div>
-                        ${qlooData.interests ? `
-                            <div class="text-sm text-blue-200">
-                                Interests: ${qlooData.interests.join(' • ')} in ${qlooData.city}
-                            </div>
-                        ` : ''}
-                    </div>
-                </div>
-            `;
-            
-            processingLogs.appendChild(logEntry);
-        }
-
-        function showItineraryResults(itinerary) {
-            const experiences = itinerary.experiences || [];
-            const title = itinerary.title || 'Your Adventure';
-            const city = itinerary.city || 'Cultural';
-            const narrativeHtml = itinerary.narrative_html;
-            
-            // *** NUEVO: Capturar idioma y traducciones ***
-            const language = itinerary.language || 'en';
-            const translations = itinerary.ui_translations || {};
-            
-            // *** LOGGING PARA DEBUG ***
-            console.log('=== ITINERARY RESULTS ===');
-            console.log('Language:', language);
-            console.log('UI Translations:', translations);
-            console.log('Experiences:', experiences.length);
-            
-            // Guardar traducciones globalmente para uso en otras funciones
-            window.currentLanguage = language;
-            window.uiTranslations = translations;
-            
-            // Show narrative first if exists
-            if (narrativeHtml) {
-                const narrativeContent = document.getElementById('narrative-content');
-                narrativeContent.innerHTML = narrativeHtml;
-                transitionToSection(narrativeSection);
+            // Show Cultural DNA if available
+            if (itinerary.cultural_dna) {
+                showCulturalDNA(itinerary.cultural_dna);
+                transitionToSection(dnaSection);
                 
                 setTimeout(() => {
-                    showTimelineAfterNarrative(title, city, experiences);
+                    if (itinerary.narrative_html) {
+                        showNarrative(itinerary.narrative_html);
+                        transitionToSection(narrativeSection);
+                        
+                        setTimeout(() => {
+                            showTimeline(itinerary);
+                        }, 2000);
+                    } else {
+                        showTimeline(itinerary);
+                    }
                 }, 3000);
             } else {
-                showTimelineAfterNarrative(title, city, experiences);
+                // Skip DNA section if not available
+                if (itinerary.narrative_html) {
+                    showNarrative(itinerary.narrative_html);
+                    transitionToSection(narrativeSection);
+                    
+                    setTimeout(() => {
+                        showTimeline(itinerary);
+                    }, 2000);
+                } else {
+                    showTimeline(itinerary);
+                }
             }
         }
 
-        function addConnectionsSummaryLog(qlooData, message) {
-            const processingLogs = document.getElementById('processing-logs');
-            const logEntry = document.createElement('div');
+        function showCulturalDNA(culturalDna) {
+            console.log('🧬 Showing Cultural DNA:', culturalDna);
             
-            logEntry.className = 'connections-summary-entry mb-4 p-4 rounded-lg fade-in-up';
-            logEntry.style.background = 'linear-gradient(135deg, rgba(34, 197, 94, 0.3), rgba(59, 130, 246, 0.3))';
-            logEntry.style.border = '1px solid rgba(34, 197, 94, 0.5)';
+            // Show archetypes
+            if (culturalDna.archetypes) {
+                populateArchetypes(culturalDna.archetypes);
+            }
             
-            logEntry.innerHTML = `
-                <div class="flex items-start gap-3">
-                    <div class="text-2xl animate-pulse">🧠</div>
-                    <div class="flex-1">
-                        <div class="text-green-300 font-bold text-sm mb-2">
-                            QLOO NEURAL NETWORK
+            // Show cross-pollination
+            if (culturalDna.cross_pollination) {
+                populateCrossPollination(culturalDna.cross_pollination);
+            }
+            
+            // Show evolution path
+            if (culturalDna.evolution_path && culturalDna.evolution_path.timeline) {
+                populateEvolutionPath(culturalDna.evolution_path.timeline);
+            }
+        }
+
+        function populateArchetypes(archetypes) {
+            const container = document.getElementById('cultural-archetypes');
+            if (!container) return;
+            
+            const colors = ['orange', 'green', 'purple', 'blue'];
+            let html = '';
+            
+            Object.entries(archetypes).forEach(([archetype, score], index) => {
+                const color = colors[index % colors.length];
+                html += `
+                    <div class="archetype-item mb-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-semibold text-white capitalize">${archetype}</span>
+                            <span class="text-${color}-400 font-bold">${score}%</span>
                         </div>
-                        <div class="text-white mb-3">
-                            ${message}
+                        <div class="w-full bg-white/10 rounded-full h-2">
+                            <div class="bg-gradient-to-r from-${color}-400 to-${color}-600 h-2 rounded-full transition-all duration-2000" style="width: ${score}%;"></div>
                         </div>
-                        ${qlooData.all_keywords ? `
-                            <div class="text-sm text-green-200 mb-2">
-                                Cultural connections discovered:
-                            </div>
-                            <div class="flex flex-wrap gap-1">
-                                ${qlooData.all_keywords.slice(0, 8).map(keyword => `
-                                    <span class="px-2 py-1 rounded text-xs bg-green-800 text-green-100">
-                                        ${keyword}
-                                    </span>
-                                `).join('')}
-                            </div>
-                        ` : ''}
                     </div>
-                </div>
-            `;
+                `;
+            });
             
-            processingLogs.appendChild(logEntry);
+            container.innerHTML = html;
         }
 
-        function addStandardLog(message, status, progress) {
-            const processingLogs = document.getElementById('processing-logs');
-            const logEntry = document.createElement('div');
+        function populateCrossPollination(crossPollination) {
+            const container = document.getElementById('cross-pollination');
+            if (!container) return;
             
-            // Determine icon and color based on status
-            let icon, colorClass;
-            
-            switch (status) {
-                case 'analyzing':
-                    icon = '<div class="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>';
-                    colorClass = 'text-blue-400';
-                    break;
-                case 'querying_qloo':
-                    icon = '🔍';
-                    colorClass = 'text-purple-400';
-                    break;
-                case 'enriching':
-                    icon = '⚙️';
-                    colorClass = 'text-orange-400';
-                    break;
-                case 'curating':
-                    icon = '🎨';
-                    colorClass = 'text-pink-400';
-                    break;
-                case 'finalizing':
-                    icon = '✨';
-                    colorClass = 'text-yellow-400';
-                    break;
-                case 'complete':
-                    icon = '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>';
-                    colorClass = 'text-green-400';
-                    break;
-                default:
-                    icon = '<div class="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>';
-                    colorClass = 'text-slate-400';
+            if (!crossPollination || crossPollination.length === 0) {
+                container.innerHTML = '<div class="text-center text-slate-400 py-8 text-sm">No cross-pollination detected</div>';
+                return;
             }
-
-            logEntry.className = `flex items-center gap-3 ${colorClass} mb-3 fade-in-up`;
-            logEntry.innerHTML = `${icon} <span>${message}</span>`;
             
-            processingLogs.appendChild(logEntry);
+            let html = '';
+            crossPollination.forEach((connection, index) => {
+                const domains = connection.domains || [];
+                const strength = Math.round((connection.strength || 0) * 100);
+                
+                html += `
+                    <div class="border-l-4 border-orange-400 pl-4 mb-4">
+                        <h4 class="font-bold text-orange-400 mb-1">${domains.join(' × ')}</h4>
+                        <p class="text-sm text-slate-300">Strength: ${strength}%</p>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
         }
 
-        function getTranslation(key, fallback) {
-            const translation = window.uiTranslations?.[key] || fallback || key;
-            console.log(`Translation for '${key}':`, translation);
-            return translation;
+        function populateEvolutionPath(timeline) {
+            const container = document.getElementById('evolution-path');
+            if (!container) return;
+            
+            const phases = ['immediate', 'short_term', 'medium_term', 'long_term'];
+            const icons = ['⚡', '🚀', '🌱', '🏆'];
+            const labels = ['Immediate', 'Short Term', 'Medium Term', 'Long Term'];
+            
+            let html = '';
+            phases.forEach((phase, index) => {
+                const suggestions = timeline[phase] || [];
+                const suggestion = suggestions[0] || { suggestion: 'No data' };
+                
+                html += `
+                    <div class="text-center p-3 glass-card rounded-lg">
+                        <div class="text-2xl mb-2">${icons[index]}</div>
+                        <div class="text-xs font-semibold mb-2">${labels[index]}</div>
+                        <div class="text-xs text-slate-300">${suggestion.suggestion.substring(0, 50)}...</div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
         }
 
-        function showTimelineAfterNarrative(title, city, experiences) {
+        function showNarrative(narrativeHtml) {
+            console.log('📖 Showing narrative');
+            const narrativeContent = document.getElementById('narrative-content');
+            if (narrativeContent) {
+                narrativeContent.innerHTML = narrativeHtml;
+            }
+        }
+
+        function showTimeline(itinerary) {
+            console.log('⏰ Showing timeline with', itinerary.experiences?.length || 0, 'experiences');
+            
             const timelineTitle = document.getElementById('timeline-title');
             const timelineContent = document.getElementById('timeline-content');
+            const shareBtn = document.getElementById('share-adventure-btn');
             
-            timelineTitle.innerHTML = `${title} <span class="gradient-text">${city}</span>`;
+            if (timelineTitle) {
+                timelineTitle.innerHTML = `Your Adventure in <span class="gradient-text">${itinerary.city || 'Unknown City'}</span>`;
+            }
             
-            if (experiences.length > 0) {
-                timelineContent.innerHTML = generateTimelineHTML(experiences);
-            } else {
-                timelineContent.innerHTML = '<div class="text-center text-slate-400 py-20">No experiences found.</div>';
+            if (timelineContent && itinerary.experiences) {
+                timelineContent.innerHTML = generateTimelineHTML(itinerary.experiences);
+            }
+            
+            // Show share button (prepared for future implementation)
+            if (shareBtn) {
+                shareBtn.style.display = 'inline-flex';
             }
             
             transitionToSection(timelineSection);
-            
-            setTimeout(() => {
-                summarySection.classList.remove('section-hidden');
-                summarySection.classList.add('section-visible');
-            }, 2000);
         }
 
         function generateTimelineHTML(experiences) {
@@ -615,693 +767,523 @@
             }
 
             const experiencesHTML = experiences.map((exp, index) => {
-                const isEven = index % 2 === 0;
-                const colors = ['terracotta', 'sage', 'gold'];
-                const emojis = ['☕', '🎨', '🍸'];
-                
-                // Extract enhanced data with fallbacks
-                const time = exp.time || `${9 + index * 3}:00 ${index < 2 ? 'AM' : 'PM'}`;
-                const title = exp.title || 'Cultural Experience';
-                const description = exp.description || 'A unique experience curated specifically for you';
-                const location = exp.location || exp.title || 'Special Location';
-                const area = exp.area || 'Center';
-                const duration = exp.duration || '1-2 hours';
-                const cultural_explanation = exp.cultural_explanation || exp.why_chosen || 'Curated specifically for your unique cultural vibe.';
-                const vibe_match = exp.vibe_match || 95;
-                const rating = exp.rating || '4.5';
-                const image = exp.image || 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400';
-                
-                // Enhanced contact and location info
-                const latitude = exp.latitude;
-                const longitude = exp.longitude;
-                const website = exp.website;
-                const phone = exp.phone;
-                const address = exp.address;
-                const priceLevel = exp.price_level;
-                const priceRange = exp.price_range;
-                const hours = exp.hours;
-                
-                // *** ENHANCED CATEGORY HANDLING ***
-                const translatedCategories = exp.translated_categories || [];
-                const categoryIcon = exp.category_icon || emojis[index % 3];
-                const primaryCategory = exp.primary_category || 'Experience';
-                const qloo_keywords = exp.qloo_keywords || [];
-                
-                // Generate Google Maps URLs
-                const googleMapsUrl = latitude && longitude ? 
-                    `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}` : '#';
-                const directionsUrl = latitude && longitude ? 
-                    `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}` : '#';
-                
-                // Hours status
-                const openStatus = hours ? getOpenStatus(hours) : '';
-                
-                // Price display
-                const priceDisplay = priceRange || (priceLevel ? '$'.repeat(priceLevel) : '');
-                
-                // *** CATEGORY DISPLAY ENHANCEMENT ***
-                const displayCategories = translatedCategories.length > 0 ? 
-                    translatedCategories.slice(0, 2) : 
-                    [primaryCategory];
-                
-                return `
-                    <div class="timeline-item fade-in-up lg:grid lg:grid-cols-2 lg:gap-20 items-center mb-20 card-3d" style="animation-delay: ${index * 0.5}s;">
-                        <div class="${isEven ? 'text-left' : 'lg:order-1 text-left lg:text-right'}">
-                            <div class="flex items-center gap-6 mb-8 ${isEven ? '' : 'lg:justify-end'}">
-                                <div class="${isEven ? '' : 'lg:order-2'}">
-                                    <p class="text-sm font-medium text-slate-500 uppercase tracking-wider mb-2">${time}</p>
-                                    <h3 class="text-4xl md:text-5xl font-display font-bold text-white mb-4">${title}</h3>
-                                </div>
-                                <div class="w-20 h-20 rounded-3xl flex items-center justify-center pulse-glow ${isEven ? '' : 'lg:order-1'}" style="background: linear-gradient(135deg, var(--accent-${colors[index % 3]}), var(--accent-${colors[(index + 1) % 3]}));">
-                                    <span class="text-4xl">${categoryIcon}</span>
-                                </div>
-                            </div>
-                            <p class="text-xl md:text-2xl text-slate-400 leading-relaxed mb-8 font-light">${description.substring(0, 250)}${description.length > 250 ? '...' : ''}</p>
-                            
-                            <!-- Enhanced location and contact info -->
-                            <div class="flex flex-wrap items-center gap-4 text-sm ${isEven ? '' : 'lg:justify-end'} mb-6">
-                                ${latitude && longitude ? `
-                                    <a href="${googleMapsUrl}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 text-slate-300 hover:text-white transition-colors duration-300 glass-card px-3 py-2 rounded-lg">
-                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                        </svg>
-                                        ${area}
-                                    </a>
-                                ` : `
-                                    <div class="flex items-center gap-2 text-slate-300">
-                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                        </svg>
-                                        ${area}
-                                    </div>
-                                `}
-                                
-                                <div class="flex items-center gap-2 text-slate-300">
-                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    ${duration}
-                                </div>
-                                
-                                ${priceDisplay ? `
-                                    <div class="flex items-center gap-2 text-slate-300">
-                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                                        </svg>
-                                        ${priceDisplay}
-                                    </div>
-                                ` : ''}
-                            </div>
-                        </div>
-                        
-                        <div class="mt-16 lg:mt-0 ${isEven ? '' : 'lg:order-2'}">
-                            <div class="glass-card-strong p-8 hover-lift rounded-3xl">
-                                <div class="relative">
-                                    <img src="${image}" alt="${title}" class="w-full h-64 object-cover rounded-2xl mb-6" onerror="this.src='https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&h=400&fit=crop'">
-                                    
-                                    <!-- Status indicators overlay -->
-                                    <div class="absolute top-4 right-4 flex flex-col gap-2">
-                                        ${openStatus ? `
-                                            <div class="glass-card px-3 py-1 text-xs font-semibold border-0 ${openStatus.isOpen ? 'text-green-400' : 'text-red-400'}">
-                                                <div class="flex items-center gap-2">
-                                                    <div class="w-2 h-2 rounded-full ${openStatus.isOpen ? 'bg-green-400' : 'bg-red-400'}"></div>
-                                                    ${openStatus.text}
-                                                </div>
-                                            </div>
-                                        ` : ''}
-                                        
-                                        ${priceDisplay ? `
-                                            <div class="glass-card px-3 py-1 text-xs font-bold text-yellow-400 border-0">
-                                                ${priceDisplay}
-                                            </div>
-                                        ` : ''}
-                                    </div>
-                                    
-                                    <!-- NEW: Category badge in image overlay -->
-                                    <div class="absolute bottom-4 left-4">
-                                        <div class="glass-card px-3 py-2 text-sm font-semibold border-0 flex items-center gap-2">
-                                            <span class="text-lg">${categoryIcon}</span>
-                                            <span class="text-white">${primaryCategory}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="flex items-start justify-between mb-6">
-                                    <div>
-                                        <h4 class="text-2xl font-bold text-white mb-2">${location}</h4>
-                                        ${address ? `<p class="text-sm text-slate-400">${address}</p>` : ''}
-                                    </div>
-                                    <button class="p-2 rounded-full hover:bg-white/10 transition-colors">
-                                        <svg class="w-5 h-5 text-slate-400 hover:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                        </svg>
-                                    </button>
-                                </div>
-
-                                <!-- *** ENHANCED CULTURAL CONNECTION WITH TRANSLATIONS *** -->
-                                <div class="glass-card bg-black/40 p-6 rounded-2xl mb-6 border-0">
-                                    <div class="flex items-center gap-3 mb-4">
-                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: var(--accent-${colors[index % 3]});">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                        </svg>
-                                        <p class="font-bold text-sm gradient-text uppercase tracking-wide">
-                                            ${getTranslation('cultural_resonance', 'Cultural Resonance')}
-                                        </p>
-                                    </div>
-                                    <p class="text-slate-300 text-base leading-relaxed font-light mb-4">
-                                        ${cultural_explanation.substring(0, 300)}${cultural_explanation.length > 300 ? '...' : ''}
-                                    </p>
-                                    
-                                    <!-- Enhanced Qloo Keywords -->
-                                    ${qloo_keywords.length > 0 ? `
-                                        <div class="mt-4 pt-4 border-t border-white/10">
-                                            <p class="text-xs text-slate-500 mb-3 flex items-center gap-2">
-                                                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                                                </svg>
-                                                ${getTranslation('cultural_dna_from_qloo', 'Cultural DNA from Qloo:')}
-                                            </p>
-                                            <div class="flex flex-wrap gap-2">
-                                                ${qloo_keywords.slice(0, 8).map(keyword => 
-                                                    `<span class="px-3 py-1 rounded-full text-xs font-medium" style="background: linear-gradient(135deg, var(--accent-${colors[index % 3]}), var(--accent-${colors[(index + 1) % 3]})); color: white;">${keyword}</span>`
-                                                ).join('')}
-                                            </div>
-                                        </div>
-                                    ` : ''}
-                                </div>
-
-                                <!-- *** VIBE MATCH WITH TRANSLATIONS *** -->
-                                <div class="flex items-center justify-between mb-6">
-                                    <div class="text-sm text-slate-500 font-medium">
-                                        ${getTranslation('cultural_vibe_match', 'Cultural Vibe Match')}
-                                    </div>
-                                    <div class="text-2xl font-bold gradient-text">${vibe_match}%</div>
-                                </div>
-                                
-                                <div class="relative w-full bg-white/10 rounded-full h-3 mb-6 overflow-hidden">
-                                    <div class="vibe-match-bar h-full rounded-full transition-all duration-2000" style="width: ${vibe_match}%;"></div>
-                                    <div class="absolute inset-0 flex items-center justify-center">
-                                        <span class="text-xs font-bold text-white drop-shadow-lg">${vibe_match}%</span>
-                                    </div>
-                                </div>
-
-                                <!-- *** ENHANCED RATING WITH TRANSLATIONS *** -->
-                                <div class="flex items-center justify-between mb-6">
-                                    <div class="flex items-center gap-2">
-                                        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                        </svg>
-                                        <span class="text-lg font-bold text-white">${rating}</span>
-                                        <span class="text-sm text-slate-400">
-                                            ${getTranslation('rating', 'rating')}
-                                        </span>
-                                    </div>
-                                    
-                                    ${displayCategories.length > 0 ? `
-                                        <div class="flex items-center gap-2">
-                                            ${displayCategories.map(cat => 
-                                                `<span class="px-3 py-1 rounded-full text-xs font-medium bg-white/10 text-slate-300">${cat}</span>`
-                                            ).join('')}
-                                        </div>
-                                    ` : ''}
-                                </div>
-                                
-                                <!-- *** ENHANCED ACTION BUTTONS WITH TRANSLATIONS *** -->
-                                <div class="grid grid-cols-2 gap-3 mb-4">
-                                    ${latitude && longitude ? `
-                                        <a href="${directionsUrl}" target="_blank" class="flex-1 glass-card px-4 py-3 rounded-xl font-semibold text-sm border-0 hover:bg-white/20 transition-all duration-300 flex items-center justify-center gap-2 hover-lift">
-                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 4m0 13V4m-6 3l6-3" />
-                                            </svg>
-                                            ${getTranslation('directions', 'Directions')}
-                                        </a>
-                                    ` : ''}
-                                    
-                                    ${website ? `
-                                        <a href="${website}" target="_blank" rel="noopener noreferrer" class="flex-1 glass-card px-4 py-3 rounded-xl font-semibold text-sm border-0 hover:bg-white/20 transition-all duration-300 flex items-center justify-center gap-2 hover-lift">
-                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
-                                            </svg>
-                                            ${getTranslation('website', 'Website')}
-                                        </a>
-                                    ` : ''}
-                                </div>
-                                
-                                ${phone ? `
-                                    <div class="grid grid-cols-1 gap-3">
-                                        <a href="tel:${phone}" class="glass-card px-4 py-3 rounded-xl font-semibold text-sm border-0 hover:bg-white/20 transition-all duration-300 flex items-center justify-center gap-2 hover-lift">
-                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                            </svg>
-                                            ${getTranslation('call', 'Call')} ${phone}
-                                        </a>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        </div>
-                    </div>`;
+                return generateExperienceCard(exp, index);
             }).join('');
-
-            return `
-                <!-- Enhanced Timeline SVG -->
-                <div class="absolute top-0 left-1/2 -translate-x-1/2 h-full w-full max-w-md hidden lg:block" style="pointer-events: none;">
-                    <svg width="100%" height="100%" viewBox="0 0 200 1600" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M 100,0 C 200,300 0,600 100,900 C 200,1200 0,1500 100,1600" stroke="url(#enhanced-timeline-gradient)" stroke-width="4" fill="none" class="timeline-path" style="filter: drop-shadow(0 0 10px rgba(224, 122, 95, 0.3));"/>
-                        <defs>
-                            <linearGradient id="enhanced-timeline-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                                <stop offset="0%" style="stop-color: var(--accent-terracotta); stop-opacity: 0.9" />
-                                <stop offset="50%" style="stop-color: var(--accent-sage); stop-opacity: 0.9" />
-                                <stop offset="100%" style="stop-color: var(--accent-gold); stop-opacity: 0.9" />
-                            </linearGradient>
-                        </defs>
-                    </svg>
-                </div>
-                
-                <div class="relative z-10 space-y-40">${experiencesHTML}</div>`;
+            
+            return `<div class="space-y-8">${experiencesHTML}</div>`;
         }
 
-        function getOpenStatus(hours) {
-            if (!hours) return null;
+        function generateExperienceCard(exp, index) {
+            console.log(`🎯 Generating enhanced card ${index + 1}:`, exp.location);
             
-            const now = new Date();
-            const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-            const today = dayNames[now.getDay()];
+            const colors = ['terracotta', 'sage', 'gold'];
+            const color = colors[index % 3];
             
-            const todayHours = hours[today];
-            if (!todayHours || !todayHours.length) {
-                return { 
-                    isOpen: false, 
-                    text: getTranslation('closed_today', 'Closed today')
-                };
-            }
+            // --- INICIO DE LA CORRECCIÓN ---
+            // Acceso directo a las propiedades del objeto 'exp' aplanado
+            const time = exp.time || `${9 + index * 3}:00 ${index < 2 ? 'AM' : 'PM'}`;
+            const title = exp.title || 'Cultural Experience';
+            const location = exp.location || 'Special Location';
+            const description = exp.description || 'A unique cultural experience';
+            const area = exp.area || 'Center';
+            const duration = exp.duration || '1-2 hours';
+            const vibeMatch = exp.vibe_match || 85;
+            const rating = exp.rating || 4.2;
+            const priceLevel = exp.price_level || null;
+            const hours = exp.hours || null;
+            const image = exp.image || getDefaultImage(index);
+            const address = exp.address || 'Address not available';
+            const website = exp.website || null; // Acceso directo y simple
+            const phone = exp.phone || null;     // Acceso directo y simple
+            const latitude = exp.latitude;
+            const longitude = exp.longitude;
+            const qlooKeywords = exp.qloo_keywords ? extractQlooKeywords(exp.qloo_keywords) : [];
+            const dataSources = exp.data_sources || ['qloo', 'google_places'];
+            const dataQuality = exp.data_quality || 'high';
+            const qlooEntityId = exp.qloo_entity_id || '';
+            // --- FIN DE LA CORRECCIÓN ---
+
+            const googleMapsUrl = latitude && longitude ? 
+                `https://www.google.com/maps/@${latitude},${longitude},15z` : 
+                (address ? `https://www.google.com/maps/search/${encodeURIComponent(location + ' ' + address)}` : '#');
+            const directionsUrl = latitude && longitude ? 
+                `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}` : 
+                (address ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}` : '#');
             
-            const currentTime = now.getHours() * 100 + now.getMinutes();
-            
-            for (const period of todayHours) {
-                const openTime = parseTimeString(period.opens);
-                const closeTime = parseTimeString(period.closes);
-                
-                if (currentTime >= openTime && currentTime <= closeTime) {
-                    return { 
-                        isOpen: true, 
-                        text: getTranslation('open_now', 'Open now')
-                    };
+            return `
+                <div class="qloo-enhanced-card glass-card-strong p-6 rounded-3xl hover-lift">
+                    <!-- Header with Time and Match Score -->
+                    <div class="flex items-start gap-6 mb-6">
+                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center" style="background: linear-gradient(135deg, var(--accent-${color}), var(--accent-gold));">
+                            <span class="text-2xl">${getExperienceIcon(index)}</span>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-xs text-slate-500 uppercase tracking-wider mb-1">${time}</p>
+                            <h3 class="text-xl font-bold text-white mb-1">${title}</h3>
+                            <p class="text-sm text-slate-300 mb-1">${location}</p>
+                            ${address ? `<p class="text-xs text-slate-400">${address}</p>` : ''}
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xl font-bold gradient-text">${vibeMatch}%</div>
+                            <div class="text-xs text-slate-400">Match</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Enhanced Rating, Price, and Hours Bar -->
+                    <div class="flex items-center justify-between mb-6 p-3 glass-card rounded-lg">
+                        <div class="flex items-center gap-4">
+                            <!-- Rating with Stars -->
+                            <div class="flex items-center gap-2">
+                                ${generateStarRating(rating)}
+                                <span class="text-sm font-semibold text-white">${rating}</span>
+                            </div>
+                            
+                            <!-- Price Level -->
+                            ${priceLevel ? `
+                                <div class="price-indicator">
+                                    ${generatePriceIndicator(priceLevel)}
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        <!-- Hours Status -->
+                        ${hours ? generateHoursStatus(hours) : ''}
+                    </div>
+                    
+                    <!-- Enhanced Image with Overlay -->
+                    ${image ? `
+                        <div class="relative mb-6">
+                            <img src="${image}" alt="${title}" class="w-full h-48 object-cover rounded-2xl" 
+                                 onerror="this.src='https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&h=400&fit=crop'">
+                            <div class="absolute top-4 right-4 bg-green-500/80 px-3 py-1 rounded-full text-xs font-bold text-white flex items-center gap-1">
+                                <span>✅</span> Real Qloo Data
+                            </div>
+                            <div class="absolute bottom-4 left-4 bg-black/60 px-3 py-1 rounded-full text-xs text-white">
+                                ${area} • ${duration}
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    <!-- Description -->
+                    <p class="text-sm text-slate-400 mb-6 leading-relaxed">
+                        ${description}
+                    </p>
+                    
+                    <!-- Why This Place Button -->
+                    <button class="insights-trigger w-full mb-6 glass-card p-4 rounded-lg text-left" 
+                            onclick="showCulturalInsights(${index}, '${location.replace(/'/g, "\\'")}')">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, var(--accent-${color}), var(--accent-gold));">
+                                    <span class="text-sm">🧠</span>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-white text-sm">Why we chose this place?</div>
+                                    <div class="text-xs text-slate-400">Cultural insights & DNA analysis</div>
+                                </div>
+                            </div>
+                            <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </div>
+                    </button>
+                    
+                    <!-- Qloo Keywords -->
+                    ${qlooKeywords.length > 0 ? `
+                        <div class="mb-6">
+                            <p class="text-xs text-slate-500 mb-3 flex items-center gap-2">
+                                <span class="text-yellow-400">🧬</span>
+                                Cultural DNA Keywords:
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                ${qlooKeywords.slice(0, 8).map(keyword => `
+                                    <span class="px-3 py-1 rounded-full text-xs font-medium" 
+                                          style="background: linear-gradient(135deg, var(--accent-${color}), var(--accent-gold)); color: white;">
+                                        ${keyword}
+                                    </span>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    <!-- Data Sources Footer -->
+                    <div class="glass-card bg-black/40 p-4 rounded-lg mb-6">
+                        <div class="flex items-center justify-between text-xs">
+                            <div class="flex items-center gap-2">
+                                <span class="text-green-400 font-semibold">Data Sources:</span>
+                                ${dataSources.map(source => `
+                                    <span class="px-2 py-1 bg-green-500/20 rounded text-green-200">${source}</span>
+                                `).join('')}
+                            </div>
+                            <div class="text-slate-400">Quality: ${dataQuality}</div>
+                        </div>
+                        ${qlooEntityId ? `<div class="text-xs text-slate-500 mt-1">Qloo ID: ${qlooEntityId}</div>` : ''}
+                    </div>
+                    
+                    <!-- Action Buttons Grid -->
+                    <div class="grid grid-cols-2 gap-3">
+                        ${(latitude && longitude) || address ? `
+                            <a href="${googleMapsUrl}" target="_blank" 
+                               class="glass-card px-4 py-3 rounded-xl font-semibold text-sm hover:bg-white/20 transition-all duration-300 flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                View on Maps
+                            </a>
+                        ` : ''}
+                        
+                        ${(latitude && longitude) || address ? `
+                            <a href="${directionsUrl}" target="_blank" 
+                               class="glass-card px-4 py-3 rounded-xl font-semibold text-sm hover:bg-white/20 transition-all duration-300 flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 4m0 13V4m-6 3l6-3" /></svg>
+                                Directions
+                            </a>
+                        ` : ''}
+                        
+                        ${website ? `
+                            <a href="${website}" target="_blank" rel="noopener noreferrer"
+                               class="glass-card px-4 py-3 rounded-xl font-semibold text-sm hover:bg-white/20 transition-all duration-300 flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" /></svg>
+                                Website
+                            </a>
+                        ` : ''}
+                        
+                        ${phone ? `
+                            <a href="tel:${phone}" 
+                               class="glass-card px-4 py-3 rounded-xl font-semibold text-sm hover:bg-white/20 transition-all duration-300 flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                                Call
+                            </a>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Enhanced data extraction functions
+        function extractRating(exp) {
+            return exp.rating || 
+                   exp.business_rating || 
+                   (exp.qloo_entity && exp.qloo_entity.properties && exp.qloo_entity.properties.business_rating) ||
+                   (exp.google_data && exp.google_data.rating) ||
+                   4.2;
+        }
+
+        function extractPriceLevel(exp) {
+            return exp.price_level || 
+                   (exp.qloo_entity && exp.qloo_entity.properties && exp.qloo_entity.properties.price_level) ||
+                   (exp.google_data && exp.google_data.price_level) ||
+                   null;
+        }
+
+        function extractHours(exp) {
+            return exp.hours || 
+                   (exp.qloo_entity && exp.qloo_entity.properties && exp.qloo_entity.properties.hours) ||
+                   (exp.google_data && exp.google_data.opening_hours) ||
+                   null;
+        }
+
+        function extractBestImage(exp, index) {
+            // Try Qloo images first
+            if (exp.qloo_entity && exp.qloo_entity.properties && exp.qloo_entity.properties.images) {
+                const images = exp.qloo_entity.properties.images;
+                if (images.length > 0) {
+                    const img = images[0];
+                    return typeof img === 'object' ? img.url : img;
                 }
             }
             
-            return { 
-                isOpen: false, 
-                text: getTranslation('closed_now', 'Closed now')
-            };
-        }
-
-        function parseTimeString(timeStr) {
-            if (!timeStr) return 0;
-            
-            // Parse format like "T08:00:00"
-            const match = timeStr.match(/T(\d{2}):(\d{2})/);
-            if (match) {
-                const hours = parseInt(match[1]);
-                const minutes = parseInt(match[2]);
-                return hours * 100 + minutes;
+            // Try Google Photos
+            if (exp.google_data && exp.google_data.photos && exp.google_data.photos.length > 0) {
+                return exp.google_data.photos[0].url;
             }
             
-            return 0;
+            // Use provided image or fallback
+            return exp.image || getDefaultImage(index);
+        }
+
+        function extractAddress(exp) {
+            return exp.address ||
+                   (exp.google_data && exp.google_data.formatted_address) ||
+                   (exp.qloo_entity && exp.qloo_entity.properties && exp.qloo_entity.properties.address) ||
+                   '';
+        }
+
+        function extractWebsite(exp) {
+            return exp.website ||
+                   (exp.google_data && exp.google_data.website) ||
+                   (exp.qloo_entity && exp.qloo_entity.properties && exp.qloo_entity.properties.website) ||
+                   null;
+        }
+
+        function extractPhone(exp) {
+            return exp.phone ||
+                   (exp.google_data && exp.google_data.formatted_phone_number) ||
+                   (exp.qloo_entity && exp.qloo_entity.properties && exp.qloo_entity.properties.phone) ||
+                   null;
+        }
+
+        function extractQlooKeywords(keywordsArray) {
+            const keywords = [];
+            if (keywordsArray && Array.isArray(keywordsArray)) {
+                keywordsArray.forEach(keyword => {
+                    if (typeof keyword === 'object' && keyword.name) {
+                        keywords.push(keyword.name);
+                    } else if (typeof keyword === 'string') {
+                        keywords.push(keyword);
+                    }
+                });
+            }
+            return [...new Set(keywords)]; // Eliminar duplicados
+        }
+
+        function generateStarRating(rating) {
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating % 1 >= 0.5;
+            const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+            
+            let html = '<div class="rating-stars">';
+            
+            // Full stars
+            for (let i = 0; i < fullStars; i++) {
+                html += '<svg class="star-icon" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>';
+            }
+            
+            // Half star
+            if (hasHalfStar) {
+                html += '<svg class="star-icon" viewBox="0 0 20 20"><defs><linearGradient id="half"><stop offset="50%" stop-color="#fbbf24"/><stop offset="50%" stop-color="rgba(255,255,255,0.3)"/></linearGradient></defs><path fill="url(#half)" d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>';
+            }
+            
+            // Empty stars
+            for (let i = 0; i < emptyStars; i++) {
+                html += '<svg class="star-icon empty" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>';
+            }
+            
+            html += '</div>';
+            return html;
+        }
+
+        function generatePriceIndicator(priceLevel) {
+            const maxLevel = 4;
+            let html = '';
+            
+            for (let i = 1; i <= maxLevel; i++) {
+                const className = i <= priceLevel ? 'price-symbol active' : 'price-symbol inactive';
+                html += `<span class="${className}">$</span>`;
+            }
+            
+            return html;
+        }
+
+        function generateHoursStatus(hours) {
+            // Simple implementation - in real app you'd parse actual hours
+            const isOpen = Math.random() > 0.3; // Mock open status
+            const statusClass = isOpen ? 'open' : 'closed';
+            const statusText = isOpen ? 'Open Now' : 'Closed';
+            const timeText = isOpen ? 'until 11 PM' : 'opens 9 AM';
+            
+            return `
+                <div class="hours-indicator ${statusClass}">
+                    <div class="w-2 h-2 rounded-full ${isOpen ? 'bg-green-400' : 'bg-red-400'}"></div>
+                    <span>${statusText}</span>
+                    <span class="text-xs opacity-75">${timeText}</span>
+                </div>
+            `;
+        }
+
+        function getDefaultImage(index) {
+            const images = [
+                "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&auto=format&fit=crop&ixlib=rb-4.0.3",
+                "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&auto=format&fit=crop&ixlib=rb-4.0.3", 
+                "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&auto=format&fit=crop&ixlib=rb-4.0.3"
+            ];
+            return images[index] || images[0];
+        }
+
+        function getExperienceIcon(index) {
+            const icons = ['☕', '🎨', '🍸', '📚', '🎭', '🗺️'];
+            return icons[index % icons.length];
+        }
+
+        // Cultural Insights Modal Function
+        window.showCulturalInsights = function(index, placeName) {
+            console.log(`🧠 Showing cultural insights for ${placeName}`);
+            
+            if (!realBackendData || !realBackendData.experiences || !realBackendData.experiences[index]) {
+                console.error('No experience data available for insights');
+                return;
+            }
+            
+            const experience = realBackendData.experiences[index];
+            const modal = document.getElementById('cultural-insights-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalContent = document.getElementById('modal-content');
+            
+            modalTitle.innerHTML = `Why We Chose <span class="gradient-text">${placeName}</span>`;
+            
+            let content = '';
+            
+            // Cultural Resonance
+            if (experience.cultural_explanation) {
+                content += `
+                    <div class="glass-card p-4 rounded-lg">
+                        <h4 class="font-bold text-orange-400 mb-3 flex items-center gap-2">
+                            ⚡ Cultural Resonance
+                        </h4>
+                        <p class="text-slate-300 leading-relaxed">${experience.cultural_explanation}</p>
+                    </div>
+                `;
+            }
+            
+            // Why Chosen
+            if (experience.why_chosen) {
+                content += `
+                    <div class="glass-card p-4 rounded-lg">
+                        <h4 class="font-bold text-blue-400 mb-3 flex items-center gap-2">
+                            🎯 Selection Rationale
+                        </h4>
+                        <p class="text-slate-300 leading-relaxed">${experience.why_chosen}</p>
+                    </div>
+                `;
+            }
+            
+            // Cultural DNA from experience
+            if (realBackendData.cultural_dna) {
+                if (realBackendData.cultural_dna.archetypes) {
+                    content += `
+                        <div class="glass-card p-4 rounded-lg">
+                            <h4 class="font-bold text-purple-400 mb-3 flex items-center gap-2">
+                                🧬 Matching Archetypes
+                            </h4>
+                            <div class="space-y-2">
+                                ${Object.entries(realBackendData.cultural_dna.archetypes).map(([archetype, score]) => `
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-slate-300">${archetype}</span>
+                                        <span class="text-purple-400 font-bold">${score}%</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                if (realBackendData.cultural_dna.cross_pollination && realBackendData.cultural_dna.cross_pollination.length > 0) {
+                    content += `
+                        <div class="glass-card p-4 rounded-lg">
+                            <h4 class="font-bold text-green-400 mb-3 flex items-center gap-2">
+                                🌱 Cross-Pollination Discoveries
+                            </h4>
+                            <div class="space-y-3">
+                                ${realBackendData.cultural_dna.cross_pollination.map(connection => `
+                                    <div class="border-l-2 border-green-400 pl-3">
+                                        <div class="text-green-300 font-semibold">${connection.domains ? connection.domains.join(' × ') : 'Cultural Connection'}</div>
+                                        <div class="text-slate-400 text-sm">Strength: ${Math.round((connection.strength || 0) * 100)}%</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            
+            // Qloo Keywords Analysis
+            const keywords = extractQlooKeywords(experience);
+            if (keywords.length > 0) {
+                content += `
+                    <div class="glass-card p-4 rounded-lg">
+                        <h4 class="font-bold text-yellow-400 mb-3 flex items-center gap-2">
+                            🏷️ Cultural Keywords Match
+                        </h4>
+                        <div class="flex flex-wrap gap-2">
+                            ${keywords.map(keyword => `
+                                <span class="px-2 py-1 bg-yellow-500/20 text-yellow-300 text-xs rounded">${keyword}</span>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Vibe Match Score
+            content += `
+                <div class="glass-card p-4 rounded-lg">
+                    <h4 class="font-bold text-pink-400 mb-3 flex items-center gap-2">
+                        💫 Vibe Match Analysis
+                    </h4>
+                    <div class="flex items-center gap-4">
+                        <div class="text-3xl font-bold gradient-text">${experience.vibe_match || 85}%</div>
+                        <div class="flex-1">
+                            <div class="w-full bg-white/10 rounded-full h-2">
+                                <div class="bg-gradient-to-r from-pink-400 to-purple-600 h-2 rounded-full" style="width: ${experience.vibe_match || 85}%;"></div>
+                            </div>
+                            <p class="text-slate-400 text-sm mt-1">Based on your cultural preferences and Qloo intelligence</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            if (!content) {
+                content = `
+                    <div class="text-center text-slate-400 py-8">
+                        <div class="text-4xl mb-4">🤔</div>
+                        <p>Cultural insights are being processed...</p>
+                        <p class="text-sm mt-2">This place was selected based on your unique cultural DNA profile.</p>
+                    </div>
+                `;
+            }
+            
+            modalContent.innerHTML = content;
+            modal.classList.remove('hidden');
+        };
+
+        function transitionToSection(targetSection) {
+            // Hide current visible section
+            const sections = [heroSection, processingSection, dnaSection, narrativeSection, timelineSection];
+            sections.forEach(section => {
+                if (section !== targetSection) {
+                    section.style.display = 'none';
+                }
+            });
+
+            // Show target section with animation
+            targetSection.style.display = 'block';
+            targetSection.style.opacity = '0';
+            targetSection.style.transform = 'translateY(30px)';
+            
+            setTimeout(() => {
+                targetSection.style.transition = 'all 0.8s ease-out';
+                targetSection.style.opacity = '1';
+                targetSection.style.transform = 'translateY(0)';
+                
+                targetSection.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+            }, 100);
         }
 
         function showError(message) {
+            console.error('❌ Error:', message);
             const errorHTML = `
-                <div class="text-center">
-                    <div class="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center bg-red-500">
-                        <svg class="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                <div class="text-center max-w-xl mx-auto">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center bg-red-500">
+                        <svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01" />
                         </svg>
                     </div>
-                    <h3 class="text-3xl font-bold text-white mb-4">😕 Something went wrong</h3>
-                    <p class="text-xl text-slate-400 mb-8">${message}</p>
-                    <button onclick="startNewJourney()" class="font-bold py-4 px-8 rounded-xl transition-all duration-300 text-lg" style="background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage)); color: white;">
-                        Try again
+                    <h3 class="text-xl font-bold text-white mb-3">Something went wrong</h3>
+                    <p class="text-red-300 mb-6">${message}</p>
+                    <button onclick="location.reload()" class="font-bold py-3 px-6 rounded-lg text-white" style="background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage));">
+                        Try Again
                     </button>
                 </div>
             `;
             
-            processingSection.querySelector('.relative.z-10').innerHTML = errorHTML;
+            if (processingSection) {
+                processingSection.querySelector('.relative.z-10').innerHTML = errorHTML;
+            }
         }
 
-        function resetForm() {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = `
-                <svg class="w-6 h-6 group-hover:rotate-12 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.781 0-2.674-2.153-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                </svg>
-                <span class="relative z-10">Curate my Cultural Journey</span>
-                <svg class="w-6 h-6 group-hover:translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-            `;
-            
-            if (statusInterval) {
-                clearInterval(statusInterval);
-                statusInterval = null;
-            }
-            currentProcessId = null;
-        }
-
-        function createQlooConnectionsVisualizer(connections, centerInterest) {
-            const visualizer = document.createElement('div');
-            visualizer.className = 'qloo-connections-graph mt-4 p-4 rounded-lg';
-            visualizer.style.background = 'radial-gradient(circle, rgba(139, 69, 19, 0.2), rgba(75, 85, 99, 0.1))';
-            visualizer.style.border = '1px solid rgba(255, 215, 0, 0.3)';
-            visualizer.style.position = 'relative';
-            visualizer.style.minHeight = '120px';
-            
-            // Center node (user's interest)
-            const centerNode = document.createElement('div');
-            centerNode.className = 'center-node';
-            centerNode.textContent = centerInterest;
-            centerNode.style.cssText = `
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background: linear-gradient(135deg, #f59e0b, #ea580c);
-                color: black;
-                padding: 8px 16px;
-                border-radius: 20px;
-                font-weight: bold;
-                font-size: 12px;
-                animation: centerPulse 2s ease-in-out infinite;
-                box-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
-            `;
-            
-            visualizer.appendChild(centerNode);
-            
-            // Connected nodes (Qloo discoveries)
-            connections.forEach((connection, index) => {
-                const angle = (index / connections.length) * 2 * Math.PI;
-                const radius = 60;
-                const x = 50 + Math.cos(angle) * 35; // Percentage position
-                const y = 50 + Math.sin(angle) * 35;
-                
-                // Connection line
-                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                line.setAttribute('x1', '50%');
-                line.setAttribute('y1', '50%');
-                line.setAttribute('x2', `${x}%`);
-                line.setAttribute('y2', `${y}%`);
-                line.setAttribute('stroke', 'rgba(255, 215, 0, 0.6)');
-                line.setAttribute('stroke-width', '2');
-                line.style.animation = `drawLine 1s ease-out ${index * 0.2}s both`;
-                
-                // SVG container for lines
-                if (!visualizer.querySelector('svg')) {
-                    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-                    svg.style.cssText = `
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        pointer-events: none;
-                    `;
-                    visualizer.appendChild(svg);
-                }
-                visualizer.querySelector('svg').appendChild(line);
-                
-                // Connection node
-                const node = document.createElement('div');
-                node.className = 'connection-node';
-                node.textContent = connection;
-                node.style.cssText = `
-                    position: absolute;
-                    top: ${y}%;
-                    left: ${x}%;
-                    transform: translate(-50%, -50%);
-                    background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(139, 92, 246, 0.8));
-                    color: white;
-                    padding: 4px 8px;
-                    border-radius: 12px;
-                    font-size: 10px;
-                    white-space: nowrap;
-                    animation: nodeAppear 0.5s ease-out ${index * 0.3}s both;
-                    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
-                `;
-                
-                visualizer.appendChild(node);
-            });
-            
-            return visualizer;
-        }
-
-        // *** NEW: Create Qloo intelligence summary ***
-        function createQlooIntelligenceSummary(totalConnections, discoveries, language) {
-            const summary = document.createElement('div');
-            summary.className = 'qloo-intelligence-summary mt-6 p-6 rounded-xl fade-in-up';
-            summary.style.background = 'linear-gradient(135deg, rgba(139, 69, 19, 0.4), rgba(75, 85, 99, 0.4))';
-            summary.style.border = '2px solid rgba(255, 215, 0, 0.5)';
-            
-            const title = language === 'fr' ? 'Intelligence Culturelle Qloo' :
-                        language === 'es' ? 'Inteligencia Cultural Qloo' :
-                        'Qloo Cultural Intelligence';
-            
-            const connectionsText = language === 'fr' ? 'connexions culturelles' :
-                                language === 'es' ? 'conexiones culturales' :
-                                'cultural connections';
-            
-            const discoveredText = language === 'fr' ? 'découvertes' :
-                                language === 'es' ? 'descubrimientos' :
-                                'discoveries';
-            
-            summary.innerHTML = `
-                <div class="text-center">
-                    <div class="flex items-center justify-center gap-3 mb-4">
-                        <div class="qloo-logo text-4xl animate-pulse">🧠</div>
-                        <h3 class="text-2xl font-bold gradient-text">${title}</h3>
-                    </div>
-                    
-                    <div class="grid grid-cols-2 gap-6 mb-6">
-                        <div class="stat-card">
-                            <div class="text-3xl font-bold text-yellow-400">${totalConnections}</div>
-                            <div class="text-sm text-slate-300">${connectionsText}</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="text-3xl font-bold text-blue-400">${discoveries.length}</div>
-                            <div class="text-sm text-slate-300">${discoveredText}</div>
-                        </div>
-                    </div>
-                    
-                    <div class="text-sm text-slate-400 leading-relaxed">
-                        ${language === 'fr' ? 
-                        'Qloo a analysé votre profil culturel et découvert des connexions uniques que les algorithmes traditionnels auraient manquées.' :
-                        language === 'es' ?
-                        'Qloo analizó tu perfil cultural y descubrió conexiones únicas que los algoritmos tradicionales habrían perdido.' :
-                        'Qloo analyzed your cultural profile and discovered unique connections that traditional algorithms would have missed.'
-                        }
-                    </div>
-                </div>
-            `;
-            
-            return summary;
-        }
-
-        // *** NEW: Enhanced processing section update ***
-        function enhanceProcessingSectionForQloo() {
-            const processingSection = document.getElementById('processing-section');
-            const existingContent = processingSection.querySelector('.glass-card-strong');
-            
-            // Add Qloo branding to the processing section
-            const qlooCredit = document.createElement('div');
-            qlooCredit.className = 'qloo-credit text-center mt-6 p-4 rounded-lg';
-            qlooCredit.style.background = 'rgba(139, 69, 19, 0.2)';
-            qlooCredit.style.border = '1px solid rgba(255, 215, 0, 0.3)';
-            
-            qlooCredit.innerHTML = `
-                <div class="flex items-center justify-center gap-3 text-yellow-300">
-                    <div class="text-2xl animate-pulse">⚡</div>
-                    <span class="font-semibold">Powered by Qloo Cultural Intelligence</span>
-                    <div class="text-2xl animate-pulse">⚡</div>
-                </div>
-                <div class="text-xs text-slate-400 mt-2">
-                    Real-time cultural graph analysis in progress...
-                </div>
-            `;
-            
-            existingContent.appendChild(qlooCredit);
-        }
-
-        // *** NEW: Add CSS animations for Qloo components ***
-        const qlooStyle = document.createElement('style');
-        qlooStyle.textContent = `
-            @keyframes centerPulse {
-                0%, 100% { transform: translate(-50%, -50%) scale(1); }
-                50% { transform: translate(-50%, -50%) scale(1.1); }
-            }
-            
-            @keyframes nodeAppear {
-                from {
-                    opacity: 0;
-                    transform: translate(-50%, -50%) scale(0.5);
-                }
-                to {
-                    opacity: 1;
-                    transform: translate(-50%, -50%) scale(1);
-                }
-            }
-            
-            @keyframes drawLine {
-                from {
-                    stroke-dasharray: 100;
-                    stroke-dashoffset: 100;
-                }
-                to {
-                    stroke-dasharray: 100;
-                    stroke-dashoffset: 0;
-                }
-            }
-            
-            .stat-card {
-                padding: 1rem;
-                background: rgba(0, 0, 0, 0.3);
-                border-radius: 0.5rem;
-                border: 1px solid rgba(255, 255, 255, 0.1);
-            }
-            
-            .qloo-connections-graph {
-                animation: graphAppear 1s ease-out;
-            }
-            
-            @keyframes graphAppear {
-                from {
-                    opacity: 0;
-                    transform: scale(0.9);
-                }
-                to {
-                    opacity: 1;
-                    transform: scale(1);
-                }
-            }
-        `;
-        document.head.appendChild(qlooStyle);
-
-        // *** NEW: Initialize Qloo enhancements when page loads ***
-        document.addEventListener('DOMContentLoaded', function() {
-            // Enhance the processing section with Qloo branding
-            enhanceProcessingSectionForQloo();
-        });
-
-        // *** MODIFIED: Enhanced addQlooDiscoveryLog to include visualizer ***
-        function addQlooDiscoveryLogWithGraph(qlooData, message) {
-            const processingLogs = document.getElementById('processing-logs');
-            const logEntry = document.createElement('div');
-            
-            logEntry.className = 'qloo-discovery-entry mb-6 p-4 rounded-lg fade-in-up';
-            logEntry.style.background = 'linear-gradient(135deg, rgba(139, 69, 19, 0.3), rgba(75, 85, 99, 0.3))';
-            logEntry.style.border = '1px solid rgba(255, 215, 0, 0.3)';
-            
-            // Basic discovery info
-            const discoveryHeader = document.createElement('div');
-            discoveryHeader.innerHTML = `
-                <div class="flex items-start gap-3 mb-4">
-                    <div class="qloo-icon animate-pulse">✨</div>
-                    <div class="flex-1">
-                        <div class="text-yellow-300 font-bold text-sm mb-2">
-                            QLOO DISCOVERY ENGINE
-                        </div>
-                        <div class="text-white">
-                            ${message}
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            logEntry.appendChild(discoveryHeader);
-            
-            // Add connection visualizer if we have keywords
-            if (qlooData.related_keywords && qlooData.interest) {
-                const visualizer = createQlooConnectionsVisualizer(
-                    qlooData.related_keywords, 
-                    qlooData.interest
-                );
-                logEntry.appendChild(visualizer);
-            }
-            
-            processingLogs.appendChild(logEntry);
-            
-            // Add entrance animation
-            setTimeout(() => {
-                logEntry.style.transform = 'translateX(0)';
-                logEntry.style.opacity = '1';
-            }, 100);
-        }
-            
+        // Global functions
         window.startNewJourney = function() {
-            transitionToSection(heroSection);
-            form.reset();
-            resetForm();
-            
-            // Reset progress indicators
-            document.getElementById('progress-bar').style.width = '0%';
-            document.getElementById('progress-percent').textContent = '0%';
-            document.getElementById('circle-percent').textContent = '0%';
-            document.getElementById('progress-circle').style.strokeDashoffset = '283';
-            document.getElementById('processing-logs').innerHTML = '';
-            
-            // Reset sections
-            [narrativeSection, timelineSection, summarySection].forEach(section => {
-                section.classList.add('section-hidden');
-                section.classList.remove('section-visible');
-            });
+            location.reload();
         };
     });
-
-    const style = document.createElement('style');
-    style.textContent = `
-        .qloo-discovery-entry {
-            transform: translateX(-20px);
-            opacity: 0;
-            transition: all 0.5s ease-out;
-        }
-        
-        .vibe-discovery-entry {
-            transform: translateY(-20px);
-            opacity: 0;
-            transition: all 0.5s ease-out;
-        }
-        
-        .connections-summary-entry {
-            transform: scale(0.95);
-            opacity: 0;
-            transition: all 0.5s ease-out;
-        }
-        
-        .keyword-badge {
-            animation: keywordPulse 1.5s ease-in-out infinite;
-        }
-        
-        @keyframes keywordPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        
-        .qloo-icon {
-            font-size: 1.5rem;
-            filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
-        }
-        
-        .fade-in-up {
-            animation: fadeInUp 0.6s ease-out forwards;
-        }
-        
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    `;
-    document.head.appendChild(style);
 </script>

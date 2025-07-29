@@ -43,20 +43,6 @@ def create_real_journey
   end
 end
 
-  # def real_status
-  #   process_id = params[:process_id]
-  #   current_status = Rails.cache.read("journey_#{process_id}")
-    
-  #   if current_status
-  #     render json: current_status
-  #   else
-  #     render json: { 
-  #       status: 'expired', 
-  #       message: 'Este proceso ha expirado o no se encontró.' 
-  #     }, status: :not_found
-  #   end
-  # end
-  # En app/controllers/app_controller.rb
 
 def real_status
   process_id = params[:process_id]

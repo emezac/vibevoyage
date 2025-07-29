@@ -22,6 +22,87 @@ class LlmService
       LocalizationService::DEFAULT_LANGUAGE
     end
 
+    def generate_cultural_dna_profile(parsed_vibe, qloo_data)
+      language = parsed_vibe[:detected_language] || LocalizationService::DEFAULT_LANGUAGE
+      
+      Rails.logger.info "🧬 Generating Cultural DNA Profile..."
+      
+      begin
+        prompt = build_dna_profile_prompt(parsed_vibe, qloo_data, language)
+        response = execute_llm_task(prompt, temperature: 0.5, max_tokens: 400)
+        
+        # Parsear la respuesta JSON y simbolizar las claves
+        dna_profile = JSON.parse(clean_json_response(response)).deep_symbolize_keys
+        
+        Rails.logger.info "✅ Cultural DNA Profile generated successfully."
+        return dna_profile
+        
+      rescue => e
+        Rails.logger.error "❌ Cultural DNA Profile generation failed: #{e.message}"
+        AnalyticsService.track_error('llm_service', 'dna_profile_generation', e, { city: parsed_vibe[:city] })
+        
+        # Devolver una estructura nula para que el frontend no falle
+        return {
+          archetypes: nil,
+          cross_pollination: nil,
+          evolution_path: nil
+        }
+      end
+    end
+
+          def build_dna_profile_prompt(parsed_vibe, qloo_data, language)
+      interests = parsed_vibe[:interests].join(', ')
+      preferences = parsed_vibe[:preferences].join(', ')
+      qloo_keywords = (qloo_data&.dig('results', 'entities') || [])
+                      .flat_map { |e| e['tags']&.map { |t| t['name'] } }
+                      .compact.uniq.first(15).join(', ')
+
+      <<~PROMPT
+        Analyze the user's cultural preferences to generate a "Cultural DNA Profile".
+
+        CONTEXT:
+        - User Interests: #{interests}
+        - User Preferences (moods): #{preferences}
+        - Related Cultural Keywords (from Qloo): #{qloo_keywords}
+        - Language for response: #{language}
+
+        TASK: Generate a JSON object with three keys: "archetypes", "cross_pollination", and "evolution_path".
+
+        1.  **archetypes**: Identify 2-4 dominant cultural archetypes. Assign a percentage score to each (total should not exceed 100).
+            (Examples: 'Explorer', 'Artist', 'Philosopher', 'Curator', 'Gourmand', 'Socialite', 'Historian').
+
+        2.  **cross_pollination**: Suggest 2-3 potential new areas of interest that connect the user's existing tastes. For each, provide the domains and a strength score (0.0 to 1.0).
+            (Example: "gothic cinema" + "artisanal mezcal" -> could connect to "Surrealist Art" or "Historical Mixology").
+
+        3.  **evolution_path**: Outline a simple cultural evolution timeline with one suggestion per phase.
+            (Phases: immediate, short_term, medium_term, long_term).
+
+        RULES:
+        - Respond ONLY with a valid JSON object.
+        - The JSON keys must be exactly: archetypes, cross_pollination, evolution_path.
+        - All text values inside the JSON should be in the specified language: "#{language}".
+
+        EXAMPLE JSON STRUCTURE:
+        {
+          "archetypes": { "Explorer": 60, "Gourmand": 40 },
+          "cross_pollination": [
+            { "domains": ["Gothic Cinema", "Mixology"], "strength": 0.85 },
+            { "domains": ["Vinyl Records", "Rare Books"], "strength": 0.7 }
+          ],
+          "evolution_path": {
+            "timeline": {
+              "immediate": [{ "suggestion": "Explore a local art gallery with a dark theme." }],
+              "short_term": [{ "suggestion": "Take a craft cocktail class." }],
+              "medium_term": [{ "suggestion": "Visit a film festival focused on fantasy genres." }],
+              "long_term": [{ "suggestion": "Plan a trip to a region known for its unique spirits and folklore." }]
+            }
+          }
+        }
+
+        JSON Response:
+      PROMPT
+    end
+
       # Simple test method
       def test_cultural_explanation
         Rails.logger.info "=== TESTING CULTURAL EXPLANATION ==="
@@ -775,4 +856,61 @@ end
     else 'cultural experiences'
     end
   end
+
+    def build_dna_profile_prompt(parsed_vibe, qloo_data, language)
+      interests = parsed_vibe[:interests].join(', ')
+      preferences = parsed_vibe[:preferences].join(', ')
+      qloo_keywords = (qloo_data&.dig('results', 'entities') || [])
+                      .flat_map { |e| e['tags']&.map { |t| t['name'] } }
+                      .compact.uniq.first(15).join(', ')
+
+      <<~PROMPT
+        Analyze the user's cultural preferences to generate a "Cultural DNA Profile".
+
+        CONTEXT:
+        - User Interests: #{interests}
+        - User Preferences (moods): #{preferences}
+        - Related Cultural Keywords (from Qloo): #{qloo_keywords}
+        - Language for response: #{language}
+
+        TASK: Generate a JSON object with three keys: "archetypes", "cross_pollination", and "evolution_path".
+
+        1.  **archetypes**: Identify 2-4 dominant cultural archetypes. Assign a percentage score to each (total should not exceed 100).
+            (Examples: 'Explorer', 'Artist', 'Philosopher', 'Curator', 'Gourmand', 'Socialite', 'Historian').
+
+        2.  **cross_pollination**: Suggest 2-3 potential new areas of interest that connect the user's existing tastes. For each, provide the domains and a strength score (0.0 to 1.0).
+            (Example: "gothic cinema" + "artisanal mezcal" -> could connect to "Surrealist Art" or "Historical Mixology").
+
+        3.  **evolution_path**: Outline a simple cultural evolution timeline with one suggestion per phase.
+            (Phases: immediate, short_term, medium_term, long_term).
+
+        RULES:
+        - Respond ONLY with a valid JSON object.
+        - The JSON keys must be exactly: archetypes, cross_pollination, evolution_path.
+        - All text values inside the JSON should be in the specified language: "#{language}".
+
+        EXAMPLE JSON STRUCTURE:
+        {
+          "archetypes": { "Explorer": 60, "Gourmand": 40 },
+          "cross_pollination": [
+            { "domains": ["Gothic Cinema", "Mixology"], "strength": 0.85 },
+            { "domains": ["Vinyl Records", "Rare Books"], "strength": 0.7 }
+          ],
+          "evolution_path": {
+            "timeline": {
+              "immediate": [{ "suggestion": "Explore a local art gallery with a dark theme." }],
+              "short_term": [{ "suggestion": "Take a craft cocktail class." }],
+              "medium_term": [{ "suggestion": "Visit a film festival focused on fantasy genres." }],
+              "long_term": [{ "suggestion": "Plan a trip to a region known for its unique spirits and folklore." }]
+            }
+          }
+        }
+
+        JSON Response:
+      PROMPT
+    end
+
+    def generate_response(parsed_vibe, input)
+     self.class.generate_response(parsed_vibe, input)
+    end
 end

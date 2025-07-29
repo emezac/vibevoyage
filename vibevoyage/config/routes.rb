@@ -4,9 +4,12 @@ Rails.application.routes.draw do
   
   # Rutas para el flujo principal de VibeVoyage
   get '/app', to: 'app#index'
-  post '/app/create_real_journey', to: 'app#create_real_journey', as: :app_create_real_journey
-  get '/app/real_status/:process_id', to: 'app#real_status', as: :app_real_status
   
+  scope '/app' do
+    get '/', to: 'app#index', as: 'app_index'
+    post '/create_real_journey', to: 'app#create_real_journey', as: 'app_create_real_journey'
+    get '/status/:process_id', to: 'app#real_status', as: 'app_real_status'
+  end
   # Rutas para explicaciones culturales
   post '/app/explain_choice', to: 'app#explain_choice', as: :app_explain_choice
   
