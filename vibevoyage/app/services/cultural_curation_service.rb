@@ -32,6 +32,9 @@ class CulturalCurationService
         index
       )
 
+      hours_data = place_data.dig(:google_data, 'opening_hours') || 
+                   extract_hours_from_qloo(qloo_entity)
+
       vibe_match = calculate_vibe_match(qloo_entity, parsed_vibe, qloo_keywords)
 
       # Usamos el método de enriquecimiento completo AHORA dentro de este servicio
@@ -49,6 +52,8 @@ class CulturalCurationService
         image: qloo_entity.dig('properties', 'images')&.first&.dig('url') || get_fallback_image(index),
         qloo_keywords: qloo_keywords,
         qloo_entity_id: qloo_entity['entity_id'],
+        hours: hours_data,
+        opening_hours: hours_data
       }.merge(enhanced_data) # Fusionamos los datos enriquecidos
 
       experience
@@ -77,6 +82,13 @@ class CulturalCurationService
         enhanced_data[:rating] = google_data&.dig('rating')&.to_f
         enhanced_data[:price_level] = google_data&.dig('price_level')&.to_i
         enhanced_data[:hours] = google_data&.dig('opening_hours')
+        enhanced_data[:opening_hours] = enhanced_data[:hours] # Alias
+
+        unless enhanced_data[:hours]
+          qloo_hours = extract_hours_from_qloo(qloo_entity) if qloo_entity
+          enhanced_data[:hours] = qloo_hours if qloo_hours
+          enhanced_data[:opening_hours] = qloo_hours if qloo_hours
+        end
 
         google_price_level = google_data&.dig('price_level')&.to_i
 

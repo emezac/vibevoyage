@@ -635,6 +635,13 @@ class ProcessVibeJobIntelligent < ApplicationJob
     enhanced_data[:rating] = google_data&.dig('rating')&.to_f
     enhanced_data[:price_level] = google_data&.dig('price_level')&.to_i
     enhanced_data[:hours] = google_data&.dig('opening_hours')
+    enhanced_data[:opening_hours] = enhanced_data[:hours] # Alias
+
+    unless enhanced_data[:hours]
+      qloo_hours = extract_hours_from_qloo(qloo_entity) if qloo_entity
+      enhanced_data[:hours] = qloo_hours if qloo_hours
+      enhanced_data[:opening_hours] = qloo_hours if qloo_hours
+    end
     
     # Extract area with multiple fallback strategies
     if defined?(PlacesEnrichmentService)
