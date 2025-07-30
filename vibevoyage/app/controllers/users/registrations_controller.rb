@@ -1,36 +1,22 @@
+# app/controllers/users/registrations_controller.rb
 class Users::RegistrationsController < Devise::RegistrationsController
-  respond_to :html, :json
+  # Skip authentication for ALL registration actions that don't need it
+  skip_before_action :authenticate_user!, only: [:new, :create, :cancel]
+  
+  before_action :configure_sign_up_params, only: [:create]
+  before_action :configure_account_update_params, only: [:update]
 
   protected
 
-  def after_sign_up_path_for(resource)
-    # Para requests HTML, usa el comportamiento por defecto de Devise
-    super(resource)
+  def configure_sign_up_params
+    devise_parameter_sanitizer.permit(:sign_up, keys: [:first_name, :last_name])
   end
 
-  def respond_with(resource, _opts = {})
-    if request.format.json?
-      # Respuesta para API (JSON)
-      if resource.persisted?
-        render json: {
-          status: 'success',
-          message: 'Usuario creado exitosamente',
-          user: {
-            id: resource.id,
-            email: resource.email,
-            created_at: resource.created_at
-          }
-        }, status: :created
-      else
-        render json: {
-          status: 'error',
-          message: 'No se pudo crear el usuario',
-          errors: resource.errors.full_messages
-        }, status: :unprocessable_entity
-      end
-    else
-      # Respuesta para web (HTML) - comportamiento normal de Devise
-      super
-    end
+  def configure_account_update_params
+    devise_parameter_sanitizer.permit(:account_update, keys: [:first_name, :last_name])
+  end
+
+  def after_sign_up_path_for(resource)
+    app_index_path
   end
 end

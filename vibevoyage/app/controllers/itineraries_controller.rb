@@ -1,5 +1,7 @@
 # app/controllers/itineraries_controller.rb
 class ItinerariesController < ApplicationController
+  # skip_before_action :authenticate_user!, only: [:show]
+  
   def new
     # Renderiza la interfaz principal (tu diseño elegante)
   end

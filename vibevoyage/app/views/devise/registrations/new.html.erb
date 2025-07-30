@@ -1,0 +1,95 @@
+<!-- app/views/devise/registrations/new.html.erb -->
+<div class="min-h-screen flex items-center justify-center px-4">
+  <div class="max-w-md w-full">
+    <div class="glass-card-strong p-8 rounded-3xl">
+      <div class="text-center mb-8">
+        <%= link_to root_path, class: "inline-flex items-center gap-3 mb-6" do %>
+          <div class="w-12 h-12 rounded-2xl flex items-center justify-center pulse-glow" style="background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage));">
+            <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" />
+            </svg>
+          </div>
+          <h1 class="text-2xl font-display font-bold gradient-text">VibeVoyage</h1>
+        <% end %>
+        
+        <h2 class="text-3xl font-display font-bold text-white mb-2">Join the Journey</h2>
+        <p class="text-slate-400">Create your account and start exploring cultural adventures</p>
+      </div>
+
+      <%= form_with model: resource, as: resource_name, url: registration_path(resource_name), local: true, class: "space-y-6" do |form| %>
+        <%= render "devise/shared/error_messages", resource: resource %>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <%= form.label :first_name, class: "block text-sm font-medium text-slate-300 mb-2" %>
+            <%= form.text_field :first_name, autofocus: true,
+                class: "w-full p-4 bg-black/40 border border-white/10 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 rounded-xl text-white placeholder-slate-400 transition-all duration-300",
+                placeholder: "First name" %>
+          </div>
+          
+          <div>
+            <%= form.label :last_name, class: "block text-sm font-medium text-slate-300 mb-2" %>
+            <%= form.text_field :last_name,
+                class: "w-full p-4 bg-black/40 border border-white/10 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 rounded-xl text-white placeholder-slate-400 transition-all duration-300",
+                placeholder: "Last name" %>
+          </div>
+        </div>
+
+        <div>
+          <%= form.label :email, class: "block text-sm font-medium text-slate-300 mb-2" %>
+          <%= form.email_field :email, autocomplete: "email", 
+              class: "w-full p-4 bg-black/40 border border-white/10 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 rounded-xl text-white placeholder-slate-400 transition-all duration-300",
+              placeholder: "your@email.com" %>
+        </div>
+
+        <div>
+          <%= form.label :password, class: "block text-sm font-medium text-slate-300 mb-2" %>
+          <%= form.password_field :password, autocomplete: "new-password",
+              class: "w-full p-4 bg-black/40 border border-white/10 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 rounded-xl text-white placeholder-slate-400 transition-all duration-300",
+              placeholder: "Create a password" %>
+          <% if @minimum_password_length %>
+            <p class="text-xs text-slate-400 mt-1">Minimum <%= @minimum_password_length %> characters</p>
+          <% end %>
+        </div>
+
+        <div>
+          <%= form.label :password_confirmation, class: "block text-sm font-medium text-slate-300 mb-2" %>
+          <%= form.password_field :password_confirmation, autocomplete: "new-password",
+              class: "w-full p-4 bg-black/40 border border-white/10 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 rounded-xl text-white placeholder-slate-400 transition-all duration-300",
+              placeholder: "Confirm your password" %>
+        </div>
+
+        <div class="glass-card bg-black/40 p-4 rounded-2xl">
+          <h4 class="text-sm font-medium text-white mb-2">🎁 Your Free Plan Includes:</h4>
+          <ul class="text-xs text-slate-300 space-y-1">
+            <li>• 5 cultural journeys per month</li>
+            <li>• Basic AI curation with Qloo intelligence</li>
+            <li>• Standard cultural recommendations</li>
+          </ul>
+        </div>
+
+        <div>
+          <%= form.submit "Create Account", 
+              class: "w-full font-bold py-4 px-6 rounded-xl transition-all duration-300 text-lg text-white",
+              style: "background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage));" %>
+        </div>
+      <% end %>
+
+      <div class="mt-6">
+        <div class="relative">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-white/10"></div>
+          </div>
+          <div class="relative flex justify-center text-sm">
+            <span class="px-2 bg-transparent text-slate-400">Already have an account?</span>
+          </div>
+        </div>
+        
+        <div class="text-center mt-4">
+          <%= link_to "Sign in here", new_session_path(resource_name),
+              class: "text-yellow-400 hover:text-yellow-300 transition-colors font-medium" %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

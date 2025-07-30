@@ -1,0 +1,107 @@
+<!-- app/views/profile/edit.html.erb -->
+<div class="min-h-screen py-20 px-4">
+  <div class="max-w-2xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h1 class="text-3xl font-display font-bold text-white mb-2">Edit Profile</h1>
+      <p class="text-slate-400">Update your account information</p>
+    </div>
+
+    <div class="glass-card-strong p-8 rounded-3xl">
+      <%= form_with model: current_user, url: profile_path, method: :patch, local: true, class: "space-y-6" do |form| %>
+        <% if current_user.errors.any? %>
+          <div class="glass-card bg-red-500/10 border border-red-400/20 p-4 rounded-2xl">
+            <h4 class="font-bold text-red-300 mb-2">Please fix the following errors:</h4>
+            <ul class="text-sm text-red-200 space-y-1">
+              <% current_user.errors.full_messages.each do |message| %>
+                <li>• <%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <%= form.label :first_name, class: "block text-sm font-medium text-slate-300 mb-2" %>
+            <%= form.text_field :first_name,
+                class: "w-full p-4 bg-black/40 border border-white/10 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 rounded-xl text-white placeholder-slate-400 transition-all duration-300",
+                placeholder: "First name" %>
+          </div>
+          
+          <div>
+            <%= form.label :last_name, class: "block text-sm font-medium text-slate-300 mb-2" %>
+            <%= form.text_field :last_name,
+                class: "w-full p-4 bg-black/40 border border-white/10 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 rounded-xl text-white placeholder-slate-400 transition-all duration-300",
+                placeholder: "Last name" %>
+          </div>
+        </div>
+
+        <div>
+          <%= form.label :email, class: "block text-sm font-medium text-slate-300 mb-2" %>
+          <%= form.email_field :email, autocomplete: "email",
+              class: "w-full p-4 bg-black/40 border border-white/10 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 rounded-xl text-white placeholder-slate-400 transition-all duration-300",
+              placeholder: "your@email.com" %>
+          <p class="text-xs text-slate-400 mt-1">
+            We'll send a confirmation email if you change your email address
+          </p>
+        </div>
+
+        <!-- Password Change Section -->
+        <div class="glass-card bg-black/40 p-6 rounded-2xl">
+          <h3 class="text-lg font-bold text-white mb-4">Change Password</h3>
+          <p class="text-sm text-slate-400 mb-4">Leave blank if you don't want to change your password</p>
+          
+          <div class="space-y-4">
+            <div>
+              <%= form.label :password, "New Password", class: "block text-sm font-medium text-slate-300 mb-2" %>
+              <%= form.password_field :password, autocomplete: "new-password",
+                  class: "w-full p-4 bg-black/40 border border-white/10 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 rounded-xl text-white placeholder-slate-400 transition-all duration-300",
+                  placeholder: "Enter new password" %>
+            </div>
+
+            <div>
+              <%= form.label :password_confirmation, "Confirm New Password", class: "block text-sm font-medium text-slate-300 mb-2" %>
+              <%= form.password_field :password_confirmation, autocomplete: "new-password",
+                  class: "w-full p-4 bg-black/40 border border-white/10 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 rounded-xl text-white placeholder-slate-400 transition-all duration-300",
+                  placeholder: "Confirm new password" %>
+            </div>
+          </div>
+        </div>
+
+        <!-- Current Password for Confirmation -->
+        <div>
+          <%= form.label :current_password, class: "block text-sm font-medium text-slate-300 mb-2" %>
+          <%= form.password_field :current_password, autocomplete: "current-password",
+              class: "w-full p-4 bg-black/40 border border-white/10 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 rounded-xl text-white placeholder-slate-400 transition-all duration-300",
+              placeholder: "Enter current password to confirm changes" %>
+          <p class="text-xs text-slate-400 mt-1">
+            Required to confirm any changes
+          </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 pt-6">
+          <%= form.submit "Update Profile", 
+              class: "flex-1 font-bold py-4 px-6 rounded-xl transition-all duration-300 text-lg text-white",
+              style: "background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage));" %>
+          
+          <%= link_to "Cancel", profile_path,
+              class: "flex-1 text-center glass-card px-6 py-4 rounded-xl font-semibold text-white hover:bg-white/10 transition-all duration-300 border-0" %>
+        </div>
+      <% end %>
+
+      <!-- Danger Zone -->
+      <div class="mt-8 pt-8 border-t border-red-400/20">
+        <h3 class="text-lg font-bold text-red-300 mb-4">Danger Zone</h3>
+        <p class="text-sm text-slate-400 mb-4">
+          Once you delete your account, there is no going back. Please be certain.
+        </p>
+        <%= button_to "Delete Account", registration_path(current_user), method: :delete,
+            class: "px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition-colors",
+            data: { 
+              confirm: "Are you sure you want to delete your account? This action cannot be undone and will permanently delete all your cultural journeys and data."
+            } %>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,148 @@
+<!-- app/views/subscriptions/index.html.erb -->
+<div class="min-h-screen py-20 px-4">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-16">
+      <div class="inline-flex items-center gap-3 glass-card px-6 py-3 text-sm text-slate-300 mb-8 rounded-full">
+        <div class="w-2 h-2 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 animate-pulse"></div>
+        <span>Choose Your Cultural Journey</span>
+      </div>
+      
+      <h1 class="text-4xl md:text-6xl font-display font-bold mb-6 gradient-text">
+        Unlock Your Cultural DNA
+      </h1>
+      
+      <p class="text-xl text-slate-400 max-w-3xl mx-auto mb-8">
+        Transform your subscription into endless cultural adventures with our AI-powered curation
+      </p>
+
+      <!-- Current Status -->
+      <div class="glass-card-strong p-6 rounded-2xl max-w-md mx-auto mb-12">
+        <h3 class="font-bold text-white mb-2">Current Plan</h3>
+        <div class="flex items-center justify-between mb-4">
+          <span class="text-2xl font-display font-bold gradient-text"><%= @current_plan.name %></span>
+          <span class="text-sm text-slate-400">$<%= @current_plan.price %>/month</span>
+        </div>
+        
+        <div class="mb-4">
+          <div class="flex justify-between text-sm text-slate-400 mb-2">
+            <span>Journeys this month</span>
+            <span><%= current_user.journeys_this_month %>/<%= @current_plan.max_journeys_per_month %></span>
+          </div>
+          <div class="w-full bg-white/10 rounded-full h-2">
+            <% progress = @current_plan.max_journeys_per_month > 0 ? (current_user.journeys_this_month.to_f / @current_plan.max_journeys_per_month * 100) : 0 %>
+            <div class="vibe-match-bar h-2 rounded-full" style="width: <%= [progress, 100].min %>%;"></div>
+          </div>
+        </div>
+        
+        <p class="text-sm text-slate-300">
+          <% if @journeys_remaining > 0 %>
+            <%= @journeys_remaining %> journeys remaining this month
+          <% else %>
+            Journey limit reached. Upgrade to continue exploring!
+          <% end %>
+        </p>
+      </div>
+    </div>
+
+    <!-- Pricing Cards -->
+    <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+      <% @plans.each_with_index do |plan, index| %>
+        <div class="<%= 'transform scale-105' if plan.slug == 'premium' %> <%= 'order-first md:order-none' if plan.slug == 'premium' %>">
+          <div class="glass-card-strong p-8 rounded-3xl hover-lift h-full relative <%= 'ring-2 ring-yellow-400 ring-offset-2 ring-offset-transparent' if plan == @current_plan %>">
+            
+            <!-- Popular Badge -->
+            <% if plan.slug == 'premium' %>
+              <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                <div class="px-4 py-2 rounded-full text-sm font-bold text-white" style="background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage));">
+                  Most Popular
+                </div>
+              </div>
+            <% end %>
+
+            <!-- Current Plan Badge -->
+            <% if plan == @current_plan %>
+              <div class="absolute -top-4 right-4">
+                <div class="px-3 py-1 bg-green-500 rounded-full text-xs font-bold text-white">
+                  Current Plan
+                </div>
+              </div>
+            <% end %>
+            
+            <div class="text-center mb-8">
+              <h3 class="text-2xl font-display font-bold text-white mb-2"><%= plan.name %></h3>
+              <p class="text-slate-400 mb-6"><%= plan.description %></p>
+              
+              <div class="mb-6">
+                <span class="text-4xl font-bold gradient-text">$<%= plan.price %></span>
+                <span class="text-slate-400">/month</span>
+              </div>
+            </div>
+
+            <!-- Features -->
+            <div class="space-y-4 mb-8">
+              <% plan.features.each do |feature| %>
+                <div class="flex items-center gap-3">
+                  <svg class="w-5 h-5 text-green-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span class="text-slate-300 text-sm"><%= feature %></span>
+                </div>
+              <% end %>
+            </div>
+
+            <!-- Action Button -->
+            <div class="mt-auto">
+              <% if plan == @current_plan %>
+                <button disabled class="w-full py-3 px-6 rounded-xl font-semibold text-slate-400 bg-white/10 cursor-not-allowed">
+                  Current Plan
+                </button>
+              <% elsif plan.free? && @current_plan.price > 0 %>
+                <%= link_to "Downgrade to Free", subscribe_subscription_path(plan), method: :post,
+                    class: "w-full block text-center py-3 px-6 rounded-xl font-semibold text-white glass-card hover:bg-white/20 transition-all duration-300",
+                    data: { confirm: "Are you sure you want to downgrade to the free plan?" } %>
+              <% elsif !plan.free? %>
+                <%= link_to "Upgrade to #{plan.name}", subscribe_subscription_path(plan), method: :post,
+                    class: "w-full block text-center py-3 px-6 rounded-xl font-semibold text-white transition-all duration-300 #{'pulse-glow' if plan.slug == 'premium'}",
+                    style: plan.slug == 'premium' ? "background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage));" : nil %>
+              <% else %>
+                <button disabled class="w-full py-3 px-6 rounded-xl font-semibold text-slate-400 bg-white/10 cursor-not-allowed">
+                  Free Plan
+                </button>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="mt-20 max-w-4xl mx-auto">
+      <h2 class="text-3xl font-display font-bold text-center mb-12 gradient-text">
+        Frequently Asked Questions
+      </h2>
+      
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="glass-card p-6 rounded-2xl">
+          <h3 class="font-bold text-white mb-3">What happens when I reach my journey limit?</h3>
+          <p class="text-slate-400 text-sm">You'll need to wait until next month or upgrade your plan to continue creating cultural adventures.</p>
+        </div>
+        
+        <div class="glass-card p-6 rounded-2xl">
+          <h3 class="font-bold text-white mb-3">Can I cancel my subscription anytime?</h3>
+          <p class="text-slate-400 text-sm">Yes! You can cancel anytime and you'll continue to have access until the end of your billing period.</p>
+        </div>
+        
+        <div class="glass-card p-6 rounded-2xl">
+          <h3 class="font-bold text-white mb-3">What's included in premium features?</h3>
+          <p class="text-slate-400 text-sm">Advanced AI curation, unlimited journeys, cultural DNA analysis, and priority support.</p>
+        </div>
+        
+        <div class="glass-card p-6 rounded-2xl">
+          <h3 class="font-bold text-white mb-3">Do unused journeys roll over?</h3>
+          <p class="text-slate-400 text-sm">Journey limits reset monthly and don't roll over, encouraging you to explore regularly.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

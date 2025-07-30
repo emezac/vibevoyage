@@ -18,9 +18,32 @@
             <p class="text-lg md:text-xl text-slate-400 font-light leading-relaxed max-w-4xl mx-auto mb-16">
                 Using <strong class="text-yellow-400">real Qloo data</strong> and 
                 <strong class="text-purple-400">actual Cultural DNA analysis</strong>
+                <% if current_user %>
+                    <br><span class="text-sm">Welcome back, <%= current_user.display_name %>! 
+                    You have <%= current_user.journeys_remaining_this_month %> 
+                    <%= 'journey'.pluralize(current_user.journeys_remaining_this_month) %> remaining this month.</span>
+                <% end %>
             </p>
             
-            <%= form_with url: app_create_real_journey_path, local: false, id: 'vibe-form', class: "glass-card-strong p-6 md:p-8 max-w-3xl mx-auto relative rounded-2xl" do |form| %>
+                <%= form_with url: app_create_real_journey_path, local: false, id: 'vibe-form', class: "glass-card-strong p-6 md:p-8 max-w-3xl mx-auto relative rounded-2xl" do |form| %>
+                    <% if current_user && !current_user.can_create_journey? %>
+                        <div class="glass-card bg-yellow-500/10 border border-yellow-400/20 p-4 rounded-2xl mb-6">
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl">⚠️</span>
+                                <div>
+                                    <h4 class="font-bold text-yellow-300 mb-1">Journey Limit Reached</h4>
+                                    <p class="text-sm text-yellow-200">
+                                        You've used all <%= current_user.subscription_plan.max_journeys_per_month %> 
+                                        <%= 'journey'.pluralize(current_user.subscription_plan.max_journeys_per_month) %> 
+                                        for this month. 
+                                        <%= link_to "Upgrade your subscription", subscriptions_path, 
+                                            class: "text-yellow-400 hover:text-yellow-300 underline font-medium" %> 
+                                        to continue exploring!
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    <% end %>
                 <div class="absolute -top-6 left-1/2 transform -translate-x-1/2">
                     <div class="w-12 h-12 rounded-xl flex items-center justify-center pulse-glow" style="background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage));">
                         <span class="text-2xl">🧬</span>
@@ -77,7 +100,8 @@
                 </div>
                 
                 <%= form.button type: "submit", id: "submit-btn",
-                    class: "mt-6 w-full font-bold py-4 md:py-5 px-6 md:px-8 rounded-xl transition-all duration-500 text-lg transform hover:scale-[1.02] flex items-center justify-center gap-3 group text-white relative overflow-hidden",
+                    disabled: (current_user && !current_user.can_create_journey?),
+                    class: "mt-6 w-full font-bold py-4 md:py-5 px-6 md:px-8 rounded-xl transition-all duration-500 text-lg transform hover:scale-[1.02] flex items-center justify-center gap-3 group text-white relative overflow-hidden #{'opacity-50 cursor-not-allowed' if current_user && !current_user.can_create_journey?}",
                     style: "background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage), var(--accent-gold));" do %>
                     
                     <span class="text-xl md:text-2xl">🔍</span>

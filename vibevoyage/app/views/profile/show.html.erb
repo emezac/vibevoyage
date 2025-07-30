@@ -1,0 +1,206 @@
+<!-- app/views/profile/show.html.erb -->
+<div class="min-h-screen py-20 px-4">
+  <div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="glass-card-strong p-8 rounded-3xl mb-8">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div>
+          <h1 class="text-3xl font-display font-bold text-white mb-2">
+            Welcome back, <%= current_user.display_name %>
+          </h1>
+          <p class="text-slate-400">Manage your account and cultural preferences</p>
+        </div>
+        
+        <div class="flex gap-3">
+          <%= link_to "Edit Profile", edit_profile_path, 
+              class: "glass-card px-6 py-3 rounded-xl font-semibold text-white hover:bg-white/20 transition-all duration-300 border-0" %>
+          <%= link_to "Subscription", subscriptions_path,
+              class: "px-6 py-3 rounded-xl font-semibold text-white transition-all duration-300",
+              style: "background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage));" %>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid lg:grid-cols-3 gap-8">
+      <!-- Account Info -->
+      <div class="lg:col-span-2">
+        <div class="glass-card-strong p-8 rounded-3xl mb-8">
+          <h2 class="text-2xl font-display font-bold text-white mb-6">Account Information</h2>
+          
+          <div class="grid md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-slate-300 mb-2">Full Name</label>
+              <p class="text-white font-medium"><%= current_user.display_name %></p>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-slate-300 mb-2">Email</label>
+              <p class="text-white font-medium"><%= current_user.email %></p>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-slate-300 mb-2">Member Since</label>
+              <p class="text-white font-medium"><%= current_user.created_at.strftime("%B %Y") %></p>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-slate-300 mb-2">Total Journeys</label>
+              <p class="text-white font-medium"><%= current_user.itineraries.count %></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Journeys -->
+        <div class="glass-card-strong p-8 rounded-3xl">
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-display font-bold text-white">Recent Cultural Journeys</h2>
+            <%= link_to "Create New Journey", app_index_path,
+                class: "text-yellow-400 hover:text-yellow-300 font-medium text-sm transition-colors" %>
+          </div>
+          
+          <% if @recent_itineraries.any? %>
+            <div class="space-y-4">
+              <% @recent_itineraries.each do |itinerary| %>
+                <div class="glass-card p-4 rounded-2xl hover-lift">
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <h3 class="font-bold text-white mb-1">
+                        <%= itinerary.city || 'Cultural Adventure' %>
+                      </h3>
+                      <p class="text-slate-400 text-sm mb-2">
+                        <%= truncate(itinerary.description, length: 100) %>
+                      </p>
+                      <p class="text-xs text-slate-500">
+                        <%= itinerary.created_at.strftime("%B %d, %Y") %>
+                      </p>
+                    </div>
+                    <div class="flex gap-2">
+                      <%= link_to "View", itinerary_path(itinerary),
+                          class: "text-xs px-3 py-1 glass-card rounded-lg text-white hover:bg-white/20 transition-colors" %>
+                    </div>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <div class="text-center py-12">
+              <div class="text-6xl mb-4">🌟</div>
+              <h3 class="text-xl font-bold text-white mb-2">No journeys yet</h3>
+              <p class="text-slate-400 mb-6">Ready to start your first cultural adventure?</p>
+              <%= link_to "Create Your First Journey", app_index_path,
+                  class: "inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white transition-all duration-300",
+                  style: "background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage));" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Subscription & Stats -->
+      <div class="space-y-8">
+        <!-- Subscription Status -->
+        <div class="glass-card-strong p-6 rounded-3xl">
+          <h3 class="text-xl font-bold text-white mb-4">Subscription Status</h3>
+          
+          <div class="mb-6">
+            <div class="flex justify-between items-center mb-2">
+              <span class="font-medium text-white"><%= @subscription_plan.name %></span>
+              <span class="text-sm text-slate-400">$<%= @subscription_plan.price %>/mo</span>
+            </div>
+            
+            <% if @subscription_plan.free? %>
+              <span class="inline-block px-3 py-1 bg-gray-500/20 text-gray-300 rounded-full text-xs font-medium">
+                Free Plan
+              </span>
+            <% else %>
+              <span class="inline-block px-3 py-1 bg-green-500/20 text-green-300 rounded-full text-xs font-medium">
+                <%= current_user.subscription_status.humanize %>
+              </span>
+            <% end %>
+          </div>
+
+          <!-- Journey Usage -->
+          <div class="mb-6">
+            <div class="flex justify-between text-sm text-slate-400 mb-2">
+              <span>Journeys this month</span>
+              <span><%= current_user.journeys_this_month %>/<%= @subscription_plan.max_journeys_per_month %></span>
+            </div>
+            
+            <div class="w-full bg-white/10 rounded-full h-2">
+              <% progress = @subscription_plan.max_journeys_per_month > 0 ? (current_user.journeys_this_month.to_f / @subscription_plan.max_journeys_per_month * 100) : 0 %>
+              <div class="vibe-match-bar h-2 rounded-full" style="width: <%= [progress, 100].min %>%;"></div>
+            </div>
+            
+            <p class="text-xs text-slate-400 mt-2">
+              <% if @journeys_remaining > 0 %>
+                <%= @journeys_remaining %> journeys remaining
+              <% else %>
+                Limit reached - upgrade to continue
+              <% end %>
+            </p>
+          </div>
+
+          <div class="space-y-3">
+            <%= link_to "Manage Subscription", subscriptions_path,
+                class: "w-full block text-center py-3 px-4 rounded-xl font-semibold text-white transition-all duration-300",
+                style: "background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage));" %>
+                
+            <% if current_user.active? %>
+              <%= link_to "Cancel Subscription", cancel_subscription_path(@subscription_plan), method: :delete,
+                  class: "w-full block text-center py-2 px-4 glass-card rounded-xl text-sm text-red-300 hover:bg-red-500/20 transition-colors",
+                  data: { confirm: "Are you sure you want to cancel your subscription?" } %>
+            <% end %>
+          </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="glass-card-strong p-6 rounded-3xl">
+          <h3 class="text-xl font-bold text-white mb-4">Your Cultural Stats</h3>
+          
+          <div class="space-y-4">
+            <div class="flex justify-between items-center">
+              <span class="text-slate-300">Total Journeys</span>
+              <span class="font-bold gradient-text"><%= current_user.itineraries.count %></span>
+            </div>
+            
+            <div class="flex justify-between items-center">
+              <span class="text-slate-300">Cities Explored</span>
+              <span class="font-bold gradient-text"><%= current_user.itineraries.distinct.count(:city) %></span>
+            </div>
+            
+            <div class="flex justify-between items-center">
+              <span class="text-slate-300">This Month</span>
+              <span class="font-bold gradient-text"><%= current_user.journeys_this_month %></span>
+            </div>
+            
+            <div class="flex justify-between items-center">
+              <span class="text-slate-300">Member Since</span>
+              <span class="font-bold gradient-text"><%= current_user.created_at.strftime("%Y") %></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="glass-card-strong p-6 rounded-3xl">
+          <h3 class="text-xl font-bold text-white mb-4">Quick Actions</h3>
+          
+          <div class="space-y-3">
+            <%= link_to app_index_path, class: "w-full flex items-center gap-3 p-3 glass-card rounded-xl hover:bg-white/20 transition-colors" do %>
+              <span class="text-2xl">🎨</span>
+              <span class="text-white font-medium">Create New Journey</span>
+            <% end %>
+            
+            <%= link_to itineraries_path, class: "w-full flex items-center gap-3 p-3 glass-card rounded-xl hover:bg-white/20 transition-colors" do %>
+              <span class="text-2xl">📚</span>
+              <span class="text-white font-medium">View All Journeys</span>
+            <% end %>
+            
+            <%= link_to edit_profile_path, class: "w-full flex items-center gap-3 p-3 glass-card rounded-xl hover:bg-white/20 transition-colors" do %>
+              <span class="text-2xl">⚙️</span>
+              <span class="text-white font-medium">Edit Profile</span>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
