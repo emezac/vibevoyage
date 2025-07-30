@@ -88,3 +88,7 @@ gem "redis", "~> 5.0"
 gem 'hiredis' 
 gem 'connection_pool' # Para conexiones optimizadas
 gem 'whatlanguage', '~> 1.0', '>= 1.0.6'
+
+group :development do
+  gem 'letter_opener'
+end

@@ -113,7 +113,7 @@
               </span>
             <% else %>
               <span class="inline-block px-3 py-1 bg-green-500/20 text-green-300 rounded-full text-xs font-medium">
-                <%= current_user.subscription_status.humanize %>
+                <%= current_user.subscription_status&.humanize %>
               </span>
             <% end %>
           </div>
@@ -144,7 +144,7 @@
                 class: "w-full block text-center py-3 px-4 rounded-xl font-semibold text-white transition-all duration-300",
                 style: "background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage));" %>
                 
-            <% if current_user.subscription_status == 'active' %>
+            <% if current_user.subscription_status&.humanize == 'active' %>
               <%= link_to "Cancel Subscription", cancel_subscription_path(@subscription_plan), method: :delete,
                   class: "w-full block text-center py-2 px-4 glass-card rounded-xl text-sm text-red-300 hover:bg-red-500/20 transition-colors",
                   data: { confirm: "Are you sure you want to cancel your subscription?" } %>

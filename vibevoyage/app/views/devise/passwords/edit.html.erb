@@ -1,25 +1,109 @@
-<h2>Change your password</h2>
+<!-- app/views/devise/passwords/edit.html.erb -->
+<div class="min-h-screen flex items-center justify-center py-20 px-4">
+  <!-- Floating Orbs -->
+  <div class="floating-orb w-64 h-64 top-20 right-20 opacity-40" style="animation-delay: 0s;"></div>
+  <div class="floating-orb w-32 h-32 top-1/2 left-10 opacity-30" style="animation-delay: 2s;"></div>
 
-<%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put }) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
-  <%= f.hidden_field :reset_password_token %>
+  <div class="w-full max-w-md">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center gap-4 mb-6">
+        <div class="w-16 h-16 rounded-2xl flex items-center justify-center pulse-glow" style="background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage));">
+          <svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+          </svg>
+        </div>
+        <h1 class="text-2xl font-display font-bold gradient-text">VibeVoyage</h1>
+      </div>
+      
+      <h2 class="text-3xl font-display font-bold text-white mb-2">
+        Reset Your Password
+      </h2>
+      <p class="text-slate-400">
+        Enter your new password below to complete the reset.
+      </p>
+    </div>
 
-  <div class="field">
-    <%= f.label :password, "New password" %><br />
-    <% if @minimum_password_length %>
-      <em>(<%= @minimum_password_length %> characters minimum)</em><br />
-    <% end %>
-    <%= f.password_field :password, autofocus: true, autocomplete: "new-password" %>
+    <!-- Form Card -->
+    <div class="glass-card-strong p-8 rounded-3xl mb-6">
+      <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put, class: "space-y-6" }) do |f| %>
+        <%= f.hidden_field :reset_password_token %>
+        
+        <!-- Error Messages -->
+        <% if resource.errors.any? %>
+          <div class="glass-card bg-red-500/20 border-red-500/30 p-4 rounded-2xl">
+            <div class="flex items-center gap-3">
+              <svg class="w-5 h-5 text-red-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div>
+                <h4 class="text-red-300 font-semibold text-sm">
+                  <%= pluralize(resource.errors.count, "error") %> prohibited this password reset:
+                </h4>
+                <ul class="text-red-200 text-sm mt-1 space-y-1">
+                  <% resource.errors.full_messages.each do |message| %>
+                    <li>• <%= message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            </div>
+          </div>
+        <% end %>
+
+        <!-- New Password Field -->
+        <div class="space-y-2">
+          <%= f.label :password, class: "block text-sm font-medium text-slate-300" do %>
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              New Password
+              <% if @minimum_password_length %>
+                <span class="text-xs text-slate-400">(<%= @minimum_password_length %> characters minimum)</span>
+              <% end %>
+            </div>
+          <% end %>
+          <%= f.password_field :password, 
+              autofocus: true, 
+              autocomplete: "new-password",
+              placeholder: "Enter your new password",
+              class: "w-full px-4 py-3 glass-card rounded-xl text-white placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-300 border-0" %>
+        </div>
+
+        <!-- Confirm Password Field -->
+        <div class="space-y-2">
+          <%= f.label :password_confirmation, class: "block text-sm font-medium text-slate-300" do %>
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Confirm New Password
+            </div>
+          <% end %>
+          <%= f.password_field :password_confirmation, 
+              autocomplete: "new-password",
+              placeholder: "Confirm your new password",
+              class: "w-full px-4 py-3 glass-card rounded-xl text-white placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-300 border-0" %>
+        </div>
+
+        <!-- Submit Button -->
+        <div>
+          <%= f.submit "Update Password", 
+              class: "w-full py-4 px-6 rounded-xl font-semibold text-white transition-all duration-300 hover:scale-105 focus:ring-4 focus:ring-blue-500/30",
+              style: "background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage));" %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Additional Links -->
+    <div class="text-center">
+      <div class="flex justify-center gap-4 text-sm">
+        <%= link_to "← Back to Sign In", new_session_path(resource_name), 
+            class: "text-slate-400 hover:text-white transition-colors flex items-center gap-1" %>
+        
+        <%= link_to "Back to Home", root_path, 
+            class: "text-slate-400 hover:text-white transition-colors flex items-center gap-1" %>
+      </div>
+    </div>
   </div>
-
-  <div class="field">
-    <%= f.label :password_confirmation, "Confirm new password" %><br />
-    <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
-  </div>
-
-  <div class="actions">
-    <%= f.submit "Change my password" %>
-  </div>
-<% end %>
-
-<%= render "devise/shared/links" %>
+</div>
