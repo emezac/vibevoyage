@@ -1,87 +1,99 @@
 # app/controllers/itineraries_controller.rb
 class ItinerariesController < ApplicationController
-  # skip_before_action :authenticate_user!, only: [:show]
-  
-  def new
-    # Renderiza la interfaz principal (tu diseño elegante)
-  end
+  before_action :authenticate_user!
+  before_action :set_itinerary, only: [:show, :edit, :update, :destroy, :make_public, :increment_share, :share_preview]
 
-  def create
-    user_vibe = params[:user_vibe]
-
-    if user_vibe.blank?
-      respond_to do |format|
-        format.turbo_stream do
-          render turbo_stream: turbo_stream.replace("magic_canvas", 
-            partial: "itineraries/error_state", 
-            locals: { error_message: "Por favor, describe tu vibe para poder crear una aventura." })
-        end
-        format.html { redirect_to new_itinerary_path, alert: "Por favor, describe tu vibe." }
-        format.json { render json: { error: 'Vibe description is required' }, status: :bad_request }
-      end
-      return
-    end
-
-    # Generar process_id único basado en session
-    process_id = "#{session.id}_#{SecureRandom.hex(8)}"
-    
-    # Estado inicial en cache para polling de respaldo
-    initial_status = { 
-      status: 'queued', 
-      message: 'Iniciando análisis cultural...', 
-      progress: 5 
-    }
-    Rails.cache.write("journey_#{process_id}", initial_status, expires_in: 15.minutes)
-
-    # *** USAR EL JOB INTELIGENTE ***
-    ProcessVibeJob.perform_later(process_id, user_vibe)
-
-    # Mostrar estado inicial inmediatamente
-    respond_to do |format|
-      format.turbo_stream do
-        render turbo_stream: turbo_stream.replace("magic_canvas", 
-          partial: "itineraries/live_processing_state", 
-          locals: { 
-            progress: 10,
-            message: "Iniciando análisis cultural...",
-            user_vibe: user_vibe,
-            city_data: nil
-          })
-      end
-      format.html do
-        # Para navegadores sin JS, redirigir a página de status
-        redirect_to "/itineraries/status/#{process_id}?user_vibe=#{CGI.escape(user_vibe)}"
-      end
-      format.json { render json: { process_id: process_id, status: 'queued' } }
-    end
+  def index
+    @itineraries = current_user.itineraries.order(created_at: :desc)
   end
 
   def show
-    @itinerary = Itinerary.find(params[:id])
     @user_vibe = @itinerary.description
     @experiences = format_experiences_for_display(@itinerary)
     @city_data = { city: @itinerary.city }
   end
 
+  def new
+    @itinerary = current_user.itineraries.build
+  end
+
+  def create
+    @itinerary = current_user.itineraries.build(itinerary_params)
+    
+    if @itinerary.save
+      redirect_to @itinerary, notice: 'Itinerary was successfully created.'
+    else
+      render :new
+    end
+  end
+
+  def edit
+    # Vista para editar itinerario
+  end
+
+  def update
+    if @itinerary.update(itinerary_params)
+      redirect_to @itinerary, notice: 'Itinerary was successfully updated.'
+    else
+      render :edit
+    end
+  end
+
+  def destroy
+    @itinerary.destroy
+    redirect_to itineraries_path, notice: 'Itinerary was successfully deleted.'
+  end
+
   def status
     process_id = params[:process_id] || params[:id]
+    current_status = Rails.cache.read("journey_#{process_id}")
     
-    if request.format.html?
-      # Página de status para fallback sin JS
-      render :status
+    if current_status
+      render json: current_status
     else
-      # API JSON para polling
-      current_status = Rails.cache.read("journey_#{process_id}")
-      
-      if current_status
-        render json: current_status
-      else
-        render json: { 
-          status: 'expired', 
-          message: 'Este proceso ha expirado o no se encontró.' 
-        }, status: :not_found
-      end
+      render json: { 
+        status: 'expired', 
+        message: 'Este proceso ha expirado o no se encontró.' 
+      }, status: :not_found
     end
+  end
+
+  def make_public
+    begin
+      if @itinerary.make_public!
+        render json: {
+          success: true,
+          share_url: shared_itinerary_url(@itinerary.slug),
+          message: 'Your adventure is now public and ready to share!'
+        }
+      else
+        render json: {
+          success: false,
+          message: 'Unable to make itinerary public'
+        }
+      end
+    rescue => e
+      Rails.logger.error "Error making itinerary public: #{e.message}"
+      render json: {
+        success: false,
+        message: 'An error occurred while making your adventure public'
+      }, status: :internal_server_error
+    end
+  end
+
+  def increment_share
+    begin
+      @itinerary.increment_share_count!
+      render json: { success: true }
+    rescue => e
+      Rails.logger.error "Error incrementing share count: #{e.message}"
+      render json: { success: false }, status: :internal_server_error
+    end
+  end
+
+  def share_preview
+    @experiences = format_experiences_for_display(@itinerary)
+    render layout: false
   end
 
   # Test endpoint mejorado
@@ -120,6 +132,22 @@ class ItinerariesController < ApplicationController
   end
 
   private
+
+  def set_itinerary
+    @itinerary = if params[:id].match?(/\A\d+\z/)
+                   # Si es un número, buscar por ID
+                   current_user.itineraries.find(params[:id])
+                 else
+                   # Si no es un número, buscar por slug
+                   current_user.itineraries.find_by!(slug: params[:id])
+                 end
+  rescue ActiveRecord::RecordNotFound
+    redirect_to itineraries_path, alert: 'Itinerary not found.'
+  end
+
+  def itinerary_params
+    params.require(:itinerary).permit(:name, :description, :city, :location)
+  end
 
   def format_experiences_for_display(itinerary)
     # Convertir stops a formato de experiencias

@@ -263,6 +263,80 @@
                 Share Adventure
             </button>
         </div>
+        <!-- Modal para sharing -->
+<div id="share-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="glass-card-strong p-6 md:p-8 rounded-3xl max-w-md w-full">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl md:text-2xl font-display font-bold gradient-text">Share Your Adventure</h3>
+                <button onclick="closeShareModal()" class="text-slate-400 hover:text-white text-2xl transition-colors">×</button>
+            </div>
+            
+            <div class="space-y-4">
+                <p class="text-slate-300 text-sm mb-6">
+                    Make your cultural journey public and share it with the world!
+                </p>
+                
+                <!-- Adventure preview -->
+                <div class="glass-card p-4 rounded-2xl mb-6" id="adventure-preview">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage));">
+                            <span class="text-white font-bold text-sm" id="user-initial">A</span>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-white" id="adventure-title">Your Cultural Adventure</div>
+                            <div class="text-xs text-slate-400" id="adventure-city">City</div>
+                        </div>
+                    </div>
+                    <p class="text-slate-300 text-sm" id="adventure-description">A unique cultural journey...</p>
+                </div>
+                
+                <!-- Share buttons -->
+                <div class="space-y-3">
+                    <button onclick="makePublicAndShare()" id="make-public-btn" class="w-full py-3 px-4 rounded-xl font-semibold text-white transition-all duration-300" style="background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage));">
+                        <span class="flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Make Public & Get Share Link
+                        </span>
+                    </button>
+                    
+                    <!-- Share options (aparecen después de hacer público) -->
+                    <div id="share-options" class="space-y-3 hidden">
+                        <div class="glass-card p-4 rounded-2xl">
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Share Link</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="share-url" readonly class="flex-1 p-2 bg-black/40 border border-white/10 rounded-lg text-white text-sm">
+                                <button onclick="copyShareLink()" class="px-3 py-2 glass-card rounded-lg hover:bg-white/20 transition-colors">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="shareToTwitter()" class="p-3 glass-card rounded-xl hover:bg-white/20 transition-colors flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                                </svg>
+                                Twitter
+                            </button>
+                            
+                            <button onclick="shareToFacebook()" class="p-3 glass-card rounded-xl hover:bg-white/20 transition-colors flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                                </svg>
+                                Facebook
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
         
         <div class="relative" id="timeline-content-wrapper">
             <div id="timeline-content" class="space-y-8 md:space-y-12">
@@ -290,12 +364,13 @@
 </div>
 
 <!-- Enhanced JavaScript -->
-<!-- Script actualizado con Google Maps URLs corregidas -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔍 Enhanced Cultural Journey Interface Loaded');
     let originalUserVibe = '';
     let detectedLanguage = 'en';
+    let currentItineraryId = null;
+    let currentShareUrl = null;
 
     function detectLanguageFromVibe(text) {
         if (!text) return 'en';
@@ -558,6 +633,26 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // ✅ Event listener para el botón Share Adventure
+    const shareAdventureBtn = document.getElementById('share-adventure-btn');
+    if (shareAdventureBtn) {
+        shareAdventureBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('🚀 Share Adventure button clicked');
+            openShareModal();
+        });
+    }
+
+    // Event listener para cerrar modal al hacer clic fuera
+    const shareModal = document.getElementById('share-modal');
+    if (shareModal) {
+        shareModal.addEventListener('click', function(e) {
+            if (e.target === shareModal) {
+                closeShareModal();
+            }
+        });
+    }
+
     // Form submission
     if (form) {
         form.addEventListener('submit', function(e) {
@@ -686,7 +781,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showResults(itinerary) {
-        console.log('🎨 Displaying results:', itinerary);
+        console.log('🎨 Displaying results with sharing:', itinerary);
+        
+        // Store the itinerary ID for sharing
+        if (itinerary.id) {
+            currentItineraryId = itinerary.id;
+            console.log('💾 Stored itinerary ID for sharing:', currentItineraryId);
+        }
+        
+        // Store the full itinerary data
+        realBackendData = itinerary;
         
         // Show Cultural DNA if available
         if (itinerary.cultural_dna) {
@@ -700,9 +804,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     setTimeout(() => {
                         showTimeline(itinerary);
+                        showShareButton(); // ✅ Show share button
                     }, 2000);
                 } else {
                     showTimeline(itinerary);
+                    showShareButton(); // ✅ Show share button
                 }
             }, 3000);
         } else {
@@ -712,9 +818,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 setTimeout(() => {
                     showTimeline(itinerary);
+                    showShareButton(); // ✅ Show share button
                 }, 2000);
             } else {
                 showTimeline(itinerary);
+                showShareButton(); // ✅ Show share button
             }
         }
     }
@@ -844,7 +952,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const timelineTitle = document.getElementById('timeline-title');
         const timelineContent = document.getElementById('timeline-content');
-        const shareBtn = document.getElementById('share-adventure-btn');
         
         if (timelineTitle) {
             timelineTitle.innerHTML = `Your Adventure in <span class="gradient-text">${itinerary.city || 'Unknown City'}</span>`;
@@ -854,11 +961,12 @@ document.addEventListener('DOMContentLoaded', function() {
             timelineContent.innerHTML = generateTimelineHTML(itinerary.experiences);
         }
         
-        if (shareBtn) {
-            shareBtn.style.display = 'inline-flex';
-        }
-        
         transitionToSection(timelineSection);
+        
+        // ✅ Show share button after a short delay
+        setTimeout(() => {
+            showShareButton();
+        }, 1000);
     }
 
     function generateTimelineHTML(experiences) {
@@ -911,7 +1019,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // ✅ PROCESAR HORARIOS
         const hours = exp.hours || exp.opening_hours;
-        // const language = document.documentElement.lang || 'en';
         const language = getDetectedLanguage();
         console.log('🌐 Using language for hours:', language);
         
@@ -1331,6 +1438,186 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.body.removeChild(toast);
             }, 300);
         }, 3000);
+    }
+
+    // ✅ FUNCIONES GLOBALES PARA COMPARTIR
+    window.openShareModal = function() {
+        console.log('📤 Opening share modal');
+        
+        if (realBackendData) {
+            const adventureTitle = document.getElementById('adventure-title');
+            const adventureCity = document.getElementById('adventure-city');
+            const adventureDescription = document.getElementById('adventure-description');
+            const userInitial = document.getElementById('user-initial');
+            
+            if (adventureTitle) adventureTitle.textContent = `Cultural Adventure in ${realBackendData.city || 'Unknown City'}`;
+            if (adventureCity) adventureCity.textContent = realBackendData.city || 'Unknown City';
+            if (adventureDescription) adventureDescription.textContent = originalUserVibe || 'A unique cultural journey';
+            if (userInitial) {
+                const initial = (realBackendData.city || 'A').charAt(0).toUpperCase();
+                userInitial.textContent = initial;
+            }
+        }
+        
+        const modal = document.getElementById('share-modal');
+        if (modal) {
+            modal.classList.remove('hidden');
+        }
+    };
+
+    window.closeShareModal = function() {
+        console.log('❌ Closing share modal');
+        const modal = document.getElementById('share-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+    };
+
+    window.makePublicAndShare = function() {
+        console.log('🌐 Making adventure public, currentItineraryId:', currentItineraryId);
+        
+        const btn = document.getElementById('make-public-btn');
+        if (!btn) return;
+        
+        btn.innerHTML = '<span class="loading-dots"><span></span><span></span><span></span></span> Making Public...';
+        btn.disabled = true;
+        
+        if (currentItineraryId) {
+            fetch(`/itineraries/${currentItineraryId}/make_public`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content || '',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('✅ Make public response:', data);
+                
+                if (data.success) {
+                    currentShareUrl = data.share_url;
+                    document.getElementById('share-url').value = currentShareUrl;
+                    document.getElementById('share-options').classList.remove('hidden');
+                    
+                    btn.innerHTML = '✅ Adventure is now public!';
+                    btn.disabled = false;
+                    
+                    showToast('Your adventure is now public and ready to share!', 'success');
+                } else {
+                    btn.innerHTML = '❌ Failed to make public';
+                    btn.disabled = false;
+                    showToast(data.message || 'Failed to make adventure public', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('❌ Error making public:', error);
+                btn.innerHTML = '❌ Error occurred';
+                btn.disabled = false;
+                showToast('Network error. Please try again.', 'error');
+            });
+        } else {
+            console.log('⚠️ No itinerary ID available');
+            btn.innerHTML = '❌ No itinerary found';
+            btn.disabled = false;
+            showToast('No itinerary found. Please create a new journey.', 'error');
+        }
+    };
+
+    window.copyShareLink = function() {
+        const shareUrl = document.getElementById('share-url').value;
+        
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                showToast('Link copied to clipboard!', 'success');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                fallbackCopyText(shareUrl);
+            });
+        } else {
+            fallbackCopyText(shareUrl);
+        }
+    };
+
+    function fallbackCopyText(text) {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-9999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+            document.execCommand('copy');
+            showToast('Link copied to clipboard!', 'success');
+        } catch (err) {
+            console.error('Fallback copy failed:', err);
+            showToast('Could not copy link. Please copy manually.', 'error');
+        }
+        
+        document.body.removeChild(textArea);
+    }
+
+    window.shareToTwitter = function() {
+        if (currentShareUrl) {
+            const text = encodeURIComponent(`Check out my cultural adventure! ${realBackendData?.city ? `in ${realBackendData.city}` : ''} 🎭✨`);
+            const url = encodeURIComponent(currentShareUrl);
+            const twitterUrl = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
+            
+            window.open(twitterUrl, '_blank', 'width=550,height=420');
+            incrementShareCount();
+        } else {
+            showToast('Please make your adventure public first', 'error');
+        }
+    };
+
+    window.shareToFacebook = function() {
+        if (currentShareUrl) {
+            const url = encodeURIComponent(currentShareUrl);
+            const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+            
+            window.open(facebookUrl, '_blank', 'width=626,height=436');
+            incrementShareCount();
+        } else {
+            showToast('Please make your adventure public first', 'error');
+        }
+    };
+
+    function incrementShareCount() {
+        if (currentItineraryId) {
+            fetch(`/itineraries/${currentItineraryId}/increment_share`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content || ''
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('📊 Share count incremented');
+            })
+            .catch(error => {
+                console.error('Error incrementing share count:', error);
+            });
+        }
+    }
+
+    function showShareButton() {
+        const shareBtn = document.getElementById('share-adventure-btn');
+        if (shareBtn) {
+            console.log('🔄 Showing share button');
+            shareBtn.style.display = 'inline-flex';
+            
+            shareBtn.style.opacity = '0';
+            shareBtn.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                shareBtn.style.transition = 'all 0.5s ease-out';
+                shareBtn.style.opacity = '1';
+                shareBtn.style.transform = 'translateY(0)';
+            }, 100);
+        }
     }
 
     // Cultural Insights Modal Function

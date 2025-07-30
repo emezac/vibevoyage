@@ -64,9 +64,13 @@ class ProcessVibeJobIntelligent < ApplicationJob
       
       # PASO 8: CONSTRUIR Y ENVIAR RESULTADO FINAL AL FRONTEND (100%)
       # Se ensambla el objeto JSON final que el frontend espera.
+
       final_result = build_final_result(itinerary, parsed_vibe, final_experiences, cultural_dna_data)
-      update_qloo_status(process_id, 'complete', 'ready', 100, { itinerary: final_result[:itinerary] })
-      
+      update_qloo_status(process_id, 'complete', 'ready', 100, { 
+        itinerary: final_result[:itinerary],
+        itinerary_id: itinerary.id  # ✅ Agregar esta línea
+      })
+
       log_completion_stats(process_id, final_result, total_duration)
 
     rescue => e
@@ -784,12 +788,17 @@ class ProcessVibeJobIntelligent < ApplicationJob
       status: status, 
       message: base_message, 
       progress: progress,
-      qloo_data: extra_data.except(:language, :interests_count, :discovery)
+      qloo_data: extra_data.except(:language, :interests_count, :discovery, :itinerary, :itinerary_id)
     }.compact
     
     # Add itinerary if complete
     if extra_data[:itinerary]
       status_data[:itinerary] = extra_data[:itinerary]
+    end
+    
+    # ✅ AGREGAR: Include itinerary_id directly for sharing functionality
+    if extra_data[:itinerary_id]
+      status_data[:itinerary_id] = extra_data[:itinerary_id]
     end
     
     Rails.cache.write("journey_#{process_id}", status_data, expires_in: 15.minutes)

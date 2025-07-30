@@ -65,35 +65,45 @@ class AppController < ApplicationController
     end
   end
 
-  def real_status
-    process_id = params[:process_id]
-    puts "=== REAL_STATUS called for: #{process_id} ==="
-    
-    status_data = Rails.cache.read("journey_#{process_id}")
-    puts "=== Status data from cache: #{status_data.inspect} ==="
-    
-    if status_data
-      # ✅ FIX: Asegurar que el status se devuelva correctamente
-      puts "=== Returning status: #{status_data[:status]} ==="
-      render json: status_data
-    else
-      # ✅ FIX: Si no hay datos en cache, devolver un estado de error
-      puts "=== No status data found for process_id: #{process_id} ==="
-      render json: { 
-        status: 'not_found', 
-        message: 'Proceso no encontrado', 
-        progress: 0 
-      }
+def real_status
+  process_id = params[:process_id]
+  puts "=== REAL_STATUS called for: #{process_id} ==="
+  
+  status_data = Rails.cache.read("journey_#{process_id}")
+  puts "=== Status data from cache: #{status_data.inspect} ==="
+  
+  if status_data
+    # ✅ MEJORADO: Asegurar que el itinerary_id esté disponible en la respuesta
+    if status_data[:status] == 'complete' && status_data[:itinerary]
+      # Si hay itinerary_id en el cache, incluirlo en la respuesta del itinerary
+      if status_data[:itinerary_id]
+        status_data[:itinerary][:id] = status_data[:itinerary_id]
+        puts "=== Added itinerary_id to response: #{status_data[:itinerary_id]} ==="
+      end
+      
+      # También incluir el itinerary_id directamente para compatibilidad
+      status_data[:itinerary_id] = status_data[:itinerary_id] if status_data[:itinerary_id]
     end
-  rescue => e
-    puts "=== ERROR in real_status: #{e.message} ==="
-    Rails.logger.error "Error en real_status: #{e.message}"
+    
+    puts "=== Returning status: #{status_data[:status]} ==="
+    render json: status_data
+  else
+    puts "=== No status data found for process_id: #{process_id} ==="
     render json: { 
-      status: 'error', 
-      message: 'Error del servidor', 
+      status: 'not_found', 
+      message: 'Proceso no encontrado', 
       progress: 0 
     }
   end
+rescue => e
+  puts "=== ERROR in real_status: #{e.message} ==="
+  Rails.logger.error "Error en real_status: #{e.message}"
+  render json: { 
+    status: 'error', 
+    message: 'Error del servidor', 
+    progress: 0 
+  }
+end
 
   # Endpoint para explicaciones del "¿Por qué?"
   def explain_choice

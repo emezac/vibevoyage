@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_29_234608) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_30_210825) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -24,6 +24,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_29_234608) do
     t.datetime "updated_at", null: false
     t.string "description"
     t.string "city"
+    t.string "slug"
+    t.boolean "is_public", default: false
+    t.string "meta_title"
+    t.text "meta_description"
+    t.string "og_image_url"
+    t.datetime "shared_at"
+    t.integer "view_count", default: 0
+    t.integer "share_count", default: 0
+    t.index ["is_public"], name: "index_itineraries_on_is_public"
+    t.index ["shared_at"], name: "index_itineraries_on_shared_at"
+    t.index ["slug"], name: "index_itineraries_on_slug", unique: true
     t.index ["user_id"], name: "index_itineraries_on_user_id"
   end
 

@@ -1,6 +1,5 @@
 class HomeController < ApplicationController
-  # Allow public access to home page
-  skip_before_action :authenticate_user!, only: [:index]
+  # Allow public access to home page - NO authentication needed
 
   def index
     # Redirect authenticated users to the app

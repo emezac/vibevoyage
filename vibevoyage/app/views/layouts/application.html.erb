@@ -245,6 +245,7 @@
             }
         }
     </style>
+    <%= yield(:head) if content_for?(:head) %>
 </head>
 <body class="antialiased text-white overflow-x-hidden">
     <!-- Constellation Background -->

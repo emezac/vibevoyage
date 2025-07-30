@@ -43,6 +43,8 @@ Rails.application.configure do
 
   # Set localhost to be used by links generated in mailer templates.
   #config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
+  config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
+  Rails.application.routes.default_url_options[:host] = 'localhost:3000'
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
@@ -75,8 +77,9 @@ Rails.application.configure do
   # config.generators.apply_rubocop_autocorrect_after_generate!
 
   # devise
-    # Configuración de mailer para desarrollo
-  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.delivery_method = :letter_opener
+  # Configuración de mailer para desarrollo
+  #config.action_mailer.delivery_method = :smtp
   config.action_mailer.perform_deliveries = true
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
@@ -93,8 +96,6 @@ Rails.application.configure do
   }
   
   # O para usar letter_opener (recomendado para desarrollo)
-  # Agrega 'gem "letter_opener"' a tu Gemfile
-  # config.action_mailer.delivery_method = :letter_opener
   
   # Configurar el host para los enlaces en los emails
   config.action_mailer.asset_host = 'http://localhost:3000'

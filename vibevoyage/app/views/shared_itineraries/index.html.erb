@@ -1,0 +1,128 @@
+<!-- app/views/shared_itineraries/index.html.erb -->
+<div class="min-h-screen py-20 px-4">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-16">
+      <div class="inline-flex items-center gap-3 glass-card px-6 py-3 text-sm text-slate-300 mb-8 rounded-full">
+        <div class="w-2 h-2 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 animate-pulse"></div>
+        <span>Community Adventures</span>
+      </div>
+      
+      <h1 class="text-4xl md:text-6xl font-display font-bold mb-6 gradient-text">
+        Discover Cultural Adventures
+      </h1>
+      
+      <p class="text-xl text-slate-400 max-w-3xl mx-auto mb-8">
+        Explore incredible journeys created by our community of cultural explorers
+      </p>
+      
+      <%= link_to "Create Your Own", new_user_registration_path,
+          class: "inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white transition-all duration-300",
+          style: "background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage));" %>
+    </div>
+
+    <!-- Featured Adventures -->
+    <% if @featured_itineraries.any? %>
+      <section class="mb-16">
+        <h2 class="text-3xl font-display font-bold mb-8 text-white">✨ Featured Adventures</h2>
+        
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <% @featured_itineraries.each do |itinerary| %>
+            <div class="glass-card-strong rounded-3xl overflow-hidden hover-lift">
+              <div class="p-6">
+                <!-- User info -->
+                <div class="flex items-center gap-3 mb-4">
+                  <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style="background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage));">
+                    <%= itinerary.user.display_name.first.upcase %>
+                  </div>
+                  <div>
+                    <div class="font-semibold text-white text-sm"><%= itinerary.user.display_name %></div>
+                    <div class="text-xs text-slate-400"><%= time_ago_in_words(itinerary.shared_at) %> ago</div>
+                  </div>
+                </div>
+                
+                <!-- Adventure info -->
+                <h3 class="text-xl font-bold text-white mb-2 line-clamp-2">
+                  <%= link_to itinerary.shareable_title, shared_itinerary_path(itinerary), class: "hover:text-yellow-400 transition-colors" %>
+                </h3>
+                
+                <p class="text-slate-400 text-sm mb-4 line-clamp-3">
+                  <%= itinerary.shareable_description %>
+                </p>
+                
+                <!-- Stats -->
+                <div class="flex items-center justify-between text-xs text-slate-500 mb-4">
+                  <span class="flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <%= itinerary.view_count %> views
+                  </span>
+                  
+                  <span class="flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    </svg>
+                    <%= itinerary.city %>
+                  </span>
+                  
+                  <span class="flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <%= itinerary.itinerary_stops.count %> stops
+                  </span>
+                </div>
+                
+                <%= link_to "Explore Adventure", shared_itinerary_path(itinerary),
+                    class: "w-full block text-center py-3 px-4 glass-card rounded-xl font-semibold text-white hover:bg-white/20 transition-all duration-300" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </section>
+    <% end %>
+
+    <!-- Recent Adventures -->
+    <% if @recent_itineraries.any? %>
+      <section>
+        <h2 class="text-3xl font-display font-bold mb-8 text-white">🌟 Recent Adventures</h2>
+        
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <% @recent_itineraries.each do |itinerary| %>
+            <div class="glass-card rounded-2xl p-4 hover-lift">
+              <div class="flex items-center gap-2 mb-3">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold" style="background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage));">
+                  <%= itinerary.user.display_name.first.upcase %>
+                </div>
+                <div class="text-xs text-slate-400"><%= itinerary.city %></div>
+              </div>
+              
+              <h4 class="font-semibold text-white text-sm mb-2 line-clamp-2">
+                <%= link_to itinerary.shareable_title, shared_itinerary_path(itinerary), class: "hover:text-yellow-400 transition-colors" %>
+              </h4>
+              
+              <div class="flex items-center justify-between text-xs text-slate-500">
+                <span><%= itinerary.view_count %> views</span>
+                <span><%= itinerary.itinerary_stops.count %> stops</span>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </section>
+    <% end %>
+
+    <!-- Empty state -->
+    <% if @featured_itineraries.empty? && @recent_itineraries.empty? %>
+      <div class="text-center py-20">
+        <div class="text-6xl mb-6">🌟</div>
+        <h3 class="text-2xl font-bold text-white mb-4">No adventures shared yet</h3>
+        <p class="text-slate-400 mb-8">Be the first to share your cultural journey!</p>
+        <%= link_to "Create & Share Adventure", new_user_registration_path,
+            class: "inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white transition-all duration-300",
+            style: "background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage));" %>
+      </div>
+    <% end %>
+  </div>
+</div>

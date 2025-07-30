@@ -50,6 +50,29 @@ Rails.application.routes.draw do
       end
     end
   end
+
+  # Rutas de itinerarios compartibles (ANTES de las rutas normales de itinerarios)
+  get '/s/:slug', to: 'shared_itineraries#show', as: :shared_itinerary
+  get '/s/:slug/image', to: 'shared_itineraries#generate_image', as: :shared_itinerary_image
+  
+  # Rutas para compartir
+  resources :itineraries do
+    member do
+      post :make_public
+      post :increment_share
+      get :share_preview
+      get :status
+    end
+    
+    resources :itinerary_stops do
+      member do
+        post :explain
+      end
+    end
+  end
+
+  # Página de itinerarios públicos
+  get '/discover', to: 'shared_itineraries#index', as: :discover_itineraries
   
   # Rutas de testing y desarrollo
   get '/app/test_apis', to: 'app#test_apis', as: :app_test_apis if Rails.env.development?

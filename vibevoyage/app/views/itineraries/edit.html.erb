@@ -1,0 +1,28 @@
+<!-- app/views/itineraries/edit.html.erb -->
+<div class="min-h-screen py-20 px-4">
+  <div class="max-w-2xl mx-auto">
+    <h1 class="text-3xl font-display font-bold text-white mb-8">Edit Adventure</h1>
+    
+    <%= form_with model: @itinerary, local: true, class: "space-y-6" do |form| %>
+      <div>
+        <%= form.label :name, class: "block text-sm font-medium text-slate-300 mb-2" %>
+        <%= form.text_field :name, class: "w-full p-4 bg-black/40 border border-white/10 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 rounded-xl text-white" %>
+      </div>
+
+      <div>
+        <%= form.label :description, class: "block text-sm font-medium text-slate-300 mb-2" %>
+        <%= form.text_area :description, rows: 4, class: "w-full p-4 bg-black/40 border border-white/10 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 rounded-xl text-white" %>
+      </div>
+
+      <div>
+        <%= form.label :city, class: "block text-sm font-medium text-slate-300 mb-2" %>
+        <%= form.text_field :city, class: "w-full p-4 bg-black/40 border border-white/10 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 rounded-xl text-white" %>
+      </div>
+
+      <div class="flex gap-4">
+        <%= form.submit "Update Adventure", class: "flex-1 py-3 px-6 rounded-xl font-semibold text-white transition-all duration-300", style: "background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage));" %>
+        <%= link_to "Cancel", @itinerary, class: "flex-1 text-center py-3 px-6 glass-card rounded-xl font-semibold text-white hover:bg-white/20 transition-all duration-300" %>
+      </div>
+    <% end %>
+  </div>
+</div>

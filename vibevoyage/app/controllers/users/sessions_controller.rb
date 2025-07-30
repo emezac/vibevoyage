@@ -1,8 +1,5 @@
 # app/controllers/users/sessions_controller.rb
 class Users::SessionsController < Devise::SessionsController
-  # Skip authentication for login pages
-  skip_before_action :authenticate_user!
-  
   protected
 
   def after_sign_in_path_for(resource)
