@@ -51,8 +51,8 @@ class AppController < ApplicationController
       }
       
       # ✅ EJECUTAR el job en background para no bloquear la respuesta
-      ProcessVibeJobIntelligent.perform_later(temp_process_id, user_vibe)
-      
+      #ProcessVibeJobIntelligent.perform_later(temp_process_id, user_vibe)
+      ProcessVibeJobIntelligent.perform_later(current_user.id, temp_process_id, user_vibe) 
     rescue => e
       puts "❌ Error iniciando ProcessVibeJobIntelligent: #{e.message}"
       Rails.logger.error "Error: #{e.message}\n#{e.backtrace.join("\n")}"

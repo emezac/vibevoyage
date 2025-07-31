@@ -2,10 +2,12 @@
 class ProcessVibeJobIntelligent < ApplicationJob
   queue_as :default
 
-  def perform(process_id, user_vibe)
+  #def perform(process_id, user_vibe)
+  def perform(user_id, process_id, user_vibe)
     start_time = Time.current
     
     puts "=== STARTING ProcessVibeJobIntelligent (Corrected Flow) ==="
+    puts "User ID: #{user_id}"
     puts "Process ID: #{process_id}"
     puts "User vibe: #{user_vibe}"
     
@@ -55,7 +57,8 @@ class ProcessVibeJobIntelligent < ApplicationJob
       # Se crea el HTML narrativo y se guarda el itinerario completo.
       update_qloo_status(process_id, 'finalizing', 'cultural_synthesis', 95, { language: language })
       narrative = build_localized_narrative(parsed_vibe, user_vibe, final_experiences)
-      itinerary = save_enhanced_itinerary(user_vibe, parsed_vibe, narrative, final_experiences)
+      #itinerary = save_enhanced_itinerary(user_vibe, parsed_vibe, narrative, final_experiences)
+      itinerary = save_enhanced_itinerary(user_id, user_vibe, parsed_vibe, narrative, final_experiences)
       
       # PASO 7: TRACKING DE ANALYTICS
       # Se registran las métricas del proceso completo.
@@ -76,7 +79,7 @@ class ProcessVibeJobIntelligent < ApplicationJob
     rescue => e
       # Manejo de errores para todo el proceso.
       AnalyticsService.track_error('process_vibe_job', 'full_processing', e, { process_id: process_id, user_vibe_length: user_vibe.length, processing_stage: determine_processing_stage(e) })
-      handle_processing_error(e, process_id, user_vibe)
+      handle_processing_error(e, user_id, process_id, user_vibe)
     end
   end
 
@@ -239,7 +242,7 @@ class ProcessVibeJobIntelligent < ApplicationJob
     )
   end
 
-  def save_enhanced_itinerary(user_vibe, parsed_vibe, narrative, experiences)
+  def save_enhanced_itinerary(user_id, user_vibe, parsed_vibe, narrative, experiences)
     city = parsed_vibe[:city] || 'Unknown City'
     preferences = parsed_vibe[:preferences]&.join(', ') || 'various preferences'
     language = parsed_vibe[:detected_language]
@@ -248,7 +251,7 @@ class ProcessVibeJobIntelligent < ApplicationJob
     itinerary_name = LocalizationService.adventure_title(city, language)
     
     itinerary = Itinerary.create!(
-      user_id: 1,
+      user_id: user_id,
       description: user_vibe,
       city: city,
       location: city,
@@ -406,7 +409,8 @@ class ProcessVibeJobIntelligent < ApplicationJob
     Rails.logger.error error_msg
   end
 
-  def handle_processing_error(error, process_id, user_vibe)
+  #def handle_processing_error(error, process_id, user_vibe)
+  def handle_processing_error(error, user_id, process_id, user_vibe)
     Rails.logger.error "ProcessVibeJobIntelligent failed: #{error.message}\n#{error.backtrace.join("\n")}"
     
     begin
@@ -414,7 +418,8 @@ class ProcessVibeJobIntelligent < ApplicationJob
       update_status(process_id, 'processing', 'Creating fallback experience...', 75)
       
       # Create fallback with language detection
-      fallback_result = create_comprehensive_fallback(user_vibe, process_id)
+      # fallback_result = create_comprehensive_fallback(user_vibe, process_id)
+      fallback_result = create_comprehensive_fallback(user_id, user_vibe, process_id)
       
       success_message = LocalizationService.success_message(
         offline: true, 
@@ -436,7 +441,8 @@ class ProcessVibeJobIntelligent < ApplicationJob
     end
   end
 
-  def create_comprehensive_fallback(user_vibe, process_id)
+  def create_comprehensive_fallback(user_id, user_vibe, process_id)
+  # def create_comprehensive_fallback(user_vibe, process_id)
     # Simple vibe parsing for fallback
     detected_language = LocalizationService.detect_language(user_vibe)
     
@@ -464,7 +470,8 @@ class ProcessVibeJobIntelligent < ApplicationJob
     )
     
     # Save fallback itinerary
-    fallback_itinerary = save_enhanced_itinerary(user_vibe, parsed_vibe, fallback_narrative, fallback_experiences)
+    #fallback_itinerary = save_enhanced_itinerary(user_vibe, parsed_vibe, fallback_narrative, fallback_experiences)
+    fallback_itinerary = save_enhanced_itinerary(user_id, user_vibe, parsed_vibe, fallback_narrative, fallback_experiences)
     
     # Track fallback usage
     AnalyticsService.track_journey_processing(
