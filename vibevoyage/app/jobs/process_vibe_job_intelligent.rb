@@ -106,7 +106,7 @@ class ProcessVibeJobIntelligent < ApplicationJob
       Rails.logger.error "Workflow parsing failed: #{e.message}"
       # Track LLM parsing error
       AnalyticsService.track_llm_performance('vibe_parsing', 0, false, nil, e)
-      LLMService.parse_vibe(user_vibe)
+      ::LLMService.parse_vibe(user_vibe)
     end
   end
 

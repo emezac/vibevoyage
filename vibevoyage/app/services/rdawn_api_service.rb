@@ -47,23 +47,27 @@ class RdawnApiService
     end
   end
 
-    def self.google_place_details(place_id:)
-      return { success: false, error: 'No place_id provided' } unless place_id.present?
-      
-      api_key = ENV['GOOGLE_PLACES_API_KEY']
-      fields = 'formatted_phone_number,international_phone_number,website,opening_hours,price_level,rating,user_ratings_total,formatted_address,geometry'
-      
-      url = "https://maps.googleapis.com/maps/api/place/details/json?place_id=#{place_id}&fields=#{fields}&key=#{api_key}"
-      
-      response = HTTPX.get(url)
-      
-  if response.status == 200
-    { success: true, data: JSON.parse(response.body.to_s) }
-  else
-    { success: false, error: response.error.message }
+def self.google_place_details(place_id:)
+  return { success: false, error: 'No place_id provided' } unless place_id.present?
+  
+  api_key = ENV['GOOGLE_PLACES_API_KEY']
+  fields = 'formatted_phone_number,international_phone_number,website,opening_hours,price_level,rating,user_ratings_total,formatted_address,geometry'
+  
+  url = "https://maps.googleapis.com/maps/api/place/details/json?place_id=#{place_id}&fields=#{fields}&key=#{api_key}"
+  
+  begin
+    response = HTTPX.get(url)
+    
+    if response.status == 200
+      { success: true, data: JSON.parse(response.body.to_s) }
+    else
+      error_message = response.is_a?(HTTPX::ErrorResponse) ? response.error.message : response.body.to_s
+      Rails.logger.error "Google Place Details API HTTP error: #{response.status} - #{error_message}"
+      { success: false, error: "HTTP #{response.status}: #{error_message}" }
+    end
+  rescue => e
+    Rails.logger.error "Google Place Details API exception: #{e.message}"
+    { success: false, error: e.message }
   end
-    rescue => e
-      Rails.logger.error "Google Place Details API error: #{e.message}"
-      { success: false, error: e.message }
-  end
+end
 end
