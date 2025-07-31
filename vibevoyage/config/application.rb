@@ -8,7 +8,10 @@ Bundler.require(*Rails.groups)
 
 module Vibevoyage
   class Application < Rails::Application
-    Dotenv::Rails
+    if %w[development test].include?(ENV['RAILS_ENV'])
+      require 'dotenv/rails' if defined?(Dotenv)
+    end
+
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.0
 

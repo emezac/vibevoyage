@@ -43,12 +43,11 @@ gem "thruster", require: false
 
 # --- Gemas para VibeVoyage ---
 gem "devise"
-gem "dotenv-rails"
 gem "httpx"
 gem "rspec-rails", group: [:development, :test]
 gem "factory_bot_rails", group: [:development, :test]
 gem "faker", group: [:development, :test]
-gem "rdawn", path: "/Users/admin/code/newstart/vibevoyage/rdawn_fix", require: "rdawn"
+gem "rdawn", github: "emezac/rdawn_fix", branch: "main"
 gem "shoulda-matchers", group: [:development, :test]
 # Herramientas backend y workflow
 gem "sidekiq"
@@ -92,3 +91,5 @@ gem 'whatlanguage', '~> 1.0', '>= 1.0.6'
 group :development do
   gem 'letter_opener'
 end
+
+gem "dockerfile-rails", ">= 1.7", :group => :development

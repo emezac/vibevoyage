@@ -1,34 +1,76 @@
-app = "vibevoyage"
-primary_region = "qro"
+# fly.toml app configuration file generated for vibevoyage on 2025-07-30T22:47:04-06:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'vibevoyage'
+primary_region = 'qro'
+console_command = '/rails/bin/rails console'
 
 [build]
-  builder = "heroku/buildpacks:20"
-
-[env]
-  RAILS_ENV = "development"
 
 [deploy]
-  release_command = "bundle exec rails db:migrate"
+  release_command = 'bundle exec rails db:migrate'
+
+[env]
+  RAILS_ENV = 'production'
+
+[processes]
+  app = 'bundle exec rails server'
+  web = 'bundle exec puma -C config/puma.rb'
+  worker = 'bundle exec sidekiq -C config/sidekiq.yml'
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+  [[http_service.checks]]
+    interval = '10s'
+    timeout = '2s'
+    grace_period = '5s'
+    method = 'GET'
+    path = '/up'
+    protocol = 'http'
+    tls_skip_verify = false
+
+    [http_service.checks.headers]
+      X-Forwarded-Proto = 'https'
+
+  [[http_service.checks]]
+    interval = '10s'
+    timeout = '2s'
+    grace_period = '5s'
+    method = 'GET'
+    path = '/up'
+    protocol = 'http'
+    tls_skip_verify = false
+
+    [http_service.checks.headers]
+      X-Forwarded-Proto = 'https'
 
 [[services]]
+  protocol = 'tcp'
   internal_port = 8080
-  protocol = "tcp"
+  processes = ['web']
 
   [[services.ports]]
-    handlers = ["http"]
     port = 80
+    handlers = ['http']
 
   [[services.ports]]
-    handlers = ["tls", "http"]
     port = 443
+    handlers = ['tls', 'http']
 
   [[services.http_checks]]
-    path = "/"
-    interval = 10000
-    timeout = 2000
+    interval = '10s'
+    timeout = '2s'
+    path = '/'
 
-# 👇 Define procesos separados
-[processes]
-web = "bundle exec puma -C config/puma.rb"
-worker = "bundle exec sidekiq -C config/sidekiq.yml"
-
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1

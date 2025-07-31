@@ -1,5 +1,7 @@
-PATH
-  remote: /Users/admin/code/newstart/vibevoyage/rdawn_fix
+GIT
+  remote: https://github.com/emezac/rdawn_fix.git
+  revision: ef69758f5d83cf53c5905bf59146bfc3f57e6d16
+  branch: main
   specs:
     rdawn (0.1.1)
       activesupport
@@ -127,6 +129,8 @@ GEM
       responders
       warden (~> 1.2.3)
     diff-lcs (1.6.2)
+    dockerfile-rails (1.7.10)
+      rails (>= 3.0.0)
     dotenv (3.1.8)
     dotenv-rails (3.1.8)
       dotenv (= 3.1.8)
@@ -166,7 +170,7 @@ GEM
       http-2 (>= 1.0.0)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
-    importmap-rails (2.2.0)
+    importmap-rails (2.2.1)
       actionpack (>= 6.0.0)
       activesupport (>= 6.0.0)
       railties (>= 6.0.0)
@@ -224,7 +228,7 @@ GEM
     mime-types (3.7.0)
       logger
       mime-types-data (~> 3.2025, >= 3.2025.0507)
-    mime-types-data (3.2025.0722)
+    mime-types-data (3.2025.0729)
     mini_mime (1.1.5)
     minitest (5.25.5)
     msgpack (1.8.0)
@@ -267,7 +271,7 @@ GEM
       dotenv (>= 2)
       faraday (>= 1)
       faraday-multipart (>= 1)
-    openai (0.15.0)
+    openai (0.16.0)
       connection_pool
     orm_adapter (0.5.0)
     ostruct (0.6.3)
@@ -298,7 +302,7 @@ GEM
       activesupport (>= 3.0.0)
     raabro (1.4.0)
     racc (1.8.1)
-    rack (3.1.16)
+    rack (3.2.0)
     rack-session (2.1.1)
       base64 (>= 0.1.0)
       rack (>= 3.0.0)
@@ -516,6 +520,7 @@ DEPENDENCIES
   connection_pool
   debug
   devise
+  dockerfile-rails (>= 1.7)
   dotenv-rails
   factory_bot_rails
   faker
