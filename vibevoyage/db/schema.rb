@@ -32,7 +32,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_30_210825) do
     t.datetime "shared_at"
     t.integer "view_count", default: 0
     t.integer "share_count", default: 0
+    t.datetime "made_public_at", precision: nil
     t.index ["is_public"], name: "index_itineraries_on_is_public"
+    t.index ["made_public_at"], name: "index_itineraries_on_made_public_at"
     t.index ["shared_at"], name: "index_itineraries_on_shared_at"
     t.index ["slug"], name: "index_itineraries_on_slug", unique: true
     t.index ["user_id"], name: "index_itineraries_on_user_id"
