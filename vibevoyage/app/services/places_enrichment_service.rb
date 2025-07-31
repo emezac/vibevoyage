@@ -91,7 +91,20 @@ class PlacesEnrichmentService
     def calculate_distance(lat1, lon1, lat2, lon2)
       return Float::INFINITY unless coordinates_valid?(lat1, lon1, lat2, lon2)
       
-      CulturalCurationService.calculate_distance(lat1, lon1, lat2, lon2)
+      #CulturalCurationService.calculate_distance(lat1, lon1, lat2, lon2)
+      rad_per_deg = Math::PI / 180
+      rkm = 6371 # Radio de la Tierra en km
+
+      dlat_rad = (lat2 - lat1) * rad_per_deg
+      dlon_rad = (lon2 - lon1) * rad_per_deg
+
+      lat1_rad = lat1 * rad_per_deg
+      lat2_rad = lat2 * rad_per_deg
+
+      a = Math.sin(dlat_rad/2)**2 + Math.cos(lat1_rad) * Math.cos(lat2_rad) * Math.sin(dlon_rad/2)**2
+      c = 2 * Math::atan2(Math::sqrt(a), Math::sqrt(1-a))
+
+      rkm * c
     end
 
     # Validate and clean coordinates
@@ -301,11 +314,11 @@ class PlacesEnrichmentService
       google_coords = enriched_data&.dig('geometry', 'location')
       return false unless google_coords
       
-      distance = calculate_distance(
+      distance = self.calculate_distance( # o simplemente calculate_distance
         qloo_coordinates['lat'], qloo_coordinates['lng'],
         google_coords['lat'], google_coords['lng']
       )
-      
+ 
       distance < COORDINATE_MATCH_THRESHOLD
     end
 

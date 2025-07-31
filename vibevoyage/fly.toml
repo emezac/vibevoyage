@@ -18,7 +18,7 @@ console_command = '/rails/bin/rails console'
 [processes]
   app = 'bundle exec rails server'
   web = 'bundle exec puma -C config/puma.rb'
-  worker = 'bundle exec sidekiq -C config/sidekiq.yml'
+  worker = 'bin/jobs start'
 
 [http_service]
   internal_port = 8080

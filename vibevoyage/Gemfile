@@ -50,7 +50,7 @@ gem "faker", group: [:development, :test]
 gem "rdawn", github: "emezac/rdawn_fix", branch: "main"
 gem "shoulda-matchers", group: [:development, :test]
 # Herramientas backend y workflow
-gem "sidekiq"
+gem 'sidekiq', '~> 7.2'  # ✅ Compatible con Redis 6.2+
 gem "kaminari"
 gem "pundit"
 
