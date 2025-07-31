@@ -55,13 +55,13 @@ class RdawnApiService
       
       url = "https://maps.googleapis.com/maps/api/place/details/json?place_id=#{place_id}&fields=#{fields}&key=#{api_key}"
       
-      response = HTTParty.get(url)
+      response = HTTPX.get(url)
       
-      if response.success?
-        { success: true, data: response.parsed_response }
-      else
-        { success: false, error: response.message }
-      end
+  if response.status == 200
+    { success: true, data: JSON.parse(response.body.to_s) }
+  else
+    { success: false, error: response.error.message }
+  end
     rescue => e
       Rails.logger.error "Google Place Details API error: #{e.message}"
       { success: false, error: e.message }

@@ -111,7 +111,14 @@ class ProcessVibeJobIntelligent < ApplicationJob
   end
 
   def parse_vibe_with_workflow(user_vibe, process_id)
-    vibe_parser_task_data = ::Workflows::VibeVoyageWorkflow.tasks.first
+    #vibe_parser_task_data = ::Workflows::VibeVoyageWorkflow.tasks.first
+    tasks_array = ::Workflows::VibeVoyageWorkflow.tasks
+    vibe_parser_task_data = tasks_array.find { |task| task[:id] == :parse_vibe }
+
+    unless vibe_parser_task_data
+      raise "La tarea :parse_vibe no fue encontrada en VibeVoyageWorkflow"
+    end
+
     parser_workflow = Rdawn::Workflow.new(workflow_id: "parser_#{process_id}", name: "Vibe Parser")
     
     prompt = vibe_parser_task_data[:prompt].gsub('{{input}}', user_vibe)
