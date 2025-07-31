@@ -1,0 +1,34 @@
+app = "vibevoyage"
+primary_region = "qro"
+
+[build]
+  builder = "heroku/buildpacks:20"
+
+[env]
+  RAILS_ENV = "development"
+
+[deploy]
+  release_command = "bundle exec rails db:migrate"
+
+[[services]]
+  internal_port = 8080
+  protocol = "tcp"
+
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+  [[services.http_checks]]
+    path = "/"
+    interval = 10000
+    timeout = 2000
+
+# 👇 Define procesos separados
+[processes]
+web = "bundle exec puma -C config/puma.rb"
+worker = "bundle exec sidekiq -C config/sidekiq.yml"
+
